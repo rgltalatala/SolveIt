@@ -11,17 +11,11 @@ import {
   SLOT_DEF,
   slotShowsRotateBottomPattern,
   slotSolved,
-  unsolvedWhiteOnDSlotIds,
   whitePartnerEdgeHeading,
 } from './crossSlotModel';
 import { findEdgeWithColors, whiteStickerOnD } from '../shared/pieceQueries';
 import { isVerifiedSlotDemo, preservesSlotsAfterDemo } from './crossSolveBfs';
-import type {
-  CrossEdgeId,
-  DPhaseOption,
-  PermuteReadyCandidate,
-  WhiteCrossLessonStep,
-} from './types';
+import type { CrossEdgeId, WhiteCrossLessonStep } from './types';
 
 function formatBottomSpinForLesson(demo: Move[]): string {
   if (demo.length === 1 && demo[0] === "D'") return 'D′';
@@ -76,105 +70,71 @@ function tryDPrefixOrInsertSolveSlot(
   return null;
 }
 
-function buildDLayerStepFromOption(
+function insertFaceFromDemo(demo: Move[], fallback: Face): Face {
+  const faceTurn = demo.find(
+    (m) => m === 'F2' || m === 'R2' || m === 'L2' || m === 'B2',
+  );
+  return faceTurn ? (faceTurn[0] as Face) : fallback;
+}
+
+/** White on D at this slot but wrong center — D / D2 / D′ only. */
+export function tryRotateBottomStepForCrossId(
   studentState: CubeState,
-  best: DPhaseOption,
-): WhiteCrossLessonStep {
-  const partner = partnerColorForSlot(studentState, best.id);
+  id: CrossEdgeId,
+): WhiteCrossLessonStep | null {
+  if (slotSolved(studentState, id)) return null;
+  if (!slotShowsRotateBottomPattern(studentState, id)) return null;
+
+  const partner = partnerColorForSlot(studentState, id);
+  const edgePosition = findEdgeWithColors(studentState, 'white', partner);
+  if (!edgePosition || !whiteStickerOnD(studentState, edgePosition)) return null;
+
+  const bottomSpinMoves = findMinimalBottomSpinToSolveSlot(studentState, id);
+  if (
+    !bottomSpinMoves ||
+    !isVerifiedSlotDemo(studentState, id, bottomSpinMoves)
+  ) {
+    return null;
+  }
+
   const label = `${formatColor(partner)} edge`;
-  const slot = SLOT_DEF[best.id];
+  const slot = SLOT_DEF[id];
 
-  if (best.variant === 'rotate-bottom') {
-    return {
-      kind: 'rotate-bottom',
-      title: whitePartnerEdgeHeading(partner),
-      edgeLabel: label,
-      partnerColor: partner,
-      body: `The white–${partner} edge already has its white sticker on the bottom (D), but it isn’t sitting below the ${formatColor(partner)} center yet. Turn the bottom layer with ${formatBottomSpinForLesson(best.demo)} so it lines up — we finish edges that are already on D before working on other cross edges.`,
-      targetFace: slot.sideFace,
-      demoMoves: best.demo,
-    };
+  return {
+    kind: 'rotate-bottom',
+    title: whitePartnerEdgeHeading(partner),
+    edgeLabel: label,
+    partnerColor: partner,
+    body: `The white–${formatColor(partner)} edge already has its white sticker on the bottom (D), but it isn't sitting below the ${formatColor(partner)} center yet. Turn the bottom layer with ${formatBottomSpinForLesson(bottomSpinMoves)} so the colored sticker lines up with the ${formatColor(partner)} center — then the cross edge is in place.`,
+    targetFace: slot.sideFace,
+    demoMoves: bottomSpinMoves,
+  };
+}
+
+/** White on the edge cubie on D; slot with D setup + side double turn if needed. */
+export function tryDLayerInsertStepForCrossId(
+  studentState: CubeState,
+  id: CrossEdgeId,
+): WhiteCrossLessonStep | null {
+  if (slotSolved(studentState, id)) return null;
+
+  const insert = tryDPrefixOrInsertSolveSlot(studentState, id);
+  if (!insert?.length || !isVerifiedSlotDemo(studentState, id, insert)) {
+    return null;
   }
 
-  if (best.variant === 'insert-double') {
-    const faceTurn = best.demo.find(
-      (m) => m === 'F2' || m === 'R2' || m === 'L2' || m === 'B2',
-    );
-    const face = faceTurn ? (faceTurn[0] as Face) : slot.sideFace;
-    return {
-      kind: 'insert-double',
-      title: whitePartnerEdgeHeading(partner),
-      body: `Finish the white–${partner} edge from the bottom layer (demo may spin D then use ${face}2). Cross slots that were already correct stay solved.`,
-      face,
-      demoMoves: best.demo,
-    };
-  }
+  const partner = partnerColorForSlot(studentState, id);
+  const label = `${formatColor(partner)} edge`;
+  const slot = SLOT_DEF[id];
+  const face = insertFaceFromDemo(insert, slot.sideFace);
 
   return {
     kind: 'insert-double',
     title: whitePartnerEdgeHeading(partner),
-    body: `A solved cross slot can block a plain D-spin. The demo sets up white–${partner} while keeping other solved bottom edges intact.`,
-    face: slot.sideFace,
-    demoMoves: best.demo,
+    edgeLabel: label,
+    partnerColor: partner,
+    body: `The white–${formatColor(partner)} edge is connected to the ${formatColor(partner)} center. Slot it into the cross on the bottom (demo may spin D then use ${face}2). Setup moves may temporarily move other cross edges; undo at the end restores them.`,
+    face,
+    demoMoves: insert,
   };
-}
-
-/** Phase 1: white on D sticker, wrong center — D / D2 / D′ only. */
-export function collectRotateBottomPermuteCandidates(
-  studentState: CubeState,
-): PermuteReadyCandidate[] {
-  const candidates: PermuteReadyCandidate[] = [];
-  for (const id of unsolvedWhiteOnDSlotIds(studentState)) {
-    if (!slotShowsRotateBottomPattern(studentState, id)) continue;
-    const bottomSpinMoves = findMinimalBottomSpinToSolveSlot(studentState, id);
-    if (
-      bottomSpinMoves &&
-      isVerifiedSlotDemo(studentState, id, bottomSpinMoves)
-    ) {
-      candidates.push({
-        id,
-        step: buildDLayerStepFromOption(studentState, {
-          id,
-          demo: bottomSpinMoves,
-          variant: 'rotate-bottom',
-        }),
-      });
-    }
-  }
-  return candidates;
-}
-
-/** Phase 2: white on edge cubie on D, needs D setup + side insert (not pure bottom permute). */
-export function collectDLayerInsertPermuteCandidates(
-  studentState: CubeState,
-): PermuteReadyCandidate[] {
-  const candidates: PermuteReadyCandidate[] = [];
-  for (const id of unsolvedWhiteOnDSlotIds(studentState)) {
-    if (slotShowsRotateBottomPattern(studentState, id)) continue;
-    const insert = tryDPrefixOrInsertSolveSlot(studentState, id);
-    if (
-      insert &&
-      insert.length > 0 &&
-      isVerifiedSlotDemo(studentState, id, insert)
-    ) {
-      candidates.push({
-        id,
-        step: buildDLayerStepFromOption(studentState, {
-          id,
-          demo: insert,
-          variant: 'insert-double',
-        }),
-      });
-    }
-  }
-  return candidates;
-}
-
-export function collectDLayerPermuteCandidates(
-  studentState: CubeState,
-): PermuteReadyCandidate[] {
-  return [
-    ...collectRotateBottomPermuteCandidates(studentState),
-    ...collectDLayerInsertPermuteCandidates(studentState),
-  ];
 }

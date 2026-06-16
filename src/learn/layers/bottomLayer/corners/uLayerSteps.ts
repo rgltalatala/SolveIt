@@ -1,10 +1,14 @@
-import { applyMoves } from '../../../../cube/cubeState';
+import {
+  applyMoves,
+  compressConsecutiveFaceQuarterTurns,
+} from '../../../../cube/cubeState';
 import type { CubeState, Face, Move } from '../../../../cube/cubeState';
 import type { CubiePosition } from '../../../../cube3d/cubeGeometry';
 import { parseFaceTurnAlgToMoves } from '../../../../cube/parseFaceTurnAlg';
 import { faceForWhiteOnCorner } from '../shared/pieceQueries';
-import type { ULayerCornerId } from './cornerCases';
-import { buildShortestVerifiedFrdDemo } from './frdDemoBuilder';
+import { recognizeCornerCaseInFrdView, type ULayerCornerId } from './cornerCases';
+import { studentHoldView, verifiedFrdDemoAtHold } from './frdViewDemoBuild';
+import { formatCornerLabel } from './cornerSlotModel';
 import type { CornerSlotId } from './types';
 
 export const FRD_URF_POS: CubiePosition = [1, 1, 1];
@@ -38,11 +42,45 @@ export function insertMovesFromUrf(whiteOnFace: Face): Move[] | null {
 
 const URF_INSERT_WHITE_FACES: Face[] = ['U', 'R', 'F'];
 
-function insertFacesToTry(preferredWhite: Face | null): Face[] {
+export function urfInsertFacesToTry(preferredWhite: Face | null): Face[] {
   if (!preferredWhite) return URF_INSERT_WHITE_FACES;
   return [
     preferredWhite,
     ...URF_INSERT_WHITE_FACES.filter((face) => face !== preferredWhite),
+  ];
+}
+
+/** True when align and insert both use U turns that could be merged into fewer moves. */
+export function uLayerDemoHasAlignInsertUOverlap(
+  demo: readonly Move[],
+): boolean {
+  if (demo.length < 2) return false;
+  return (
+    compressConsecutiveFaceQuarterTurns([...demo]).length < demo.length
+  );
+}
+
+const U_LAYER_ALIGN_INSERT_NOTE =
+  " Some U turns may look redundant—for example U then U'—but that is intentional: always align the piece above the front-right slot (URF), recognize which case it is from how white is facing, then run the matching insert.";
+
+export function uLayerInsertStepBody(
+  cornerId: CornerSlotId,
+  demo: readonly Move[],
+): string {
+  const base = `The ${formatCornerLabel(cornerId).toLowerCase()} piece is on the top layer. The demo lines it up above the front-right slot (URF), then inserts it with white on the bottom. Your white cross and any corners you already solved stay intact.`;
+  return uLayerDemoHasAlignInsertUOverlap(demo)
+    ? `${base}${U_LAYER_ALIGN_INSERT_NOTE}`
+    : base;
+}
+
+/** Keep align and insert as separate phases when compressing U turns. */
+export function compressPedagogicalULayerDemo(
+  align: readonly Move[],
+  insert: readonly Move[],
+): Move[] {
+  return [
+    ...compressConsecutiveFaceQuarterTurns([...align]),
+    ...compressConsecutiveFaceQuarterTurns([...insert]),
   ];
 }
 
@@ -53,23 +91,28 @@ export function buildFrdULayerDemo(
   holdIndex = 0,
   solvedCornerIds?: readonly CornerSlotId[],
 ): Move[] | null {
-  return buildShortestVerifiedFrdDemo(
+  const viewState = studentHoldView(studentState, holdIndex, []);
+  const cornerCase = recognizeCornerCaseInFrdView(
+    viewState,
+    targetId,
+    holdIndex,
+  );
+  if (cornerCase.kind !== 'in-u-layer') return null;
+
+  const align = alignMovesToUrf(cornerCase.uPosition);
+  const afterAlign = applyMoves(viewState, align);
+  const whiteOnFace = faceForWhiteOnCorner(FRD_URF_POS, afterAlign);
+  if (!whiteOnFace) return null;
+
+  const insert = insertMovesFromUrf(whiteOnFace);
+  if (!insert?.length) return null;
+
+  const studentDemo = compressPedagogicalULayerDemo(align, insert);
+  return verifiedFrdDemoAtHold(
     studentState,
     targetId,
     holdIndex,
+    studentDemo,
     solvedCornerIds,
-    (viewState, cornerCase, uPrefix) => {
-      if (cornerCase.kind !== 'in-u-layer') return [];
-
-      const align = alignMovesToUrf(cornerCase.uPosition);
-      const afterAlign = applyMoves(viewState, align);
-      const preferredWhite = faceForWhiteOnCorner(FRD_URF_POS, afterAlign);
-
-      return insertFacesToTry(preferredWhite).flatMap((whiteFace) => {
-        const insert = insertMovesFromUrf(whiteFace);
-        if (!insert?.length) return [];
-        return [{ studentDemo: [...uPrefix, ...align, ...insert] }];
-      });
-    },
   );
 }

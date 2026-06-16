@@ -1,3 +1,4 @@
+import { normalizeLessonDemoMovesInStep } from '../../../lessonCore';
 import { isWhiteCrossComplete } from '../cross/crossSlotModel';
 import type { CubeState } from '../../../../cube/cubeState';
 import {
@@ -111,13 +112,15 @@ function tryInteractiveCornerSolveStep(
   currentHoldIndex: CornerHoldIndex,
   solvedCornerIds?: readonly CornerSlotId[],
 ): WhiteCornersLessonStep | null {
+  const uLayerStep = tryFrdULayerInsert(
+    studentState,
+    cornerId,
+    currentHoldIndex,
+    solvedCornerIds,
+  );
+  if (uLayerStep?.demoMoves?.length) return uLayerStep;
+
   const caseSteps = [
-    tryFrdULayerInsert(
-      studentState,
-      cornerId,
-      currentHoldIndex,
-      solvedCornerIds,
-    ),
     tryFrdWrongDLayerExtract(
       studentState,
       cornerId,
@@ -132,7 +135,7 @@ function tryInteractiveCornerSolveStep(
     ),
   ];
   for (const step of caseSteps) {
-    if (step?.demoMoves?.length) return step;
+    if (step?.demoMoves?.length) return normalizeLessonDemoMovesInStep(step);
   }
 
   const fixed = tryDirectSolveStepForCornerId(
@@ -141,7 +144,7 @@ function tryInteractiveCornerSolveStep(
     currentHoldIndex,
     solvedCornerIds,
   );
-  if (fixed?.demoMoves?.length) return fixed;
+  if (fixed?.demoMoves?.length) return normalizeLessonDemoMovesInStep(fixed);
 
   return null;
 }

@@ -9,24 +9,11 @@ export const WHITE_CROSS_STEP_KINDS = [
   'complete',
   'solve-edge',
   'rotate-bottom',
-  'side-connect',
+  'align-to-center',
   'insert-double',
 ] as const;
 
 export type WhiteCrossStepKind = (typeof WHITE_CROSS_STEP_KINDS)[number];
-
-/** Within a permute tier: higher wins ties after slots gained and shorter demo. */
-export const PERMUTE_STEP_KIND_TIEBREAK: Record<
-  Extract<
-    WhiteCrossStepKind,
-    'rotate-bottom' | 'side-connect' | 'insert-double'
-  >,
-  number
-> = {
-  'rotate-bottom': 3,
-  'side-connect': 2,
-  'insert-double': 1,
-};
 
 export type WhiteCrossLessonStep =
   | {
@@ -53,9 +40,11 @@ export type WhiteCrossLessonStep =
       demoMoves?: Move[];
     }
   | {
-      kind: 'side-connect';
+      kind: 'align-to-center';
       title: string;
       body: string;
+      edgeLabel: string;
+      partnerColor: Color;
       face: Face;
       demoMoves?: Move[];
     }
@@ -63,20 +52,11 @@ export type WhiteCrossLessonStep =
       kind: 'insert-double';
       title: string;
       body: string;
+      edgeLabel: string;
+      partnerColor: Color;
       face: Face;
       demoMoves?: Move[];
     };
-
-export type DPhaseOption = {
-  id: CrossEdgeId;
-  demo: Move[];
-  variant: 'rotate-bottom' | 'insert-double';
-};
-
-export type PermuteReadyCandidate = {
-  id: CrossEdgeId;
-  step: WhiteCrossLessonStep;
-};
 
 export interface SimulateWhiteCrossLessonResult {
   lessonStepsSimulated: number;

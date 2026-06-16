@@ -107,3 +107,13 @@ export function slotShowsRotateBottomPattern(
       studentState[slot.sideFace][4]
   );
 }
+
+/** First unsolved cross slot in DF → DR → DB → DL order, or null when complete. */
+export function firstUnsolvedCrossId(
+  studentState: CubeState,
+): CrossEdgeId | null {
+  for (const id of CROSS_ORDER) {
+    if (!slotSolved(studentState, id)) return id;
+  }
+  return null;
+}

@@ -29,9 +29,8 @@ export function isStudentFacingDemo(demo: readonly Move[]): boolean {
 
 function inferWrongDStorageCandidates(
   studentDemo: Move[],
-  holdIndex: number,
+  _holdIndex: number,
 ): Move[][] {
-  if (holdIndex !== 0) return [];
   const candidates: Move[][] = [];
   for (const dSlot of CORNER_ORDER) {
     if (dSlot === 'FRD') continue;
@@ -120,5 +119,5 @@ export function verifiedFrdDemoAtHold(
 
   if (!studentVerifies && !storageDemo) return null;
 
-  return studentDemo;
+  return studentVerifies ? studentDemo : storageDemo!;
 }

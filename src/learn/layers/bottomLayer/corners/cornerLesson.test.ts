@@ -593,6 +593,28 @@ describe('white corners planner', () => {
     ).toEqual(FRD_URF_WHITE_ON_F);
   });
 
+  it('keeps explicit URF align before insert for shortcut U-layer cases', () => {
+    expect(
+      getWhiteCornerLessonStep(frdOnULayerStudent('UFL', 'F')).demoMoves,
+    ).toEqual([...alignMovesToUrf('UFL'), ...FRD_URF_WHITE_ON_F]);
+    expect(
+      getWhiteCornerLessonStep(frdOnULayerStudent('ULB', 'F')).demoMoves,
+    ).toEqual([...alignMovesToUrf('ULB'), ...FRD_URF_WHITE_ON_F]);
+  });
+
+  it('explains redundant U turns for pedagogical U-layer align-then-insert demos', () => {
+    const overlapStep = getWhiteCornerLessonStep(
+      frdOnULayerStudent('UFL', 'F'),
+    );
+    expect(overlapStep.body).toContain('look redundant');
+    expect(overlapStep.body).toContain('align the piece above the front-right slot');
+
+    const noOverlapStep = getWhiteCornerLessonStep(
+      frdOnULayerStudent('UFL', 'R'),
+    );
+    expect(noOverlapStep.body).not.toContain('look redundant');
+  });
+
   it('getWhiteCornerLessonStepAsync matches sync', async () => {
     const student = crossIntactCornersScrambledStudent();
     const sync = getWhiteCornerLessonStep(student);

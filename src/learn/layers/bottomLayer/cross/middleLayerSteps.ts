@@ -1,113 +1,122 @@
-import { applyMove } from '../../../../cube/cubeState';
-import type { Color, CubeState, Face, Move } from '../../../../cube/cubeState';
+import { applyMove, applyMoves } from '../../../../cube/cubeState';
+import type { CubeState, Face, Move } from '../../../../cube/cubeState';
+import { demoChangesState } from '../../../lessonCore';
 import {
-  CROSS_ORDER,
   crossSlotsSolvedInState,
   formatColor,
   partnerColorForSlot,
   SLOT_DEF,
   slotSolved,
+  whitePartnerEdgeHeading,
 } from './crossSlotModel';
-import { demoChangesState } from '../../../lessonCore';
 import {
   edgeAlignedToSideCenter,
   findEdgeWithColors,
   isMiddleLayerEdge,
-  whiteStickerOnD,
-  whiteStickerOnU,
 } from '../shared/pieceQueries';
-import type { PermuteReadyCandidate, WhiteCrossLessonStep } from './types';
+import type { CrossEdgeId, WhiteCrossLessonStep } from './types';
 
-/**
- * Middle-layer cross edge hugging its side center: pick clockwise vs counterclockwise quarter turn.
- */
-export function middleLayerConnectDemoMove(
+function isVerifiedAlignDemo(
   studentState: CubeState,
-  partner: Color,
-  alignedFace: Face,
-): Move {
-  const clockwiseMove = alignedFace as Move;
-  const counterClockwiseMove = `${alignedFace}'` as Move;
-  const solvedSlotsToPreserve = crossSlotsSolvedInState(studentState);
-
-  const rankEdgeAfterMove = (nextState: CubeState): number => {
-    const edgePosition = findEdgeWithColors(nextState, 'white', partner);
-    if (!edgePosition) return -1;
-    if (whiteStickerOnD(nextState, edgePosition)) return 4;
-    if (edgePosition[1] === -1) return 3;
-    if (whiteStickerOnU(nextState, edgePosition)) return 2;
-    if (edgePosition[1] === 1) return 1;
-    return 0;
-  };
-
-  let best: { move: Move; rank: number } | null = null;
-  for (const move of [clockwiseMove, counterClockwiseMove]) {
-    const nextState = applyMove(studentState, move);
-    const preservesSolvedSlots = solvedSlotsToPreserve.every((id) =>
-      slotSolved(nextState, id),
-    );
-    if (!preservesSolvedSlots) continue;
-    const rank = rankEdgeAfterMove(nextState);
-    if (rank < 0) continue;
-    if (
-      !best ||
-      rank > best.rank ||
-      (rank === best.rank && move === clockwiseMove)
-    ) {
-      best = { move, rank };
-    }
-  }
-  return best?.move ?? clockwiseMove;
+  targetId: CrossEdgeId,
+  partner: ReturnType<typeof partnerColorForSlot>,
+  demo: Move[],
+): boolean {
+  if (!demo.length) return false;
+  const mustPreserve = crossSlotsSolvedInState(studentState).filter(
+    (id) => id !== targetId,
+  );
+  const after = applyMoves(studentState, demo);
+  if (slotSolved(after, targetId)) return false;
+  if (!mustPreserve.every((id) => slotSolved(after, id))) return false;
+  const edgePosition = findEdgeWithColors(after, 'white', partner);
+  if (!edgePosition) return false;
+  return edgeAlignedToSideCenter(after, edgePosition) !== null;
 }
 
-function buildMiddleLayerSideConnectStep(
+function buildAlignToCenterStep(
   studentState: CubeState,
-  partner: Color,
+  id: CrossEdgeId,
   turnFace: Face,
-  alignedToCenter: boolean,
+  demo: Move[],
+  alreadyAligned: boolean,
 ): WhiteCrossLessonStep {
-  const demo = middleLayerConnectDemoMove(studentState, partner, turnFace);
-  const turnWord = demo.endsWith("'") ? 'counterclockwise' : 'clockwise';
-  const body = alignedToCenter
-    ? `The white–${formatColor(partner)} edge sits in the middle layer with ${formatColor(partner)} already next to the ${formatColor(partner)} center — we finish edges that are already lined up with their center before other cross edges. One quarter turn on ${turnFace} (${turnWord} here) moves it toward the bottom so it can be slotted into the cross.`
-    : `The white–${formatColor(partner)} edge is in the middle layer but not lined up with the ${formatColor(partner)} center yet. One quarter turn on ${turnFace} (${turnWord} here) sets it up while keeping cross edges you already placed.`;
+  const partner = partnerColorForSlot(studentState, id);
+  const label = `${formatColor(partner)} edge`;
+  const turnWord = demo[0]?.endsWith("'") ? 'counterclockwise' : 'clockwise';
+  const body = alreadyAligned
+    ? `The white–${formatColor(partner)} edge is in the middle layer. One quarter turn on ${turnFace} (${turnWord} here) connects the ${formatColor(partner)} sticker to the ${formatColor(partner)} center before you slot white on the bottom.`
+    : `The white–${formatColor(partner)} edge is in the middle layer but not lined up with the ${formatColor(partner)} center yet. One quarter turn on ${turnFace} (${turnWord} here) connects the colored sticker to its center while keeping cross edges you already placed.`;
+
   return {
-    kind: 'side-connect',
-    title: 'Middle layer: bring edge up or down',
+    kind: 'align-to-center',
+    title: whitePartnerEdgeHeading(partner),
+    edgeLabel: label,
+    partnerColor: partner,
     body,
     face: turnFace,
-    demoMoves: [demo],
+    demoMoves: demo,
   };
 }
 
-export function collectMiddleLayerPermuteCandidates(
+/** Middle-layer align: one quarter turn that achieves center alignment without slotting. */
+export function tryMiddleLayerAlignStepForCrossId(
   studentState: CubeState,
-): PermuteReadyCandidate[] {
-  const crossPartners = new Set(
-    CROSS_ORDER.map((id) => partnerColorForSlot(studentState, id)),
-  );
-  const candidates: PermuteReadyCandidate[] = [];
+  id: CrossEdgeId,
+): WhiteCrossLessonStep | null {
+  if (slotSolved(studentState, id)) return null;
 
-  for (const id of CROSS_ORDER) {
-    const partner = partnerColorForSlot(studentState, id);
-    if (!crossPartners.has(partner)) continue;
-    if (slotSolved(studentState, id)) continue;
-    const edgePosition = findEdgeWithColors(studentState, 'white', partner);
-    if (!edgePosition || !isMiddleLayerEdge(edgePosition)) continue;
-    const alignedFace = edgeAlignedToSideCenter(studentState, edgePosition);
-    const turnFace = alignedFace ?? SLOT_DEF[id].sideFace;
-    const step = buildMiddleLayerSideConnectStep(
-      studentState,
-      partner,
-      turnFace,
-      !!alignedFace,
+  const partner = partnerColorForSlot(studentState, id);
+  const edgePosition = findEdgeWithColors(studentState, 'white', partner);
+  if (!edgePosition || !isMiddleLayerEdge(edgePosition)) return null;
+  if (edgeAlignedToSideCenter(studentState, edgePosition)) return null;
+
+  const alignedFace = edgeAlignedToSideCenter(studentState, edgePosition);
+  const turnFace = alignedFace ?? SLOT_DEF[id].sideFace;
+  const clockwiseMove = turnFace as Move;
+  const counterClockwiseMove = `${turnFace}'` as Move;
+  const solvedSlotsToPreserve = crossSlotsSolvedInState(studentState);
+
+  type Candidate = { move: Move; demo: Move[]; newlyAligned: boolean };
+  let best: Candidate | null = null;
+
+  for (const move of [clockwiseMove, counterClockwiseMove]) {
+    const nextState = applyMove(studentState, move);
+    const preservesSolvedSlots = solvedSlotsToPreserve.every((slotId) =>
+      slotSolved(nextState, slotId),
     );
+    if (!preservesSolvedSlots) continue;
+    if (slotSolved(nextState, id)) continue;
+
+    const nextEdge = findEdgeWithColors(nextState, 'white', partner);
+    if (!nextEdge) continue;
+    const newlyAligned =
+      edgeAlignedToSideCenter(studentState, edgePosition) === null &&
+      edgeAlignedToSideCenter(nextState, nextEdge) !== null;
+    if (!newlyAligned) continue;
+
+    const demo = [move];
+    if (!demoChangesState(studentState, demo)) continue;
+    if (!isVerifiedAlignDemo(studentState, id, partner, demo)) continue;
+
+    const candidate: Candidate = { move, demo, newlyAligned };
     if (
-      !step.demoMoves?.length ||
-      !demoChangesState(studentState, step.demoMoves)
-    )
-      continue;
-    candidates.push({ id, step });
+      !best ||
+      candidate.demo.length < best.demo.length ||
+      (candidate.demo.length === best.demo.length &&
+        move === clockwiseMove)
+    ) {
+      best = candidate;
+    }
   }
-  return candidates;
+
+  if (!best) return null;
+
+  return buildAlignToCenterStep(
+    studentState,
+    id,
+    turnFace,
+    best.demo,
+    !!alignedFace,
+  );
 }

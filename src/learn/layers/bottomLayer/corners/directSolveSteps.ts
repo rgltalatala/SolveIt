@@ -5,7 +5,7 @@ import { demoChangesState } from '../../../lessonCore';
 import { verifiedFrdDemoAtHold, studentHoldView } from './frdViewDemoBuild';
 import { formatColor, formatCornerLabel } from './cornerSlotModel';
 import type { CornerSlotId, WhiteCornersLessonStep } from './types';
-import { buildFrdULayerDemo } from './uLayerSteps';
+import { buildFrdULayerDemo, uLayerInsertStepBody } from './uLayerSteps';
 import { buildFrdWrongDLayerDemo } from './wrongDLayerSteps';
 import { U_LAYER_U_PREFIXES } from './uLayerSteps';
 
@@ -105,7 +105,7 @@ function buildULayerInsertStep(
     kind: 'solve-corner',
     cornerId,
     title: formatCornerLabel(cornerId),
-    body: `The ${formatCornerLabel(cornerId).toLowerCase()} piece is on the top layer. The demo lines it up above the front-right slot (URF), then inserts it with white on the bottom. Your white cross and any corners you already solved stay intact.`,
+    body: uLayerInsertStepBody(cornerId, demo),
     demoMoves: demo,
   };
 }

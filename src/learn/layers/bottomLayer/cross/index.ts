@@ -5,9 +5,13 @@ export type {
   WhiteCrossLessonStep,
 } from './types';
 
-export { PERMUTE_STEP_KIND_TIEBREAK, WHITE_CROSS_STEP_KINDS } from './types';
+export { WHITE_CROSS_STEP_KINDS } from './types';
 
-export { countSolvedCrossSlots, isWhiteCrossComplete } from './crossSlotModel';
+export {
+  countSolvedCrossSlots,
+  firstUnsolvedCrossId,
+  isWhiteCrossComplete,
+} from './crossSlotModel';
 
 export { crossEdgeExampleDemoMoves } from './crossEdgeDemoMoves';
 

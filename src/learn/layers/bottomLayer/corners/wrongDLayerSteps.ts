@@ -1,12 +1,12 @@
 import { applyMoves } from '../../../../cube/cubeState';
-import type { CubeState, Face, Move } from '../../../../cube/cubeState';
+import type { CubeState, Move } from '../../../../cube/cubeState';
 import { parseFaceTurnAlgToMoves } from '../../../../cube/parseFaceTurnAlg';
 import { faceForWhiteOnCorner } from '../shared/pieceQueries';
 import type { WrongDLayerSlotId } from './cornerCases';
 import { buildShortestVerifiedFrdDemo } from './frdDemoBuilder';
 import type { CornerSlotId } from './types';
 import { CORNER_ORDER } from './types';
-import { FRD_URF_POS, insertMovesFromUrf } from './uLayerSteps';
+import { FRD_URF_POS, insertMovesFromUrf, urfInsertFacesToTry } from './uLayerSteps';
 
 export const FRD_EXTRACT: Move[] = parseFaceTurnAlgToMoves("R U R' U'");
 
@@ -60,9 +60,7 @@ export function buildFrdWrongDLayerDemo(
         const setupInView = setupMovesForWrongDSlotInHoldView(dSlot);
         const afterSetup = applyMoves(viewState, setupInView);
         const preferredWhite = faceForWhiteOnCorner(FRD_URF_POS, afterSetup);
-        const whiteFacesToTry: Face[] = preferredWhite
-          ? [preferredWhite]
-          : ['U', 'R', 'F'];
+        const whiteFacesToTry = urfInsertFacesToTry(preferredWhite);
 
         return whiteFacesToTry.flatMap((whiteFace) => {
           const insert = insertMovesFromUrf(whiteFace);
@@ -70,7 +68,7 @@ export function buildFrdWrongDLayerDemo(
 
           const studentDemo = [...uPrefix, ...setupInView, ...insert];
           const extraStorage: Move[][] =
-            holdIndex === 0 && dSlot !== 'FRD'
+            dSlot !== 'FRD'
               ? [
                   [
                     ...uPrefix,
