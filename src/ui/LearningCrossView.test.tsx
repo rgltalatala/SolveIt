@@ -52,9 +52,11 @@ describe('LearningCrossView', () => {
     seedStore();
     mockUseWhiteCrossLessonStep.mockReturnValue({
       step: {
-        kind: 'side-connect',
+        kind: 'align-to-center',
         title: 'Connect edge',
         body: 'Turn the front face.',
+        edgeLabel: 'Green edge',
+        partnerColor: 'green',
         face: 'F',
         demoMoves: ['F'],
       },
