@@ -24,6 +24,7 @@ export {
   middleLayerEdgePairs,
   pickActiveUnsolvedEdge,
   pickBuriedExtractSlot,
+  pickPreferredOnUEdge,
   slotIdForExpectedEdgeColors,
   targetFrontSlotBetweenCenters,
 } from './edgeSlotModel';

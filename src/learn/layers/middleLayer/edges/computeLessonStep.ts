@@ -80,14 +80,18 @@ function buildReorientToPartnerStep(
   currentHoldIndex: CornerHoldIndex,
   edgeColors: [Color, Color],
   targetSlotId: MiddleEdgeSlotId,
+  onUAligned = false,
 ): MiddleLayerEdgesLessonStep {
   const targetHold = targetHoldForMiddleEdgeInsert(targetSlotId, partnerColor);
   const demoMoves = relativeY(currentHoldIndex, targetHold);
   const faceLabel = formatColorHoldLabel(targetHold);
+  const body = onUAligned
+    ? `The ${formatColor(edgeColors[0])}–${formatColor(edgeColors[1])} edge is on the top layer and already aligned with its center colors. Turn the whole cube so the ${faceLabel} face is toward you, then insert it into the middle layer between its centers.`
+    : `Turn the whole cube so the ${faceLabel} face is toward you. You will insert the ${formatColor(edgeColors[0])}–${formatColor(edgeColors[1])} edge into the middle layer between its centers.`;
   return {
     kind: 'reorient-hold',
     title: `Face the ${formatColor(partnerColor)} side`,
-    body: `Turn the whole cube so the ${faceLabel} face is toward you. You will insert the ${formatColor(edgeColors[0])}–${formatColor(edgeColors[1])} edge into the middle layer between its centers.`,
+    body,
     demoMoves,
     targetHoldIndex: targetHold,
   };
@@ -124,15 +128,24 @@ function buildSolveEdgeStep(
   slot: 'FL' | 'FR',
   action: 'insert' | 'extract',
   demoMoves: Move[],
+  onUAligned = false,
 ): MiddleLayerEdgesLessonStep {
   const algName = slot === 'FL' ? 'left' : 'right';
+  const slotLabel = slot === 'FL' ? 'front-left' : 'front-right';
   const body =
     action === 'extract'
-      ? `The edge in the ${slot === 'FL' ? 'front-left' : 'front-right'} middle slot needs to come out. Use the ${algName} algorithm to lift it to the top layer while keeping your bottom layer intact.`
-      : `Insert the ${formatColor(edgeColors[0])}–${formatColor(edgeColors[1])} edge into the ${slot === 'FL' ? 'front-left' : 'front-right'} middle slot using the ${algName} algorithm. Your white cross, white corners, and any middle edges you already placed stay intact.`;
+      ? `The edge in the ${slotLabel} middle slot needs to come out. Use the ${algName} algorithm to lift it to the top layer while keeping your bottom layer intact.`
+      : onUAligned
+        ? `The ${formatColor(edgeColors[0])}–${formatColor(edgeColors[1])} edge is on the top layer and already aligned with its center colors. Rotate U if needed, then insert it into the ${slotLabel} middle slot using the ${algName} algorithm. Your white cross, white corners, and any middle edges you already placed stay intact.`
+        : `Insert the ${formatColor(edgeColors[0])}–${formatColor(edgeColors[1])} edge into the ${slotLabel} middle slot using the ${algName} algorithm. Your white cross, white corners, and any middle edges you already placed stay intact.`;
   return {
     kind: 'solve-edge',
-    title: action === 'extract' ? 'Extract edge' : 'Insert edge',
+    title:
+      action === 'extract'
+        ? 'Extract edge'
+        : onUAligned
+          ? 'Insert aligned top-layer edge'
+          : 'Insert edge',
     body,
     demoMoves,
     edgeColors,
@@ -258,7 +271,8 @@ function tryInsertAtHold(
         solvedSlots,
       )
     ) {
-      return buildSolveEdgeStep(edgeColors, slot, 'insert', demo);
+      const onUAligned = isPartnerAlignedToCenter(studentState, edgeColors);
+      return buildSolveEdgeStep(edgeColors, slot, 'insert', demo, onUAligned);
     }
   }
 
@@ -354,6 +368,7 @@ function computeMiddleLayerEdgeLessonStep(
           holdIndex,
           edgeColors,
           targetSlotId,
+          isPartnerAlignedToCenter(studentState, edgeColors),
         );
       }
     }

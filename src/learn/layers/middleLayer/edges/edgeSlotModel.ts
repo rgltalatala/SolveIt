@@ -6,6 +6,10 @@ import {
   type CornerHoldIndex,
 } from '../../bottomLayer/corners/cornerHold';
 import { holdFacingOpposite } from './edgeHold';
+import {
+  alignMovesToPartnerCenter,
+  isPartnerAlignedToCenter,
+} from './uLayerAlign';
 import { findEdgeWithColors } from '../../bottomLayer/shared/pieceQueries';
 import { formatColor } from '../../bottomLayer/shared';
 import { MIDDLE_EDGE_SLOTS, type MiddleEdgeSlotId } from './types';
@@ -268,6 +272,42 @@ export function unsolvedStudentFrontMiddleSlots(
   );
 }
 
+function onUEdgePriorityTier(
+  state: CubeState,
+  colors: [Color, Color],
+): number {
+  if (isPartnerAlignedToCenter(state, colors)) return 2;
+  const alignMoves = alignMovesToPartnerCenter(state, colors);
+  if (alignMoves && alignMoves.length > 0) return 1;
+  return 0;
+}
+
+/** Prefer aligned on-U edges, then U-turn-alignable, then front-visible slots. */
+export function pickPreferredOnUEdge(
+  state: CubeState,
+  onU: Array<{ slotId: MiddleEdgeSlotId; colors: [Color, Color] }>,
+  holdIndex: CornerHoldIndex = 0,
+): { slotId: MiddleEdgeSlotId; colors: [Color, Color] } | null {
+  if (onU.length === 0) return null;
+
+  let bestTier = -1;
+  let best: Array<{ slotId: MiddleEdgeSlotId; colors: [Color, Color] }> = [];
+  for (const edge of onU) {
+    const tier = onUEdgePriorityTier(state, edge.colors);
+    if (tier > bestTier) {
+      bestTier = tier;
+      best = [edge];
+    } else if (tier === bestTier) {
+      best.push(edge);
+    }
+  }
+
+  const onFront = best.filter((edge) =>
+    isMiddleEdgeSlotOnStudentFront(edge.slotId, holdIndex),
+  );
+  return (onFront[0] ?? best[0]) ?? null;
+}
+
 export function pickActiveUnsolvedEdge(
   state: CubeState,
   holdIndex = 0,
@@ -280,7 +320,12 @@ export function pickActiveUnsolvedEdge(
     unsolvedEdgeCubieOnU(state, slotId, holdIndex),
   );
 
-  if (onU[0]) return onU[0];
+  const preferredOnU = pickPreferredOnUEdge(
+    state,
+    onU,
+    holdIndex as CornerHoldIndex,
+  );
+  if (preferredOnU) return preferredOnU;
   if (needsExtract[0]) return needsExtract[0];
   return unsolved[0] ?? null;
 }

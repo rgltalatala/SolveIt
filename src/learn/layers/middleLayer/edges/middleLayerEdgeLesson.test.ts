@@ -261,6 +261,21 @@ describe('middle layer edge lesson', () => {
     }
   });
 
+  it('pickActiveUnsolvedEdge prefers aligned on-U edge over one needing U alignment', () => {
+    const state = twoMiddleEdgesOnUStudent();
+    const active = pickActiveUnsolvedEdge(state, 0);
+    expect(active?.slotId).toBe('FL');
+    expect(isPartnerAlignedToCenter(state, active!.colors)).toBe(true);
+
+    const step = getMiddleLayerEdgeLessonStep(state);
+    expect(step.kind).not.toBe('align-u');
+    if (step.kind === 'solve-edge') {
+      expect(step.edgeColors).toEqual(active!.colors);
+      expect(step.body).toContain('top layer');
+      expect(step.body).toContain('already aligned');
+    }
+  });
+
   it('simulates solving two middle edges lifted to U', () => {
     const scrambled = twoMiddleEdgesOnUStudent();
     expect(isMiddleLayerEdgesComplete(scrambled)).toBe(false);
