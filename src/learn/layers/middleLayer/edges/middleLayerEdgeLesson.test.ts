@@ -95,6 +95,8 @@ function studentWithBottomLayerIncomplete(): CubeState {
   return next;
 }
 
+const AFTER_STRATEGY_INTRO = { hasSeenStrategyIntro: true } as const;
+
 describe('middle layer edge lesson', () => {
   it('valid lesson state requires cross and corners', () => {
     expect(isMiddleLayerLessonStateValid(solvedStudent())).toBe(true);
@@ -112,6 +114,15 @@ describe('middle layer edge lesson', () => {
   it('prerequisite when bottom layer incomplete', () => {
     const step = getMiddleLayerEdgeLessonStep(studentWithBottomLayerIncomplete());
     expect(step.kind).toBe('cross-corners-prerequisite');
+  });
+
+  it('returns strategy intro before first edge solve', () => {
+    const step = getMiddleLayerEdgeLessonStep(frEdgeOnUStudent());
+    expect(step.kind).toBe('intro');
+    if (step.kind === 'intro') {
+      expect(step.title).toBeTruthy();
+      expect(step.body).toContain('yellow');
+    }
   });
 
   it('getMiddleLayerEdgeLessonStepAsync matches sync', async () => {
@@ -175,7 +186,7 @@ describe('middle layer edge lesson', () => {
 
   it('planner returns align-u or reorient for edge on U', () => {
     const student = frEdgeOnUStudent();
-    const step = getMiddleLayerEdgeLessonStep(student);
+    const step = getMiddleLayerEdgeLessonStep(student, AFTER_STRATEGY_INTRO);
     expect(['align-u', 'reorient-hold', 'solve-edge']).toContain(step.kind);
   });
 
@@ -255,7 +266,7 @@ describe('middle layer edge lesson', () => {
     expect(active).not.toBeNull();
     expect(unsolvedEdgeCubieOnU(state, active!.slotId, 0)).toBe(true);
 
-    const step = getMiddleLayerEdgeLessonStep(state);
+    const step = getMiddleLayerEdgeLessonStep(state, AFTER_STRATEGY_INTRO);
     if (step.kind === 'solve-edge') {
       expect(step.action).not.toBe('extract');
     }
@@ -267,7 +278,7 @@ describe('middle layer edge lesson', () => {
     expect(active?.slotId).toBe('FL');
     expect(isPartnerAlignedToCenter(state, active!.colors)).toBe(true);
 
-    const step = getMiddleLayerEdgeLessonStep(state);
+    const step = getMiddleLayerEdgeLessonStep(state, AFTER_STRATEGY_INTRO);
     expect(step.kind).not.toBe('align-u');
     if (step.kind === 'solve-edge') {
       expect(step.edgeColors).toEqual(active!.colors);

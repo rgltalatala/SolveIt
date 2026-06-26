@@ -5,6 +5,7 @@ export const MIDDLE_EDGE_SLOTS = ['FR', 'FL', 'BR', 'BL'] as const;
 export type MiddleEdgeSlotId = (typeof MIDDLE_EDGE_SLOTS)[number];
 
 export const MIDDLE_LAYER_EDGES_STEP_KINDS = [
+  'intro',
   'complete',
   'cross-corners-prerequisite',
   'reorient-hold',
@@ -16,6 +17,12 @@ export type MiddleLayerEdgesStepKind =
   (typeof MIDDLE_LAYER_EDGES_STEP_KINDS)[number];
 
 export type MiddleLayerEdgesLessonStep =
+  | {
+      kind: 'intro';
+      title: string;
+      body: string;
+      demoMoves?: Move[];
+    }
   | {
       kind: 'complete';
       title: string;
@@ -56,6 +63,8 @@ export type MiddleLayerEdgesLessonStep =
 export interface MiddleLayerEdgeLessonStepOptions {
   currentHoldIndex?: number;
   solvedMiddleEdgeSlots?: readonly MiddleEdgeSlotId[];
+  /** Strategy intro shown once per lesson session before the first edge solve. */
+  hasSeenStrategyIntro?: boolean;
 }
 
 export interface SimulateMiddleLayerEdgesLessonResult {

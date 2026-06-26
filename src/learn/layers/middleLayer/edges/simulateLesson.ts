@@ -32,8 +32,9 @@ function initialSolvedMiddleEdgeSlots(student: CubeState): MiddleEdgeSlotId[] {
 function lessonOptions(
   currentHoldIndex: CornerHoldIndex,
   solvedMiddleEdgeSlots: MiddleEdgeSlotId[],
+  hasSeenStrategyIntro: boolean,
 ): MiddleLayerEdgeLessonStepOptions {
-  return { currentHoldIndex, solvedMiddleEdgeSlots };
+  return { currentHoldIndex, solvedMiddleEdgeSlots, hasSeenStrategyIntro };
 }
 
 function isMiddleLayerLessonComplete(
@@ -80,6 +81,7 @@ async function runMiddleLayerEdgesLessonSimulation(
   ) => MiddleLayerEdgesLessonStep | Promise<MiddleLayerEdgesLessonStep>,
 ): Promise<SimulateMiddleLayerEdgesLessonResult> {
   let currentHoldIndex: CornerHoldIndex = 0;
+  let hasSeenStrategyIntro = false;
   let student = cloneCubeState(studentFrame);
   const solvedMiddleEdgeSlots = initialSolvedMiddleEdgeSlots(student);
   let lessonStepsSimulated = 0;
@@ -98,7 +100,7 @@ async function runMiddleLayerEdgesLessonSimulation(
 
     const step = await getStep(
       student,
-      lessonOptions(currentHoldIndex, solvedMiddleEdgeSlots),
+      lessonOptions(currentHoldIndex, solvedMiddleEdgeSlots, hasSeenStrategyIntro),
     );
     lastStepKind = step.kind;
 
@@ -120,6 +122,11 @@ async function runMiddleLayerEdgesLessonSimulation(
         stuckNoDemo: true,
         finalHoldIndex: currentHoldIndex,
       };
+    }
+
+    if (step.kind === 'intro') {
+      hasSeenStrategyIntro = true;
+      continue;
     }
 
     if (!step.demoMoves?.length) {
@@ -171,6 +178,7 @@ function runMiddleLayerEdgesLessonSimulationSync(
   maxLessonSteps: number,
 ): SimulateMiddleLayerEdgesLessonResult {
   let currentHoldIndex: CornerHoldIndex = 0;
+  let hasSeenStrategyIntro = false;
   let student = cloneCubeState(studentFrame);
   const solvedMiddleEdgeSlots = initialSolvedMiddleEdgeSlots(student);
   let lessonStepsSimulated = 0;
@@ -189,7 +197,7 @@ function runMiddleLayerEdgesLessonSimulationSync(
 
     const step = getMiddleLayerEdgeLessonStep(
       student,
-      lessonOptions(currentHoldIndex, solvedMiddleEdgeSlots),
+      lessonOptions(currentHoldIndex, solvedMiddleEdgeSlots, hasSeenStrategyIntro),
     );
     lastStepKind = step.kind;
 
@@ -211,6 +219,11 @@ function runMiddleLayerEdgesLessonSimulationSync(
         stuckNoDemo: true,
         finalHoldIndex: currentHoldIndex,
       };
+    }
+
+    if (step.kind === 'intro') {
+      hasSeenStrategyIntro = true;
+      continue;
     }
 
     if (!step.demoMoves?.length) {

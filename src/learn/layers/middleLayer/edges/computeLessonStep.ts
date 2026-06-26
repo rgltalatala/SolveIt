@@ -62,6 +62,14 @@ function prerequisiteStep(): MiddleLayerEdgesLessonStep {
   };
 }
 
+function strategyIntroStep(): MiddleLayerEdgesLessonStep {
+  return {
+    kind: 'intro',
+    title: middleLayerSteps.intro.title,
+    body: middleLayerSteps.intro.body,
+  };
+}
+
 function buildReturnToBlueStep(
   currentHoldIndex: CornerHoldIndex,
 ): MiddleLayerEdgesLessonStep {
@@ -334,6 +342,10 @@ function computeMiddleLayerEdgeLessonStep(
       return buildReturnToBlueStep(holdIndex);
     }
     return completeStep();
+  }
+
+  if (!options?.hasSeenStrategyIntro) {
+    return strategyIntroStep();
   }
 
   const active = pickActiveUnsolvedEdge(studentState, holdIndex);

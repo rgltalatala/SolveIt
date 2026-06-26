@@ -329,10 +329,9 @@ async function f2lCompleteStudentFromRandomScramble(): Promise<{
 
   const middleRes = simulateMiddleLayerEdgesLessonOnStorageCube(student, 250);
   expect(middleRes.stuckNoDemo, `middle stuck alg=${algStr}`).toBe(false);
-  expect(
-    middleRes.middleLayerComplete,
-    `middle incomplete alg=${algStr}`,
-  ).toBe(true);
+  expect(middleRes.middleLayerComplete, `middle incomplete alg=${algStr}`).toBe(
+    true,
+  );
   expect(middleRes.finalHoldIndex).toBe(0);
 
   const f2lComplete = middleLayerCompleteStudent(student);
@@ -388,7 +387,8 @@ describe('last layer permute-corners vs random scrambles', () => {
         true,
       );
       expect(
-        isCornersFullyPermuted(res.student) || res.milestones['permute-corners'],
+        isCornersFullyPermuted(res.student) ||
+          res.milestones['permute-corners'],
         algStr,
       ).toBe(true);
     }
@@ -410,8 +410,7 @@ describe('last layer orient-corners vs random scrambles', () => {
         `F2L not restored iter ${i} alg=${algStr}`,
       ).toBe(true);
       expect(
-        res.milestones['orient-corners'] ||
-          isLastLayerComplete(student),
+        res.milestones['orient-corners'] || isLastLayerComplete(student),
         algStr,
       ).toBe(true);
     }

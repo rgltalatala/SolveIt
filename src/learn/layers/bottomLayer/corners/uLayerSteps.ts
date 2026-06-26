@@ -68,7 +68,7 @@ export function uLayerInsertStepBody(
     formatCornerLabel(cornerId).toLowerCase(),
   );
   return uLayerDemoHasAlignInsertUOverlap(demo)
-    ? `${base}${whiteCornersSteps.uLayerAlignInsertNote}`
+    ? `${base} ${whiteCornersSteps.uLayerAlignInsertNote}`
     : base;
 }
 

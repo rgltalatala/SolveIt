@@ -28,6 +28,18 @@ export const middleLayerLesson = {
 } as const;
 
 export const middleLayerSteps = {
+  intro: {
+    title: 'How this lesson works',
+    body: `Middle-layer edges are the four side edges between the top and bottom layers. An easy way to spot them: no yellow sticker. If an edge has yellow, it belongs on the top layer. We'll handle that when we solve the last layer.
+
+Once you've picked a middle-layer edge, line up the sticker that's not on U with its matching center. Then turn the whole cube so that center faces you.
+
+From there, decide whether the edge goes in the front-left slot or the front-right slot, and run the matching insert algorithm.
+
+Sometimes an edge is already in its slot but flipped. Extract it with the same algorithm, line it up with its center on top, then insert it again.
+
+If every unsolved middle-layer edge is on the top layer, extract one that's stuck in the middle layer first, then insert it where it belongs.`,
+  },
   complete: {
     title: 'Middle layer edges complete',
     body: "All four middle-layer edges match their side centers. No white or yellow on these pieces. Hold blue toward you (white on bottom, yellow on top) and check the diagram.",

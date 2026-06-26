@@ -159,7 +159,8 @@ export function LearningMiddleLayerView() {
     !isStepPending &&
     demoMoves.length > 0 &&
     step.kind !== 'complete' &&
-    step.kind !== 'cross-corners-prerequisite';
+    step.kind !== 'cross-corners-prerequisite' &&
+    step.kind !== 'intro';
 
   const handleRestartLessonTips = () => {
     resetLessonSession();
@@ -176,6 +177,14 @@ export function LearningMiddleLayerView() {
     startLessonTransition(() => {
       undoLessonStep();
       undoMiddleSessionStep();
+    });
+  };
+
+  const handleContinueIntro = () => {
+    if (step?.kind !== 'intro') return;
+    startLessonTransition(() => {
+      advanceAfterStep(step, studentFrame);
+      recomputeStep();
     });
   };
 
@@ -223,7 +232,8 @@ export function LearningMiddleLayerView() {
           ) : null}
           {step &&
           step.kind !== 'complete' &&
-          step.kind !== 'cross-corners-prerequisite' ? (
+          step.kind !== 'cross-corners-prerequisite' &&
+          step.kind !== 'intro' ? (
             <p className="mt-2 text-sm text-slate-400">
               {middleLayerLesson.progress(solvedSlots)}
             </p>
@@ -281,6 +291,19 @@ export function LearningMiddleLayerView() {
           </p>
         ) : null}
 
+        {step?.kind === 'intro' ? (
+          <div className="mt-4">
+            <button
+              type="button"
+              className="inline-flex rounded-lg bg-violet-700 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-600"
+              onClick={handleContinueIntro}
+              disabled={isStepPending}
+            >
+              {ui.continue}
+            </button>
+          </div>
+        ) : null}
+
         {step?.kind === 'cross-corners-prerequisite' ? (
           <div className="mt-4 flex flex-wrap gap-3">
             <button
@@ -302,7 +325,8 @@ export function LearningMiddleLayerView() {
 
         {step &&
         step.kind !== 'complete' &&
-        step.kind !== 'cross-corners-prerequisite' ? (
+        step.kind !== 'cross-corners-prerequisite' &&
+        step.kind !== 'intro' ? (
           <p className="mt-3 text-xs text-slate-500">
             {SAME_HOLD_NOTE(
               formatColorLabel(lessonHold.F),
