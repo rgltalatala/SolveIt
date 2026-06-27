@@ -4,7 +4,6 @@ import { parseFaceTurnAlgToMoves } from '../../../../cube/parseFaceTurnAlg';
 import { recognizeCornerCaseInFrdView } from './cornerCases';
 import { demoChangesState } from '../../../lessonCore';
 import { verifiedFrdDemoAtHold, studentHoldView } from './frdViewDemoBuild';
-import { formatColor } from './cornerSlotModel';
 import type { CornerSlotId, WhiteCornersLessonStep } from './types';
 import { buildFrdULayerDemo, uLayerInsertStepBody } from './uLayerSteps';
 import { buildFrdWrongDLayerDemo } from './wrongDLayerSteps';
@@ -93,11 +92,7 @@ function buildTwistedInSlotStep(
     kind: 'solve-corner',
     cornerId,
     title: formatCornerLabel(cornerId),
-    body: whiteCornersSteps.twisted(
-      formatCornerLabel(cornerId),
-      formatColor(studentState[whiteOnFace][4]),
-      whiteOnFace,
-    ),
+    body: whiteCornersSteps.twisted(formatCornerLabel(cornerId)),
     demoMoves: demo,
   };
 }

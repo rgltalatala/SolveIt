@@ -160,7 +160,7 @@ describe('white cross lesson', () => {
     expect(step.kind).toBe('rotate-bottom');
     if (step.kind === 'rotate-bottom') {
       expect(step.demoMoves).toEqual(['D2']);
-      expect(step.body).toContain('D2');
+      expect(step.body).toContain('bottom layer');
       expect(step.title).toMatch(/^White–/);
       expect(step.edgeLabel.length).toBeGreaterThan(0);
     }

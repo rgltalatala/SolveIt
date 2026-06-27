@@ -119,21 +119,13 @@ export function tryULayerAlignStepForCrossId(
   if (!best) return null;
 
   const label = `${formatColor(partner)} edge`;
-  const turnWord = best.demo[best.demo.length - 1]?.endsWith("'")
-    ? 'counterclockwise'
-    : 'clockwise';
-  const lastFace = best.turnFace;
 
   return {
     kind: 'align-to-center',
     title: whitePartnerEdgeHeading(partner),
     edgeLabel: label,
     partnerColor: partner,
-    body: whiteCrossSteps.uLayerConnect(
-      formatColor(partner),
-      turnWord,
-      lastFace,
-    ),
+    body: whiteCrossSteps.uLayerAlign(formatColor(partner)),
     face: best.turnFace,
     demoMoves: best.demo,
   };
@@ -173,7 +165,7 @@ export function tryULayerInsertStepForCrossId(
     title: whitePartnerEdgeHeading(partner),
     edgeLabel: label,
     partnerColor: partner,
-    body: whiteCrossSteps.uLayerSlot(formatColor(partner), face),
+    body: whiteCrossSteps.uLayerInsert(formatColor(partner)),
     face,
     demoMoves: best,
   };

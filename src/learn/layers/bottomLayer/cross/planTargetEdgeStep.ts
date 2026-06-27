@@ -58,15 +58,13 @@ function buildSolveEdgeStep(
   studentState: CubeState,
   id: CrossEdgeId,
   demo: Move[],
-  extraNote?: string,
 ): WhiteCrossLessonStep {
   const partner = partnerColorForSlot(studentState, id);
   const label = `${formatColor(partner)} edge`;
-  const note = extraNote ? ` ${extraNote}` : '';
   return {
     kind: 'solve-edge',
     title: whitePartnerEdgeHeading(partner),
-    body: whiteCrossSteps.solveEdge(formatColor(partner), note),
+    body: whiteCrossSteps.solveEdge(formatColor(partner)),
     edgeLabel: label,
     partnerColor: partner,
     demoMoves: demo,
@@ -78,24 +76,7 @@ function buildSolveEdgeFromVerifiedDemo(
   id: CrossEdgeId,
   verifiedDemo: Move[],
 ): WhiteCrossLessonStep {
-  const partner = partnerColorForSlot(studentState, id);
-  const edgePosition = findEdgeWithColors(studentState, 'white', partner);
-  const whiteFace = edgePosition
-    ? faceForWhiteOnEdge(edgePosition, studentState)
-    : null;
-  const topLayerWhiteOnSide =
-    edgePosition !== null &&
-    edgePosition[1] === 1 &&
-    whiteFace !== null &&
-    whiteFace !== 'U';
-  return buildSolveEdgeStep(
-    studentState,
-    id,
-    verifiedDemo,
-    topLayerWhiteOnSide
-      ? whiteCrossSteps.solveEdgeBfsTopLayerNote
-      : undefined,
-  );
+  return buildSolveEdgeStep(studentState, id, verifiedDemo);
 }
 
 function isTargetAligned(studentState: CubeState, id: CrossEdgeId): boolean {

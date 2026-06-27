@@ -1,0 +1,39 @@
+---
+description: Voice and structure for user-facing copy in src/content/
+globs: src/content/**/*
+alwaysApply: false
+---
+
+# App copy voice
+
+All user-facing instructional copy lives in `src/content/`. Write like a patient cuber coach.
+
+## Tone
+
+1. **Why → what → how** for new concepts.
+2. **Contractions** and spoken rhythm (`you're`, `we'll`, `don't`).
+3. **Actionable, skimmable** instructions. Cut filler.
+4. **Teach intent** before algorithms, then point to the demo for exact moves.
+5. **Anticipate mistakes** where users commonly slip.
+6. **Restrained encouragement** on completion steps, not generic cheer every step.
+7. **Consistent vocabulary**: face, layer, edge, corner, center, algorithm, turn, rotate, solve, scramble, top layer, bottom layer.
+
+## Punctuation
+
+- **Do not use em dashes (—) for asides or colloquial breaks.** Use a period, comma, or two short sentences instead.
+- En dashes in compound labels are fine: `White–red edge`, `Front–right corner`, `green–red`.
+- Algorithms and notation (`R U R' U'`, `F2`, `y2`) stay unchanged.
+
+## Step instructions
+
+- State **where the piece is** and **what you're trying to achieve** (strategy only).
+- Do **not** prescribe specific turns in step body copy; the demo and step-by-step UI handle that.
+- Reassure when setup moves temporarily disturb other layers, without naming every move.
+
+## Examples
+
+| Avoid | Prefer |
+| ----- | ------ |
+| `Slot it on the bottom—the demo handles setup.` | `Slot it on the bottom. The demo handles setup.` |
+| `Turn so blue is toward you—white stays on bottom.` | `Turn so blue is toward you. White stays on bottom.` |
+| `A ${face} turn (counterclockwise) or a U turn…` | `Line up the side sticker with its center, then slot white on the bottom. The demo includes any positioning you need.` |

@@ -62,21 +62,19 @@ Once a corner is solved, simply rotate the entire cube so the next unsolved corn
   },
   faceSideTitle: (faceLabel: string) => `Face the ${faceLabel.toLowerCase()} side`,
   reorient: (faceLabel: string, cornerLabel: string, skipNote: string) =>
-    `Turn the whole cube so the ${faceLabel} face is toward you (white stays on bottom, yellow on top). You'll slot the ${cornerLabel} into the front-right position.${skipNote}`,
-  reorientSkipTwoSteps:
-    ' The next corner is in the back right of the top layer. A U2 will orient it to the front right.',
-  reorientSkipThreeSteps:
-    ' The next corner is in the front left of the top layer. A U\' turn does it.',
+    `Turn the whole cube so ${faceLabel} is toward you. White stays on bottom, yellow on top. You're setting up to slot the ${cornerLabel} into the front-right corner.${skipNote}`,
+  reorientSkipAlignNote:
+    " The next piece is on the top layer; we'll line it up above the front-right slot before inserting.",
   placeholder: (colorA: string, colorB: string) =>
-    `Slot the white–${colorA}–${colorB} corner: white on D, ${colorA} and ${colorB} matching their centers. Line the piece up with its centers on your own, or reset the scramble and try again.`,
-  twisted: (corner: string, color: string, face: string) =>
-    `The ${corner.toLowerCase()} is in the front-right slot but twisted. White is on ${color} (${face}) instead of the bottom. The demo orients white onto D without disturbing your cross or corners you've already solved.`,
+    `Slot the white–${colorA}–${colorB} corner: white on the bottom, side colors matching their centers. Line it up on your own, or reset the scramble and try again.`,
+  twisted: (corner: string) =>
+    `The ${corner.toLowerCase()} is in the front-right slot but twisted. The demo orients white onto the bottom without disturbing your cross or corners you've already placed.`,
   wrongDSlot: (corner: string) =>
-    `The ${corner.toLowerCase()} is in the wrong bottom corner. The demo lifts it to the top (URF), then inserts it with white on the bottom. Your cross and solved corners stay put.`,
+    `The ${corner.toLowerCase()} is in the wrong bottom corner. The demo lifts it to the top layer, lines it up above the front-right slot, then inserts it correctly. Your cross and solved corners stay put.`,
   directSolve: (corner: string) =>
-    `Slot the ${corner.toLowerCase()} using the demo. Your white cross and any corners you've already solved stay intact.`,
-  uLayerBase: (corner: string) =>
-    `The ${corner.toLowerCase()} is on the top layer. The demo lines it up above the front-right slot (URF), then inserts it with white on the bottom. Your cross and solved corners stay put.`,
-  uLayerAlignInsertNote:
-    "Some U turns might look redundant, like U then U'. That's on purpose: always get the piece above URF, read the case from how white is facing, then run the matching insert. Once you feel comfortable with the demo, you can skip the U turns and just run the insert.",
+    `Slot the ${corner.toLowerCase()} with the demo. Your white cross and any corners you've already solved stay put.`,
+  uLayer: (corner: string) =>
+    `The ${corner.toLowerCase()} is on the top layer. The demo lines it up above the front-right slot and inserts it with white on the bottom, without touching your cross or solved corners.`,
+  uLayerAlignHabitNote:
+    "Some U turns might look redundant, like U then U' or U2 then U. That's on purpose. We're building the habit of lining up every top-layer corner above the front-right slot (URF) before you insert. Check how white is facing, then run the matching insert. Once you're comfortable, skip the extra U turns and go straight to the insert.",
 } as const;

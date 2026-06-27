@@ -62,6 +62,18 @@ function cornerLessonStep(
   });
 }
 
+function solveCornerDemoMoves(
+  student: CubeState,
+  options?: Parameters<typeof getWhiteCornerLessonStep>[1],
+): Move[] {
+  const step = cornerLessonStep(student, options);
+  expect(step.kind).toBe('solve-corner');
+  if (step.kind !== 'solve-corner' || !step.demoMoves) {
+    throw new Error('expected solve-corner step with demoMoves');
+  }
+  return step.demoMoves;
+}
+
 /** Storage scramble: cross intact on student frame, corners unsolved (FRD still solved). */
 function crossIntactCornersScrambledStorage(): CubeState {
   return applyMoves(createSolvedCubeState(), ['F', 'D', "F'"]);
@@ -605,36 +617,35 @@ describe('white corners planner', () => {
   );
 
   it('returns URF-only insert algs when already at URF', () => {
-    expect(
-      cornerLessonStep(frdOnULayerStudent('URF', 'U')).demoMoves,
-    ).toEqual(FRD_URF_WHITE_ON_U);
-    expect(
-      cornerLessonStep(frdOnULayerStudent('URF', 'R')).demoMoves,
-    ).toEqual(FRD_URF_WHITE_ON_R);
-    expect(
-      cornerLessonStep(frdOnULayerStudent('URF', 'F')).demoMoves,
-    ).toEqual(FRD_URF_WHITE_ON_F);
+    expect(solveCornerDemoMoves(frdOnULayerStudent('URF', 'U'))).toEqual(
+      FRD_URF_WHITE_ON_U,
+    );
+    expect(solveCornerDemoMoves(frdOnULayerStudent('URF', 'R'))).toEqual(
+      FRD_URF_WHITE_ON_R,
+    );
+    expect(solveCornerDemoMoves(frdOnULayerStudent('URF', 'F'))).toEqual(
+      FRD_URF_WHITE_ON_F,
+    );
   });
 
   it('keeps explicit URF align before insert for shortcut U-layer cases', () => {
-    expect(
-      cornerLessonStep(frdOnULayerStudent('UFL', 'F')).demoMoves,
-    ).toEqual([...alignMovesToUrf('UFL'), ...FRD_URF_WHITE_ON_F]);
-    expect(
-      cornerLessonStep(frdOnULayerStudent('ULB', 'F')).demoMoves,
-    ).toEqual([...alignMovesToUrf('ULB'), ...FRD_URF_WHITE_ON_F]);
+    expect(solveCornerDemoMoves(frdOnULayerStudent('UFL', 'F'))).toEqual([
+      ...alignMovesToUrf('UFL'),
+      ...FRD_URF_WHITE_ON_F,
+    ]);
+    expect(solveCornerDemoMoves(frdOnULayerStudent('ULB', 'F'))).toEqual([
+      ...alignMovesToUrf('ULB'),
+      ...FRD_URF_WHITE_ON_F,
+    ]);
   });
 
   it('explains redundant U turns for pedagogical U-layer align-then-insert demos', () => {
-    const overlapStep = cornerLessonStep(
-      frdOnULayerStudent('UFL', 'F'),
-    );
+    const overlapStep = cornerLessonStep(frdOnULayerStudent('UFL', 'F'));
     expect(overlapStep.body).toContain('look redundant');
-    expect(overlapStep.body).toContain('get the piece above URF');
+    expect(overlapStep.body).toContain('URF');
+    expect(overlapStep.body).toContain("you're comfortable");
 
-    const noOverlapStep = cornerLessonStep(
-      frdOnULayerStudent('UFL', 'R'),
-    );
+    const noOverlapStep = cornerLessonStep(frdOnULayerStudent('UFL', 'R'));
     expect(noOverlapStep.body).not.toContain('look redundant');
   });
 

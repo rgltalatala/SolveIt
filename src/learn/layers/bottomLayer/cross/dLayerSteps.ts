@@ -20,11 +20,6 @@ import { findEdgeWithColors, whiteStickerOnD } from '../shared/pieceQueries';
 import { isVerifiedSlotDemo, preservesSlotsAfterDemo } from './crossSolveBfs';
 import type { CrossEdgeId, WhiteCrossLessonStep } from './types';
 
-function formatBottomSpinForLesson(demo: Move[]): string {
-  if (demo.length === 1 && demo[0] === "D'") return 'D′';
-  return demo.join(' ');
-}
-
 const MINIMAL_BOTTOM_SPINS: Move[][] = [['D'], ['D2'], ["D'"]];
 
 /** Fewest quarter D turns (as D, D2, or D′) that align this cross slot, or null if none. */
@@ -108,10 +103,7 @@ export function tryRotateBottomStepForCrossId(
     title: whitePartnerEdgeHeading(partner),
     edgeLabel: label,
     partnerColor: partner,
-    body: whiteCrossSteps.dLayerRotate(
-      formatColor(partner),
-      formatBottomSpinForLesson(bottomSpinMoves),
-    ),
+    body: whiteCrossSteps.dLayerRotate(formatColor(partner)),
     targetFace: slot.sideFace,
     demoMoves: bottomSpinMoves,
   };
@@ -139,7 +131,7 @@ export function tryDLayerInsertStepForCrossId(
     title: whitePartnerEdgeHeading(partner),
     edgeLabel: label,
     partnerColor: partner,
-    body: whiteCrossSteps.dLayerInsert(formatColor(partner), face),
+    body: whiteCrossSteps.dLayerInsert(formatColor(partner)),
     face,
     demoMoves: insert,
   };

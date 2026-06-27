@@ -52,33 +52,21 @@ Repeat the process for the other three white edges, being careful not to undo th
     body: "You've got the full white cross. Each edge matches its center on the bottom. Line up your physical cube with the diagram (white on bottom, yellow on top), then head back to the overview when you're done.",
   },
   alignBfs: (partner: string) =>
-    `Match the ${partner} sticker on this white–${partner} edge to the ${partner} center before slotting white on the bottom. The demo is the shortest path we found that keeps your other cross edges in place.`,
-  solveEdge: (partner: string, extraNote: string) =>
-    `Work this white–${partner} edge: line up its ${partner} sticker with the ${partner} center, then slot white on the bottom.${extraNote} The demo handles setup, alignment, slotting, and undo so edges you've already solved stay put.`,
-  solveEdgeBfsTopLayerNote:
-    'This piece is on the top layer with white on a side. We still connect it to the center and slot it rather than only parking white on U.',
+    `Match the ${partner} sticker on this white–${partner} edge to the ${partner} center, then slot white on the bottom. The demo finds a path that won't knock out cross edges you've already solved.`,
+  solveEdge: (partner: string) =>
+    `Work this white–${partner} edge: line up its ${partner} sticker with the ${partner} center, then slot white on the bottom. The demo handles setup and keeps solved cross edges in place.`,
   stuck: (partner: string) =>
-    `We couldn't find a short demo for this white–${partner} edge from here without disturbing your other cross edges. Line up the colored sticker with the ${partner} center on your own, then slot white on the bottom. Or reset the scramble and try again.`,
-  middleLayerAlign: (partner: string, face: string, turnWord: string) =>
-    `This white–${partner} edge is in the middle layer. One ${face} turn (${turnWord}) lines up the ${partner} sticker with the ${partner} center. Then you can slot white on the bottom.`,
-  middleLayerAlignNotLinedUp: (
-    partner: string,
-    face: string,
-    turnWord: string,
-  ) =>
-    `This white–${partner} edge is in the middle layer but isn't lined up with the ${partner} center yet. One ${face} turn (${turnWord}) connects the colored sticker to its center without undoing cross edges you've already placed.`,
-  uLayerConnect: (
-    partner: string,
-    turnWord: string,
-    lastFace: string,
-  ) =>
-    `This white–${partner} edge is on the top layer. Line up its ${partner} sticker with the ${partner} center. A ${lastFace} turn (${turnWord}) or a U turn to position it works before slotting white on the bottom.`,
-  uLayerSlot: (partner: string, face: string) =>
-    `The white–${partner} edge is lined up with the ${partner} center on top. Slot it into the cross with ${face}2 (the demo may include U setup). Setup and undo keep your other cross edges safe.`,
-  dLayerRotate: (partner: string, spin: string) =>
-    `White is already on the bottom for this white–${partner} edge, but it's not under the ${partner} center yet. Turn the bottom layer (${spin}) until the colored sticker lines up with the ${partner} center. That's the cross edge done.`,
-  dLayerInsert: (partner: string, face: string) =>
-    `The white–${partner} edge is connected to the ${partner} center. Slot it on the bottom (the demo may spin D, then use ${face}2). Setup moves might shuffle other cross edges briefly; undo at the end puts them back.`,
+    `We couldn't build a safe demo for this white–${partner} edge from here. Match the side sticker to its center and slot white on the bottom yourself, or reset the scramble and try again.`,
+  middleLayer: (partner: string) =>
+    `This white–${partner} edge is in the middle layer. Line up its ${partner} sticker with the ${partner} center, then slot white on the bottom. The demo walks you through it without disturbing solved cross edges.`,
+  uLayerAlign: (partner: string) =>
+    `This white–${partner} edge is on the top layer. Match its ${partner} sticker to the ${partner} center, then slot white on the bottom. The demo includes any positioning you need first.`,
+  uLayerInsert: (partner: string) =>
+    `This white–${partner} edge already lines up with the ${partner} center on top. Slot it into the cross on the bottom. The demo shows the insert and any setup.`,
+  dLayerRotate: (partner: string) =>
+    `White is on the bottom for this white–${partner} edge, but it's not under the ${partner} center yet. Turn the bottom layer until the side sticker matches its center.`,
+  dLayerInsert: (partner: string) =>
+    `This white–${partner} edge lines up with the ${partner} center. Slot it on the bottom. The demo handles setup so your other cross edges stay put.`,
   directSolve: (partner: string) =>
-    `The white–${partner} edge is lined up with the ${partner} center. Slot it on the bottom. Setup moves might move other cross edges temporarily. Undo at the end restores them.`,
+    `This white–${partner} edge is ready to slot. Keep the ${partner} sticker matched to its center and put white on the bottom. The demo takes care of any setup.`,
 } as const;

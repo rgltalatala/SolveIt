@@ -64,11 +64,11 @@ export function uLayerInsertStepBody(
   cornerId: CornerSlotId,
   demo: readonly Move[],
 ): string {
-  const base = whiteCornersSteps.uLayerBase(
+  const base = whiteCornersSteps.uLayer(
     formatCornerLabel(cornerId).toLowerCase(),
   );
   return uLayerDemoHasAlignInsertUOverlap(demo)
-    ? `${base} ${whiteCornersSteps.uLayerAlignInsertNote}`
+    ? `${base} ${whiteCornersSteps.uLayerAlignHabitNote}`
     : base;
 }
 

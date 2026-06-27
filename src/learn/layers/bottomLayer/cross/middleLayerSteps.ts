@@ -42,26 +42,17 @@ function buildAlignToCenterStep(
   id: CrossEdgeId,
   turnFace: Face,
   demo: Move[],
-  alreadyAligned: boolean,
 ): WhiteCrossLessonStep {
   const partner = partnerColorForSlot(studentState, id);
   const label = `${formatColor(partner)} edge`;
-  const turnWord = demo[0]?.endsWith("'") ? 'counterclockwise' : 'clockwise';
   const partnerLabel = formatColor(partner);
-  const body = alreadyAligned
-    ? whiteCrossSteps.middleLayerAlign(partnerLabel, turnFace, turnWord)
-    : whiteCrossSteps.middleLayerAlignNotLinedUp(
-        partnerLabel,
-        turnFace,
-        turnWord,
-      );
 
   return {
     kind: 'align-to-center',
     title: whitePartnerEdgeHeading(partner),
     edgeLabel: label,
     partnerColor: partner,
-    body,
+    body: whiteCrossSteps.middleLayer(partnerLabel),
     face: turnFace,
     demoMoves: demo,
   };
@@ -125,6 +116,5 @@ export function tryMiddleLayerAlignStepForCrossId(
     id,
     turnFace,
     best.demo,
-    !!alignedFace,
   );
 }

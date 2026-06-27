@@ -78,11 +78,9 @@ function buildReorientHoldStep(
 
   const delta = (((targetHold - currentHoldIndex) % 4) + 4) % 4;
   const skipNote =
-    delta === 2
-      ? whiteCornersSteps.reorientSkipTwoSteps
-      : delta === 3
-        ? whiteCornersSteps.reorientSkipThreeSteps
-        : '';
+    delta === 2 || delta === 3
+      ? whiteCornersSteps.reorientSkipAlignNote
+      : '';
 
   return {
     kind: 'reorient-hold',
