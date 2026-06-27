@@ -131,13 +131,15 @@ function tryInteractiveCornerSolveStep(
   );
   if (uLayerStep?.demoMoves?.length) return uLayerStep;
 
+  const wrongDStep = tryFrdWrongDLayerExtract(
+    studentState,
+    cornerId,
+    currentHoldIndex,
+    solvedCornerIds,
+  );
+  if (wrongDStep?.demoMoves?.length) return wrongDStep;
+
   const caseSteps = [
-    tryFrdWrongDLayerExtract(
-      studentState,
-      cornerId,
-      currentHoldIndex,
-      solvedCornerIds,
-    ),
     tryFrdTwistedInSlot(
       studentState,
       cornerId,

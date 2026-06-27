@@ -47,7 +47,10 @@ import {
   WHITE_CORNERS_STEP_KINDS,
 } from './index';
 import { CORNER_SLOT_DEF } from './cornerSlotModel';
-import { setupMovesForWrongDSlotStorage } from './wrongDLayerSteps';
+import {
+  compressPedagogicalWrongDDemo,
+  setupMovesForWrongDSlotStorage,
+} from './wrongDLayerSteps';
 import { isWhiteCrossComplete } from '../cross/crossSlotModel';
 
 const AFTER_STRATEGY_INTRO = { hasSeenStrategyIntro: true } as const;
@@ -172,15 +175,37 @@ function cornerOnULayerAtHold(
   return cornerAtHoldStudent(cornerId, [...align, ...insert]);
 }
 
+/** Wrong D-layer demo: extract, explicit URF align, then insert. */
+function wrongDSlotDemoMoves(
+  dSlot: WrongDLayerSlotId,
+  whiteOnFace: Face,
+): Move[] {
+  const extract = setupMovesForWrongDSlotStorage(dSlot);
+  const insert = insertMovesFromUrf(whiteOnFace);
+  if (!insert) throw new Error(`unsupported white face ${whiteOnFace}`);
+
+  for (const uPosition of ['URF', 'UBR', 'ULB', 'UFL'] as ULayerCornerId[]) {
+    const align = alignMovesToUrf(uPosition);
+    const demo = compressPedagogicalWrongDDemo(extract, align, insert);
+    const student = applyMoves(solvedStudent(), invertMoves(demo));
+    const cornerCase = recognizeCornerCaseInFrdView(student, 'FRD', 0);
+    if (cornerCase.kind === 'in-wrong-d-slot' && cornerCase.dSlot === dSlot) {
+      return demo;
+    }
+  }
+
+  throw new Error(`unable to build wrong D demo for ${dSlot}`);
+}
+
 /** Wrong D-layer case for FRD at blue-front hold. */
 function frdInWrongDSlotStudent(
   dSlot: WrongDLayerSlotId,
   whiteOnFace: Face,
 ): CubeState {
-  const setup = setupMovesForWrongDSlotStorage(dSlot);
-  const insert = insertMovesFromUrf(whiteOnFace);
-  if (!insert) throw new Error(`unsupported white face ${whiteOnFace}`);
-  return applyMoves(solvedStudent(), invertMoves([...setup, ...insert]));
+  return applyMoves(
+    solvedStudent(),
+    invertMoves(wrongDSlotDemoMoves(dSlot, whiteOnFace)),
+  );
 }
 
 /** Wrong D-layer case for any corner at its lesson hold. */
@@ -189,10 +214,10 @@ function cornerInWrongDSlotAtHold(
   dSlot: WrongDLayerSlotId,
   whiteOnFace: Face,
 ): CubeState {
-  const setup = setupMovesForWrongDSlotStorage(dSlot);
-  const insert = insertMovesFromUrf(whiteOnFace);
-  if (!insert) throw new Error(`unsupported white face ${whiteOnFace}`);
-  return cornerAtHoldStudent(cornerId, [...setup, ...insert]);
+  return cornerAtHoldStudent(
+    cornerId,
+    wrongDSlotDemoMoves(dSlot, whiteOnFace),
+  );
 }
 
 const WRONG_D_LAYER_CASES: Array<{
@@ -637,6 +662,26 @@ describe('white corners planner', () => {
       ...alignMovesToUrf('ULB'),
       ...FRD_URF_WHITE_ON_F,
     ]);
+  });
+
+  it('keeps explicit URF align after wrong-D extract', () => {
+    const student = frdInWrongDSlotStudent('BDR', 'F');
+    const demo = solveCornerDemoMoves(student);
+    const extract = setupMovesForWrongDSlotStorage('BDR');
+    const applyDemo = storageDemoForStep(student, 'FRD', demo);
+    expect(applyDemo.slice(0, extract.length)).toEqual(extract);
+
+    const afterExtract = applyMoves(student, applyDemo.slice(0, extract.length));
+    const cornerCase = recognizeCornerCaseInFrdView(afterExtract, 'FRD', 0);
+    expect(cornerCase.kind).toBe('in-u-layer');
+    if (cornerCase.kind !== 'in-u-layer') return;
+    expect(demo.slice(extract.length)).toEqual(
+      compressPedagogicalWrongDDemo(
+        [],
+        alignMovesToUrf(cornerCase.uPosition),
+        FRD_URF_WHITE_ON_F,
+      ),
+    );
   });
 
   it('explains redundant U turns for pedagogical U-layer align-then-insert demos', () => {

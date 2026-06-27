@@ -6,7 +6,7 @@ import { demoChangesState } from '../../../lessonCore';
 import { verifiedFrdDemoAtHold, studentHoldView } from './frdViewDemoBuild';
 import type { CornerSlotId, WhiteCornersLessonStep } from './types';
 import { buildFrdULayerDemo, uLayerInsertStepBody } from './uLayerSteps';
-import { buildFrdWrongDLayerDemo } from './wrongDLayerSteps';
+import { buildFrdWrongDLayerDemo, wrongDSlotStepBody } from './wrongDLayerSteps';
 import { U_LAYER_U_PREFIXES } from './uLayerSteps';
 
 export const FRD_WHITE_ON_F: Move[] =
@@ -118,7 +118,7 @@ function buildWrongDLayerStep(
     kind: 'solve-corner',
     cornerId,
     title: formatCornerLabel(cornerId),
-    body: whiteCornersSteps.wrongDSlot(formatCornerLabel(cornerId)),
+    body: wrongDSlotStepBody(cornerId, demo),
     demoMoves: demo,
   };
 }

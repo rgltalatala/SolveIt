@@ -1,39 +1,72 @@
-import { applyMoves } from '../../../../cube/cubeState';
+import {
+  applyMoves,
+  compressConsecutiveFaceQuarterTurns,
+} from '../../../../cube/cubeState';
 import type { CubeState, Move } from '../../../../cube/cubeState';
 import { parseFaceTurnAlgToMoves } from '../../../../cube/parseFaceTurnAlg';
+import { whiteCornersSteps, formatCornerLabel } from '../../../../content/whiteCorners';
 import { faceForWhiteOnCorner } from '../shared/pieceQueries';
 import type { WrongDLayerSlotId } from './cornerCases';
+import { recognizeCornerCaseInFrdView } from './cornerCases';
 import { buildShortestVerifiedFrdDemo } from './frdDemoBuilder';
 import type { CornerSlotId } from './types';
 import { CORNER_ORDER } from './types';
-import { FRD_URF_POS, insertMovesFromUrf, urfInsertFacesToTry } from './uLayerSteps';
+import {
+  alignMovesToUrf,
+  FRD_URF_POS,
+  insertMovesFromUrf,
+  uLayerDemoHasAlignInsertUOverlap,
+  urfInsertFacesToTry,
+} from './uLayerSteps';
 
 export const FRD_EXTRACT: Move[] = parseFaceTurnAlgToMoves("R U R' U'");
 
 export const FRD_WRONG_D_SETUP: Record<
   WrongDLayerSlotId,
-  { yIn: Move[]; uAlign: Move[]; yOut: Move[] }
+  { yIn: Move[]; yOut: Move[] }
 > = {
-  FRD: { yIn: [], uAlign: [], yOut: [] },
-  BDR: { yIn: ['y'], uAlign: ['U'], yOut: ["y'"] },
-  BLD: { yIn: ['y2'], uAlign: ['U2'], yOut: ['y2'] },
-  FDL: { yIn: ["y'"], uAlign: ["U'"], yOut: ['y'] },
+  FRD: { yIn: [], yOut: [] },
+  BDR: { yIn: ['y'], yOut: ["y'"] },
+  BLD: { yIn: ['y2'], yOut: ['y2'] },
+  FDL: { yIn: ["y'"], yOut: ['y'] },
 };
 
-/** Face-turn setup in the current hold view: extract → U-align to URF. */
+/** Face-turn extract in the current hold view (no URF align yet). */
 export function setupMovesForWrongDSlotInHoldView(
-  dSlot: WrongDLayerSlotId,
+  _dSlot: WrongDLayerSlotId,
 ): Move[] {
-  const { uAlign } = FRD_WRONG_D_SETUP[dSlot];
-  return [...FRD_EXTRACT, ...uAlign];
+  return [...FRD_EXTRACT];
 }
 
-/** Blue-front storage setup including y to reach the wrong D slot (hold 0 only). */
+/** Blue-front storage extract including y to reach the wrong D slot (hold 0 only). */
 export function setupMovesForWrongDSlotStorage(
   dSlot: WrongDLayerSlotId,
 ): Move[] {
-  const { yIn, uAlign, yOut } = FRD_WRONG_D_SETUP[dSlot];
-  return [...yIn, ...FRD_EXTRACT, ...yOut, ...uAlign];
+  const { yIn, yOut } = FRD_WRONG_D_SETUP[dSlot];
+  return [...yIn, ...FRD_EXTRACT, ...yOut];
+}
+
+export function wrongDSlotStepBody(
+  cornerId: CornerSlotId,
+  demo: readonly Move[],
+): string {
+  const base = whiteCornersSteps.wrongDSlot(formatCornerLabel(cornerId));
+  return uLayerDemoHasAlignInsertUOverlap(demo)
+    ? `${base} ${whiteCornersSteps.uLayerAlignHabitNote}`
+    : base;
+}
+
+/** Keep extract, URF align, and insert as separate phases when compressing U turns. */
+export function compressPedagogicalWrongDDemo(
+  extract: readonly Move[],
+  align: readonly Move[],
+  insert: readonly Move[],
+): Move[] {
+  return [
+    ...compressConsecutiveFaceQuarterTurns([...extract]),
+    ...compressConsecutiveFaceQuarterTurns([...align]),
+    ...compressConsecutiveFaceQuarterTurns([...insert]),
+  ];
 }
 
 export function buildFrdWrongDLayerDemo(
@@ -57,23 +90,41 @@ export function buildFrdWrongDLayerDemo(
       ];
 
       return dSlotsToTry.flatMap((dSlot) => {
-        const setupInView = setupMovesForWrongDSlotInHoldView(dSlot);
-        const afterSetup = applyMoves(viewState, setupInView);
-        const preferredWhite = faceForWhiteOnCorner(FRD_URF_POS, afterSetup);
+        const extractInView = setupMovesForWrongDSlotInHoldView(dSlot);
+        const extractStorage = setupMovesForWrongDSlotStorage(dSlot);
+        const extractForSimulation =
+          dSlot === 'FRD' ? extractInView : extractStorage;
+        const afterExtract = applyMoves(viewState, extractForSimulation);
+        const afterExtractCase = recognizeCornerCaseInFrdView(
+          afterExtract,
+          targetId,
+          holdIndex,
+        );
+        if (afterExtractCase.kind !== 'in-u-layer') return [];
+
+        const align = alignMovesToUrf(afterExtractCase.uPosition);
+        const afterAlign = applyMoves(afterExtract, align);
+        const preferredWhite = faceForWhiteOnCorner(FRD_URF_POS, afterAlign);
         const whiteFacesToTry = urfInsertFacesToTry(preferredWhite);
 
         return whiteFacesToTry.flatMap((whiteFace) => {
           const insert = insertMovesFromUrf(whiteFace);
           if (!insert?.length) return [];
 
-          const studentDemo = [...uPrefix, ...setupInView, ...insert];
+          const studentDemo = [
+            ...uPrefix,
+            ...compressPedagogicalWrongDDemo(extractInView, align, insert),
+          ];
           const extraStorage: Move[][] =
             dSlot !== 'FRD'
               ? [
                   [
                     ...uPrefix,
-                    ...setupMovesForWrongDSlotStorage(dSlot),
-                    ...insert,
+                    ...compressPedagogicalWrongDDemo(
+                      extractStorage,
+                      align,
+                      insert,
+                    ),
                   ],
                 ]
               : [];

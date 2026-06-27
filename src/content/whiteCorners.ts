@@ -62,7 +62,7 @@ Once a corner is solved, simply rotate the entire cube so the next unsolved corn
   },
   faceSideTitle: (faceLabel: string) => `Face the ${faceLabel.toLowerCase()} side`,
   reorient: (faceLabel: string, cornerLabel: string, skipNote: string) =>
-    `Turn the whole cube so ${faceLabel} is toward you. White stays on bottom, yellow on top. You're setting up to slot the ${cornerLabel} into the front-right corner.${skipNote}`,
+    `Turn the whole cube so ${faceLabel} is toward you. White stays on bottom, yellow on top. You're setting up to solve the ${cornerLabel}.${skipNote}`,
   reorientSkipAlignNote:
     " The next piece is on the top layer; we'll line it up above the front-right slot before inserting.",
   placeholder: (colorA: string, colorB: string) =>
@@ -70,7 +70,7 @@ Once a corner is solved, simply rotate the entire cube so the next unsolved corn
   twisted: (corner: string) =>
     `The ${corner.toLowerCase()} is in the front-right slot but twisted. The demo orients white onto the bottom without disturbing your cross or corners you've already placed.`,
   wrongDSlot: (corner: string) =>
-    `The ${corner.toLowerCase()} is in the wrong bottom corner. The demo lifts it to the top layer, lines it up above the front-right slot, then inserts it correctly. Your cross and solved corners stay put.`,
+    `The ${corner.toLowerCase()} is in the wrong bottom corner. The demo lifts it to the top layer, lines it up above the front-right slot (URF), then runs the matching insert. Your cross and solved corners stay put.`,
   directSolve: (corner: string) =>
     `Slot the ${corner.toLowerCase()} with the demo. Your white cross and any corners you've already solved stay put.`,
   uLayer: (corner: string) =>
