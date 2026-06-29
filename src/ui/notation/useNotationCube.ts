@@ -95,7 +95,7 @@ export function useNotationCube(replayAnimations: boolean) {
   const handleAnimationComplete = useCallback(() => {
     const move = pendingMoveRef.current;
     const kind = pendingKindRef.current;
-    const cardId = animatingCardId;
+    const cardId = activeCardRef.current;
 
     setAnimating(false);
     setAnimatingCardId(null);
@@ -121,7 +121,7 @@ export function useNotationCube(replayAnimations: boolean) {
     if (replayCountRef.current <= MAX_NOTATION_REPLAYS) {
       scheduleReplay(move, kind, cardId);
     }
-  }, [animatingCardId, scheduleReplay]);
+  }, [scheduleReplay]);
 
   const activateMoveCard = useCallback(
     (move: Move, kind: NotationMoveKind) => {
@@ -134,7 +134,6 @@ export function useNotationCube(replayAnimations: boolean) {
       demoBaseRef.current = cloneCubeState(committedStateRef.current);
       setDemoState(null);
 
-      if (animatingRef.current) return;
       triggerAnimation(move, kind, cardId);
     },
     [clearReplayTimeout, triggerAnimation],

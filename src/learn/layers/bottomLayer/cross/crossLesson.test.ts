@@ -23,6 +23,7 @@ import { isVerifiedSlotDemo } from './crossSolveBfs';
 import {
   edgeAlignedToSideCenter,
   findEdgeWithColors,
+  whiteStickerOnD,
 } from '../shared/pieceQueries';
 import { partnerColorForSlot, slotSolved } from './crossSlotModel';
 import {
@@ -164,6 +165,37 @@ describe('white cross lesson', () => {
       expect(step.title).toMatch(/^White–/);
       expect(step.edgeLabel.length).toBeGreaterThan(0);
     }
+  });
+
+  it('rotate-bottom uses a single D move when white is down and that slots the edge (U D2 F)', () => {
+    const student = applyMoves(
+      cubeStateToStudentFrame(createSolvedCubeState()),
+      ['U', 'D2', 'F'],
+    );
+    const targetId = firstUnsolvedCrossId(student);
+    expect(targetId).toBe('DF');
+
+    const step = crossLessonStep(student);
+    expect(step.kind).toBe('rotate-bottom');
+    expect(step.demoMoves).toEqual(['D2']);
+    expect(isVerifiedSlotDemo(student, targetId!, step.demoMoves!)).toBe(true);
+  });
+
+  it('rotate-bottom prefers D-only over align when a quarter D turn fully solves the edge', () => {
+    const student = applyMoves(
+      cubeStateToStudentFrame(createSolvedCubeState()),
+      ['U', 'D', 'F'],
+    );
+    const targetId = firstUnsolvedCrossId(student);
+    expect(targetId).toBe('DF');
+
+    const partner = partnerColorForSlot(student, targetId!);
+    const edge = findEdgeWithColors(student, 'white', partner);
+    expect(edge && whiteStickerOnD(student, edge)).toBe(true);
+
+    const step = crossLessonStep(student);
+    expect(step.kind).toBe('rotate-bottom');
+    expect(step.demoMoves).toEqual(["D'"]);
   });
 
   it('middle-layer align-to-center uses exactly one side quarter turn', () => {

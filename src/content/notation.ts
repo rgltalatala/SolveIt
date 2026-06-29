@@ -3,13 +3,28 @@ import type { Face } from '../cube/cubeState';
 export const notationGuide = {
   resetOrientation: 'Reset orientation',
   replayAnimations: 'Replay animations (up to 5 while hovered)',
-  referenceSummary: 'Notation reference',
+} as const;
+
+export const notationCubePieces = {
+  heading: 'Cube pieces',
+  intro:
+    "A 3x3 cube has three kinds of pieces. Centers stay fixed on each face. Edges sit between two faces. Corners sit where three faces meet. Hover a card (tap on mobile) to see that piece type on the cube.",
+  labels: {
+    center: 'Center',
+    edge: 'Edge',
+    corner: 'Corner',
+  },
+  descriptions: {
+    center: 'One sticker per face. Centers never move.',
+    edge: 'Two stickers. Twelve edge pieces on the cube.',
+    corner: 'Three stickers. Eight corner pieces on the cube.',
+  },
 } as const;
 
 export const notationFaceNames = {
   heading: 'Face names',
   intro:
-    "Each letter names a side of the cube based on how you're holding it, not a sticker color. Green might be on F today and on L after you rotate the whole cube.",
+    "Each letter names a side of the cube based on how you're holding it, not a sticker color. Green might be on F today and on L after you rotate the whole cube. Hover a face (tap on mobile) to see where it is on the cube.",
   labels: {
     F: 'Front',
     R: 'Right',

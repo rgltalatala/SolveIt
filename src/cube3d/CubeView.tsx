@@ -2,9 +2,11 @@ import { useEffect, useRef } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import type { CubeState } from '../cube/cubeState';
+import type { CubeState, Face } from '../cube/cubeState';
 import { isWholeCubeRotation } from '../cube/cubeState';
+import type { CubeAnatomyHighlight } from './cubeAnatomy';
 import { AnimatedCubeMesh, type CubeMoveAnimation } from './AnimatedCubeMesh';
+import { FaceAnatomyLabels } from './FaceAnatomyLabels';
 import {
   captureLessonCamera,
   snapLessonCamera,
@@ -30,6 +32,10 @@ export interface CubeViewProps {
   snapCameraOnWholeCubeRotation?: boolean;
   /** Allow drag-to-orbit (off for notation guide so face letters stay aligned with the view). */
   enableOrbitControls?: boolean;
+  /** Override sticker colors for notation anatomy tabs. */
+  anatomyHighlight?: CubeAnatomyHighlight | null;
+  /** Face letter labels for the notation face-names tab. */
+  faceLabels?: { highlightedFace: Face | null };
 }
 
 export function CubeView({
@@ -41,6 +47,8 @@ export function CubeView({
   cameraBaselineKey = 'default',
   snapCameraOnWholeCubeRotation = true,
   enableOrbitControls = true,
+  anatomyHighlight = null,
+  faceLabels,
 }: CubeViewProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const lessonCameraRef = useRef<LessonCameraSnapshot | null>(null);
@@ -96,7 +104,14 @@ export function CubeView({
         <directionalLight position={[6, 8, 5]} intensity={0.9} castShadow />
         <directionalLight position={[-5, 4, -4]} intensity={0.4} />
         <group rotation={meshRotation}>
-          <AnimatedCubeMesh cubeState={cubeState} animation={activeAnimation} />
+          <AnimatedCubeMesh
+            cubeState={cubeState}
+            animation={activeAnimation}
+            anatomyHighlight={anatomyHighlight}
+          />
+          {faceLabels ? (
+            <FaceAnatomyLabels highlightedFace={faceLabels.highlightedFace} />
+          ) : null}
         </group>
 
         <OrbitControls

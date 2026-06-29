@@ -141,6 +141,23 @@ describe('useNotationCube', () => {
     expect(result.current.moveAnimation).toBeNull();
   });
 
+  it('prioritizes the latest hovered card while an animation is playing', () => {
+    const { result } = renderHook(() => useNotationCube(false));
+
+    act(() => {
+      result.current.activateMoveCard('F', 'face');
+    });
+    expect(result.current.moveAnimation?.move).toBe('F');
+
+    act(() => {
+      result.current.activateMoveCard('R', 'face');
+    });
+
+    expect(result.current.moveAnimation?.move).toBe('R');
+    expect(result.current.isCardActive('face', 'F')).toBe(false);
+    expect(result.current.isCardActive('face', 'R')).toBe(true);
+  });
+
   it('selectMoveCard switches active card on touch', () => {
     const { result } = renderHook(() => useNotationCube(false));
 

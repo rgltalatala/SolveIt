@@ -47,22 +47,23 @@ function tryDPrefixOrInsertSolveSlot(
   const dQuarterTurns = (count: number): Move[] =>
     count === 0 ? [] : count === 1 ? ['D'] : count === 2 ? ['D2'] : ["D'"];
 
+  const tryDemo = (dPart: Move[], extra: Move[]): Move[] | null => {
+    const raw = [...dPart, ...extra];
+    const demo = compressConsecutiveFaceQuarterTurns(raw);
+    if (!preservesSlotsAfterDemo(studentState, demo, mustPreserve)) return null;
+    const after = applyMoves(studentState, demo);
+    return slotSolved(after, id) ? demo : null;
+  };
+
   for (let spinCount = 0; spinCount < 4; spinCount += 1) {
-    const dPart = dQuarterTurns(spinCount);
-
-    const tryDemo = (extra: Move[]): Move[] | null => {
-      const raw = [...dPart, ...extra];
-      const demo = compressConsecutiveFaceQuarterTurns(raw);
-      if (!preservesSlotsAfterDemo(studentState, demo, mustPreserve))
-        return null;
-      const after = applyMoves(studentState, demo);
-      return slotSolved(after, id) ? demo : null;
-    };
-
-    const onlyD = tryDemo([]);
+    const onlyD = tryDemo(dQuarterTurns(spinCount), []);
     if (onlyD) return onlyD;
+  }
 
-    const withDoubleTurn = tryDemo([faceDoubleTurn(slot.sideFace)]);
+  for (let spinCount = 0; spinCount < 4; spinCount += 1) {
+    const withDoubleTurn = tryDemo(dQuarterTurns(spinCount), [
+      faceDoubleTurn(slot.sideFace),
+    ]);
     if (withDoubleTurn) return withDoubleTurn;
   }
   return null;
@@ -75,13 +76,12 @@ function insertFaceFromDemo(demo: Move[], fallback: Face): Face {
   return faceTurn ? (faceTurn[0] as Face) : fallback;
 }
 
-/** White on D at this slot but wrong center — D / D2 / D′ only. */
+/** White on D — D / D2 / D′ only when that fully slots the edge. */
 export function tryRotateBottomStepForCrossId(
   studentState: CubeState,
   id: CrossEdgeId,
 ): WhiteCrossLessonStep | null {
   if (slotSolved(studentState, id)) return null;
-  if (!slotShowsRotateBottomPattern(studentState, id)) return null;
 
   const partner = partnerColorForSlot(studentState, id);
   const edgePosition = findEdgeWithColors(studentState, 'white', partner);

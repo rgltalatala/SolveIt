@@ -1,10 +1,14 @@
 import type { Face } from '../cube/cubeState';
 import { colorHexMap } from '../cube/cubeColors';
-import type { DisplayColor } from './cubeGeometry';
+import type { CubeAnatomyHighlight } from './cubeAnatomy';
+import { resolveAnatomyStickerColor } from './cubeAnatomy';
+import type { CubiePosition, DisplayColor } from './cubeGeometry';
 
 export interface CubieProps {
   position: [number, number, number];
+  cubiePosition: CubiePosition;
   faceColors: Partial<Record<Face, DisplayColor>>;
+  anatomyHighlight?: CubeAnatomyHighlight | null;
 }
 
 const darkPlastic = '#111827';
@@ -38,7 +42,12 @@ function FaceMaterial({ color, materialIndex }: FaceMaterialProps) {
   );
 }
 
-export function Cubie({ position, faceColors }: CubieProps) {
+export function Cubie({
+  position,
+  cubiePosition,
+  faceColors,
+  anatomyHighlight = null,
+}: CubieProps) {
   const [x, y, z] = position;
   const size = 0.92;
 
@@ -48,6 +57,14 @@ export function Cubie({ position, faceColors }: CubieProps) {
     const face = materialByNormal[normal];
     const sticker = faceColors[face];
     if (!sticker) return darkPlastic;
+
+    const anatomyColor = resolveAnatomyStickerColor(
+      anatomyHighlight,
+      cubiePosition,
+      face,
+    );
+    if (anatomyColor) return anatomyColor;
+
     if (sticker === 'unknown') return '#374151';
     return colorHexMap[sticker];
   });

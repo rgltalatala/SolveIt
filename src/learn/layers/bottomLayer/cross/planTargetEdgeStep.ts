@@ -91,7 +91,6 @@ function tryInsertStepForCrossId(
   id: CrossEdgeId,
 ): WhiteCrossLessonStep | null {
   return (
-    tryDLayerInsertStepForCrossId(studentState, id) ??
     tryULayerInsertStepForCrossId(studentState, id) ??
     tryDirectSolveStepForCrossId(studentState, id)
   );
@@ -101,9 +100,7 @@ async function tryInsertStepForCrossIdAsync(
   studentState: CubeState,
   id: CrossEdgeId,
 ): Promise<WhiteCrossLessonStep | null> {
-  const sync =
-    tryDLayerInsertStepForCrossId(studentState, id) ??
-    tryULayerInsertStepForCrossId(studentState, id);
+  const sync = tryULayerInsertStepForCrossId(studentState, id);
   if (sync) return sync;
 
   return tryDirectSolveStepForCrossIdAsync(studentState, id);
@@ -163,6 +160,9 @@ export function planTargetEdgeStep(
   const rotate = tryRotateBottomStepForCrossId(studentState, targetId);
   if (rotate) return rotate;
 
+  const dLayerInsert = tryDLayerInsertStepForCrossId(studentState, targetId);
+  if (dLayerInsert) return dLayerInsert;
+
   if (isTargetAligned(studentState, targetId)) {
     return (
       tryInsertStepForCrossId(studentState, targetId) ??
@@ -184,6 +184,9 @@ export async function planTargetEdgeStepAsync(
 
   const rotate = tryRotateBottomStepForCrossId(studentState, targetId);
   if (rotate) return rotate;
+
+  const dLayerInsert = tryDLayerInsertStepForCrossId(studentState, targetId);
+  if (dLayerInsert) return dLayerInsert;
 
   if (isTargetAligned(studentState, targetId)) {
     return (

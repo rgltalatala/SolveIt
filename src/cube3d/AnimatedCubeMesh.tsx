@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import type { Group } from 'three';
 import type { CubeState, Move } from '../cube/cubeState';
+import type { CubeAnatomyHighlight } from './cubeAnatomy';
 import { Cubie } from './Cubie';
 import { cubieDefinitions, getCubieFaceColors } from './cubeGeometry';
 import {
@@ -28,6 +29,7 @@ export type CubeMoveAnimation = {
 type AnimatedCubeMeshProps = {
   cubeState: CubeState;
   animation: CubeMoveAnimation | null;
+  anatomyHighlight?: CubeAnatomyHighlight | null;
 };
 
 function partitionCubies(spec: MoveAnimationSpec | null) {
@@ -55,16 +57,20 @@ function partitionCubies(spec: MoveAnimationSpec | null) {
 function CubieAt({
   cubeState,
   position,
+  anatomyHighlight = null,
 }: {
   cubeState: CubeState;
   position: (typeof cubieDefinitions)[0]['position'];
+  anatomyHighlight?: CubeAnatomyHighlight | null;
 }) {
   const [x, y, z] = position;
   return (
     <group position={[x, y, z]}>
       <Cubie
         position={[0, 0, 0]}
+        cubiePosition={position}
         faceColors={getCubieFaceColors(cubeState, position)}
+        anatomyHighlight={anatomyHighlight}
       />
     </group>
   );
@@ -77,6 +83,7 @@ function CubieAt({
 export function AnimatedCubeMesh({
   cubeState,
   animation,
+  anatomyHighlight = null,
 }: AnimatedCubeMeshProps) {
   const spec = animation ? getMoveAnimationSpec(animation.move) : null;
   const { staticCubies, layerCubies } = useMemo(
@@ -147,6 +154,7 @@ export function AnimatedCubeMesh({
           key={c.position.join(':')}
           cubeState={cubeState}
           position={c.position}
+          anatomyHighlight={anatomyHighlight}
         />
       ))}
       <group ref={turnRef}>
@@ -155,6 +163,7 @@ export function AnimatedCubeMesh({
             key={c.position.join(':')}
             cubeState={cubeState}
             position={c.position}
+            anatomyHighlight={anatomyHighlight}
           />
         ))}
       </group>
