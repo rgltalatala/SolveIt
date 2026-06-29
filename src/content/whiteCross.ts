@@ -34,7 +34,7 @@ export const whiteCrossLesson = {
 } as const;
 
 export function whitePartnerEdgeHeading(partner: Color): string {
-  return `white–${partner} edge`;
+  return `White–${partner} edge`;
 }
 
 export const whiteCrossSteps = {
