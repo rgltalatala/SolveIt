@@ -246,6 +246,24 @@ describe('last layer orient corners model', () => {
       alignMoves: ['U'],
     });
   });
+
+  it('uses a single U turn to finish when all remaining corners are oriented on U', () => {
+    let current = cloneCubeState(twoUnsolvedOrientStudent());
+    const session = { ...AFTER_ORIENT_EDGES, inOrientCornersPhase: true };
+    current = applyMoves(current, getLastLayerLessonStep(current, session).demoMoves!);
+    current = applyMoves(current, getLastLayerLessonStep(current, session).demoMoves!);
+    current = applyMoves(current, getLastLayerLessonStep(current, session).demoMoves!);
+    const finishAlign = getLastLayerLessonStep(current, session);
+    expect(finishAlign).toMatchObject({
+      kind: 'align-u',
+      subLesson: 'orient-corners',
+    });
+    expect(finishAlign.demoMoves?.length).toBe(1);
+    expect(finishAlign.demoMoves?.[0]).not.toBe('U');
+    expect(isLastLayerComplete(applyMoves(current, finishAlign.demoMoves!))).toBe(
+      true,
+    );
+  });
 });
 
 describe('last layer orient corners planner', () => {
@@ -309,6 +327,43 @@ describe('last layer orient corners planner', () => {
     const result = simulateOrientCornersPhase(twoUnsolvedOrientStudent());
     expect(result.complete).toBe(true);
     expect(result.f2lRestored).toBe(true);
+  });
+
+  it('finishes two-unsolved orient without repeated single-U align steps', () => {
+    let current = cloneCubeState(twoUnsolvedOrientStudent());
+    const session = { ...AFTER_ORIENT_EDGES, inOrientCornersPhase: true };
+
+    const firstOrient = getLastLayerLessonStep(current, session);
+    expect(firstOrient.kind).toBe('orient-corners');
+    current = applyMoves(current, firstOrient.demoMoves!);
+
+    const firstAlign = getLastLayerLessonStep(current, session);
+    expect(firstAlign.kind).toBe('align-u');
+    current = applyMoves(current, firstAlign.demoMoves!);
+
+    const secondOrient = getLastLayerLessonStep(current, session);
+    expect(secondOrient.kind).toBe('orient-corners');
+    current = applyMoves(current, secondOrient.demoMoves!);
+
+    const remainingAligns: Move[][] = [];
+    for (let i = 0; i < 4; i += 1) {
+      const step = getLastLayerLessonStep(current, session);
+      if (step.kind === 'complete') break;
+      if (step.kind === 'align-u') {
+        remainingAligns.push(step.demoMoves);
+        current = applyMoves(current, step.demoMoves);
+        continue;
+      }
+      if (step.kind === 'orient-corners') {
+        current = applyMoves(current, step.demoMoves);
+        continue;
+      }
+      break;
+    }
+
+    expect(remainingAligns.flat()).not.toEqual(['U', 'U', 'U']);
+    expect(remainingAligns.length).toBeLessThanOrEqual(1);
+    expect(isLastLayerComplete(current)).toBe(true);
   });
 });
 

@@ -16,19 +16,34 @@ export type OrientCornersCase =
   | { kind: 'needs-align'; alignMoves: Move[] }
   | { kind: 'orient-at-urf'; reps: 2 | 4 };
 
+const U_ALIGN_PREFIXES: Move[][] = [[], ['U'], ['U2'], ["U'"]];
+
 function alignCost(moves: Move[]): number {
-  return moves.reduce((sum, move) => {
-    if (move === 'U2') return sum + 2;
-    return sum + 1;
-  }, 0);
+  return moves.reduce((sum, move) => (move === 'U2' ? sum + 2 : sum + 1), 0);
 }
 
-function closestAlignToUrf(
-  unsolved: readonly ULayerCornerId[],
+function findUPrefixToFullySolveCorners(state: CubeState): Move[] | null {
+  let best: Move[] | null = null;
+  let bestCost = Infinity;
+  for (const prefix of U_ALIGN_PREFIXES) {
+    const after = applyMoves(state, prefix);
+    if (isCornersFullySolved(after)) {
+      const cost = alignCost(prefix);
+      if (cost < bestCost) {
+        bestCost = cost;
+        best = [...prefix];
+      }
+    }
+  }
+  return best;
+}
+
+function closestAlignToUnoriented(
+  unoriented: readonly ULayerCornerId[],
 ): Move[] {
   let best: Move[] | null = null;
   let bestCost = Infinity;
-  for (const slotId of unsolved) {
+  for (const slotId of unoriented) {
     const moves = alignMovesToUrf(slotId);
     if (moves.length === 0) continue;
     const cost = alignCost(moves);
@@ -65,11 +80,22 @@ export function recognizeOrientCornersCase(
     return { kind: 'orient-at-urf', reps: orientRepsAtUrf(state) };
   }
 
-  const unsolved = unsolvedCornerSlots(state);
-  return {
-    kind: 'needs-align',
-    alignMoves: closestAlignToUrf(unsolved),
-  };
+  const finishPrefix = findUPrefixToFullySolveCorners(state);
+  if (finishPrefix !== null) {
+    return { kind: 'needs-align', alignMoves: finishPrefix };
+  }
+
+  const unoriented = unsolvedCornerSlots(state).filter(
+    (slotId) => !cornerOrientedAtSlot(state, slotId),
+  );
+  if (unoriented.length > 0) {
+    return {
+      kind: 'needs-align',
+      alignMoves: closestAlignToUnoriented(unoriented),
+    };
+  }
+
+  return { kind: 'orient-at-urf', reps: orientRepsAtUrf(state) };
 }
 
 export { ORIENT_CORNER_ALG };

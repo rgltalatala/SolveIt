@@ -1,4 +1,5 @@
 import type { CubeState, Move } from '../../../cube/cubeState';
+import { compressConsecutiveFaceQuarterTurns } from '../../../cube/cubeState';
 import { returnToBlueY, type CornerHoldIndex } from '../bottomLayer/corners/cornerHold';
 import { lastLayerSteps } from '../../../content/lastLayer';
 import { orientRepsAtUrf, recognizeOrientCornersCase } from './orientCorners/orientCornersCases';
@@ -27,12 +28,14 @@ function buildReturnToBlueStep(
 }
 
 function buildAlignUStep(alignMoves: Move[]): LastLayerLessonStep {
+  const compressed = compressConsecutiveFaceQuarterTurns(alignMoves);
+  const demoMoves = compressed.length > 0 ? compressed : alignMoves;
   return {
     kind: 'align-u',
     subLesson: 'orient-corners',
     title: lastLayerSteps.alignOrientCorners.title,
     body: lastLayerSteps.alignOrientCorners.body,
-    demoMoves: alignMoves,
+    demoMoves,
   };
 }
 

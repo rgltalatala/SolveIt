@@ -139,7 +139,9 @@ export function LearningLastLayerView() {
 
   const lastSessionEntry =
     sessionUndoStack[sessionUndoStack.length - 1] ?? null;
-  const canUndo = lastSessionEntry !== null && canUndoLesson;
+  const canUndo =
+    lastSessionEntry !== null &&
+    (!lastSessionEntry.withCubeApply || canUndoLesson);
 
   if (!cubeState || !studentFrame) {
     return <LessonUnavailable onBack={() => setAppPhase('ready')} />;
@@ -211,8 +213,11 @@ export function LearningLastLayerView() {
   const handleUndoLessonStep = () => {
     if (!canUndo || isStepPending) return;
     startLessonTransition(() => {
-      undoLessonStep();
-      undoLastSessionStep();
+      const withCubeApply = undoLastSessionStep();
+      if (withCubeApply) {
+        undoLessonStep();
+      }
+      recomputeStep();
     });
   };
 
