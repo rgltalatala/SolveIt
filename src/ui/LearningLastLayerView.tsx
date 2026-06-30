@@ -41,6 +41,7 @@ import { LessonCubeStage } from './lessons/LessonCubeStage';
 import { LessonHeaderActions } from './lessons/LessonHeaderActions';
 import { LessonUnavailable } from './lessons/LessonUnavailable';
 import { useLessonDemoPipeline } from './lessons/useLessonDemoPipeline';
+import { cornerHoldToStudentHold } from '../learn/layers/bottomLayer/corners';
 
 function expandHoldReorientDemo(moves: Move[]): {
   steps: DemoStep[];
@@ -119,6 +120,11 @@ export function LearningLastLayerView() {
     [step, demoMoves],
   );
 
+  const demoInitialHold = useMemo(
+    () => cornerHoldToStudentHold(currentHoldIndex),
+    [currentHoldIndex],
+  );
+
   const { visibleDemo } = useLessonDemoPipeline({
     demoMoves,
     stepKey,
@@ -126,6 +132,7 @@ export function LearningLastLayerView() {
     isStepPending,
     stepKind: step?.kind,
     snapshotKeySuffix: `-${currentHoldIndex}`,
+    initialHold: demoInitialHold,
     expandDemo: isHoldReorientStep ? expandReorientDemoForPipeline : undefined,
   });
 

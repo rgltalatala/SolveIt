@@ -124,6 +124,18 @@ describe('expandDemoToInstructions', () => {
     ).toEqual(raw);
   });
 
+  it('uses hold-aware face colors from initial y-hold', () => {
+    const { instructions } = expandDemoToInstructions(['R'], { y: 'y2' });
+    expect(instructions[0]?.text).toMatch(/orange/i);
+    expect(instructions[0]?.text).not.toMatch(/\bred\b/i);
+  });
+
+  it('updates face colors after embedded y in demo', () => {
+    const { instructions } = expandDemoToInstructions(['y', 'R'], noneHold());
+    expect(instructions[1]?.text).toMatch(/green/i);
+    expect(instructions[1]?.text).not.toMatch(/\bred\b/i);
+  });
+
   it('expands B′ with y2 bookends and F′', () => {
     const { instructions, finalHold } = expandDemoToInstructions(
       ["B'"],

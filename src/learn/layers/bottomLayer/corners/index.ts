@@ -36,6 +36,7 @@ export {
 
 export type { CornerHoldIndex } from './cornerHold';
 export {
+  cornerHoldToStudentHold,
   formatHoldFaceLabel,
   holdIndexToY,
   normalizeHoldToBlue,

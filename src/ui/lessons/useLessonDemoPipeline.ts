@@ -12,6 +12,7 @@ import {
   noneHold,
   type DemoStep,
   type Instruction,
+  type StudentHold,
 } from '../../learn/studentHold';
 import { resolveVisibleDemo, type DemoSnapshot } from './lessonDemo';
 
@@ -28,6 +29,8 @@ type UseLessonDemoPipelineOptions = {
   isStepPending: boolean;
   stepKind?: string | null;
   snapshotKeySuffix?: string;
+  /** Cumulative y-hold for the cube before this demo (e.g. after reorient-hold). */
+  initialHold?: StudentHold;
   expandDemo?: (moves: Move[], avoidOn: boolean) => DemoExpansionResult;
 };
 
@@ -38,6 +41,7 @@ export function useLessonDemoPipeline({
   isStepPending,
   stepKind,
   snapshotKeySuffix = '',
+  initialHold = noneHold(),
   expandDemo,
 }: UseLessonDemoPipelineOptions) {
   const showAvoidBackToggle = useMemo(
@@ -63,15 +67,15 @@ export function useLessonDemoPipeline({
   const buildExpansion = useCallback(
     (moves: Move[], avoid: boolean): DemoExpansionResult => {
       if (expandDemo) return expandDemo(moves, avoid);
-      const expansion = getLessonDemoExpansion(moves, avoid, noneHold());
+      const expansion = getLessonDemoExpansion(moves, avoid, initialHold);
       return {
         steps: expansion.steps,
-        instructions: expandDemoToInstructions(moves, noneHold(), {
+        instructions: expandDemoToInstructions(moves, initialHold, {
           avoidBackMoves: avoid,
         }).instructions,
       };
     },
-    [expandDemo],
+    [expandDemo, initialHold],
   );
 
   const demoExpansion = useMemo(
