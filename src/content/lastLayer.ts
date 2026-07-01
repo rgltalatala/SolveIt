@@ -147,11 +147,7 @@ export const lastLayerSteps = {
   },
   permuteCornersZeroFlowFirst: {
     title: 'Permute top corners',
-    body: "No top corners have their side colors in place yet. Run U R U' L' U R' U' L, turn the cube with y2, then run the same algorithm again. All four corners will be permuted.",
-  },
-  permuteCornersZeroFlowSecond: {
-    title: 'Permute top corners again',
-    body: "Run U R U' L' U R' U' L once more. All four top corner side stickers should match their adjacent centers.",
+    body: "No top corners have their side colors in place yet. Run U R U' L' U R' U' L once.",
   },
   permuteCornersOne: {
     title: 'Permute top corners',

@@ -9,6 +9,7 @@ import {
   notationFaceTurns,
   notationGuide as notationGuideCopy,
 } from '../../content/notation';
+import type { NotationSectionId } from '../../store/lessonSessionStore';
 import { FaceNameCard } from './FaceNameCard';
 import { NotationMoveCard } from './NotationMoveCard';
 import { PieceTypeCard } from './PieceTypeCard';
@@ -22,11 +23,10 @@ import {
 import { useNotationCube } from './useNotationCube';
 import { usePrefersHover } from './usePrefersHover';
 
-type NotationSectionId =
-  | 'cubePieces'
-  | 'faceNames'
-  | 'faceTurns'
-  | 'cubeRotations';
+type NotationGuideProps = {
+  activeSection?: NotationSectionId;
+  onSectionChange?: (section: NotationSectionId) => void;
+};
 
 const NOTATION_SECTIONS: { id: NotationSectionId; label: string }[] = [
   { id: 'cubePieces', label: notationCubePieces.heading },
@@ -57,8 +57,14 @@ const PIECE_TYPE_CARDS: {
   },
 ];
 
-export function NotationGuide() {
-  const [activeSection, setActiveSection] = useState<NotationSectionId>('cubePieces');
+export function NotationGuide({
+  activeSection: controlledSection,
+  onSectionChange,
+}: NotationGuideProps = {}) {
+  const [internalSection, setInternalSection] =
+    useState<NotationSectionId>('cubePieces');
+  const activeSection = controlledSection ?? internalSection;
+  const setActiveSection = onSectionChange ?? setInternalSection;
   const [highlightedFace, setHighlightedFace] = useState<Face | null>(null);
   const [highlightedPieceType, setHighlightedPieceType] = useState<CubiePieceType | null>(null);
   const [replayAnimations, setReplayAnimations] = useState(false);

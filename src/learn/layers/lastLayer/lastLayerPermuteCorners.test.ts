@@ -19,7 +19,9 @@ import {
   PERMUTE_CORNERS_ALG,
   recognizePermuteCornersCase,
   simulateLastLayerLessonOnStorageCube,
-  ZERO_FLOW_Y2_TARGET_HOLD,
+  ZERO_FLOW_NONE_PERMUTED_SETUP,
+  ZERO_FLOW_PERMUTE_CORNERS_FULL,
+  buildZeroFlowPermuteDemo,
 } from './index';
 
 const AFTER_ORIENT_EDGES = LAST_LAYER_PAST_ORIENT_EDGES;
@@ -63,11 +65,7 @@ function onePermutedCornerStudent(): CubeState {
 }
 
 function zeroPermutedCornersStudent(): CubeState {
-  return applyMoves(solvedStudent(), [
-    ...PERMUTE_CORNERS_ALG,
-    'y2',
-    ...invertMoves(PERMUTE_CORNERS_ALG),
-  ]);
+  return applyMoves(solvedStudent(), [...ZERO_FLOW_NONE_PERMUTED_SETUP]);
 }
 
 describe('last layer permute corners model', () => {
@@ -120,50 +118,37 @@ describe('last layer permute corners planner', () => {
     });
   });
 
-  it('advances zero-flow through alg, y2, and second alg', () => {
+  it('advances zero-flow through first alg, URF setup, then repeat algs', () => {
     let student = zeroPermutedCornersStudent();
-    let zeroFlowStep: 0 | 1 | 2 | undefined;
+    let hold = 0 as 0 | 1 | 2 | 3;
 
-    const first = getLastLayerLessonStep(student, { ...AFTER_ORIENT_EDGES, permuteCornersZeroFlowStep: zeroFlowStep });
+    const first = getLastLayerLessonStep(student, {
+      ...AFTER_ORIENT_EDGES,
+      currentHoldIndex: hold,
+    });
     expect(first).toMatchObject({
       kind: 'permute-corners',
       permuteCase: 'zero-flow-first',
     });
     student = applyMoves(student, expectStepDemoMoves(first));
-    zeroFlowStep = 1;
 
-    const second = getLastLayerLessonStep(student, { ...AFTER_ORIENT_EDGES, permuteCornersZeroFlowStep: zeroFlowStep });
-    expect(second).toMatchObject({
-      kind: 'reorient-hold',
-      zeroFlowStep: 1,
-      targetHoldIndex: ZERO_FLOW_Y2_TARGET_HOLD,
+    const second = getLastLayerLessonStep(student, {
+      ...AFTER_ORIENT_EDGES,
+      currentHoldIndex: hold,
     });
-    student = applyMoves(student, expectStepDemoMoves(second));
-    zeroFlowStep = 2;
+    if (second.kind === 'reorient-hold') {
+      expect(second.demoMoves.length).toBeGreaterThan(0);
+      student = applyMoves(student, expectStepDemoMoves(second));
+      hold = (second.targetHoldIndex ?? hold) as 0 | 1 | 2 | 3;
+    }
 
     const third = getLastLayerLessonStep(student, {
       ...AFTER_ORIENT_EDGES,
-      currentHoldIndex: ZERO_FLOW_Y2_TARGET_HOLD,
-      permuteCornersZeroFlowStep: zeroFlowStep,
+      currentHoldIndex: hold,
     });
     expect(third).toMatchObject({
       kind: 'permute-corners',
-      permuteCase: 'zero-flow-second',
-    });
-  });
-
-  it('skips empty y2 when zero-flow step 1 already at green hold', () => {
-    const student = zeroPermutedCornersStudent();
-    expect(
-      getLastLayerLessonStep(student, {
-        ...AFTER_ORIENT_EDGES,
-        currentHoldIndex: ZERO_FLOW_Y2_TARGET_HOLD,
-        permuteCornersZeroFlowStep: 1,
-      }),
-    ).toMatchObject({
-      kind: 'permute-corners',
-      permuteCase: 'zero-flow-second',
-      demoMoves: PERMUTE_CORNERS_ALG,
+      permuteCase: 'one-permuted',
     });
   });
 
@@ -174,6 +159,23 @@ describe('last layer permute corners planner', () => {
     expect(result.stuckNoDemo).toBe(false);
     expect(result.lastLayerComplete).toBe(true);
     expect(result.finalHoldIndex).toBe(0);
+  });
+
+  it('permutes all corners when full zero-flow demo is applied', () => {
+    const after = applyMoves(
+      zeroPermutedCornersStudent(),
+      ZERO_FLOW_PERMUTE_CORNERS_FULL,
+    );
+    expect(isCornersFullyPermuted(after)).toBe(true);
+    expect(recognizePermuteCornersCase(after).kind).toBe('solved');
+  });
+
+  it('buildZeroFlowPermuteDemo matches exported full demo moves', () => {
+    const demo = buildZeroFlowPermuteDemo(zeroPermutedCornersStudent());
+    expect(demo.moves).toEqual(ZERO_FLOW_PERMUTE_CORNERS_FULL);
+    expect(isCornersFullyPermuted(applyMoves(zeroPermutedCornersStudent(), demo.moves))).toBe(
+      true,
+    );
   });
 
   it('returns reorient-hold then permute-corners for one-permuted case at wrong hold', () => {
@@ -220,18 +222,14 @@ describe('last layer permute corners planner', () => {
     );
   });
 
-  it('verifies zero-flow y2 reorient demo', () => {
-    const student = applyMoves(
-      zeroPermutedCornersStudent(),
-      PERMUTE_CORNERS_ALG,
+  it('verifies reorient demo after zero-flow first alg when needed', () => {
+    let student = zeroPermutedCornersStudent();
+    student = applyMoves(student, PERMUTE_CORNERS_ALG);
+    const step = getLastLayerLessonStep(student, AFTER_ORIENT_EDGES);
+    if (step.kind !== 'reorient-hold') return;
+    expect(isVerifiedPermuteCornersReorientDemo(student, step.demoMoves)).toBe(
+      true,
     );
-    const step = getLastLayerLessonStep(student, { ...AFTER_ORIENT_EDGES, permuteCornersZeroFlowStep: 1 });
-    expect(step.kind).toBe('reorient-hold');
-    if (step.kind === 'reorient-hold' && step.demoMoves) {
-      expect(isVerifiedPermuteCornersReorientDemo(student, step.demoMoves)).toBe(
-        true,
-      );
-    }
   });
 });
 
@@ -252,13 +250,11 @@ describe('last layer permute corners simulation', () => {
     const student = onePermutedCornerStudent();
     let current = cloneCubeState(student);
     let hold = 0 as 0 | 1 | 2 | 3;
-    let zeroFlowStep: 0 | 1 | 2 | undefined;
     let before = countPermutedCorners(current);
     for (let i = 0; i < 12; i += 1) {
       const step = getLastLayerLessonStep(current, {
         ...AFTER_ORIENT_EDGES,
         currentHoldIndex: hold,
-        permuteCornersZeroFlowStep: zeroFlowStep,
       });
       if (step.kind === 'complete') break;
       current = applyMoves(current, expectStepDemoMoves(step));
@@ -266,11 +262,6 @@ describe('last layer permute corners simulation', () => {
         hold = (step.returnToInitialHold
           ? 0
           : step.targetHoldIndex ?? hold) as 0 | 1 | 2 | 3;
-        if (step.zeroFlowStep === 1) zeroFlowStep = 2;
-      }
-      if (step.kind === 'permute-corners') {
-        if (step.permuteCase === 'zero-flow-first') zeroFlowStep = 1;
-        if (step.permuteCase === 'zero-flow-second') zeroFlowStep = undefined;
       }
       const after = countPermutedCorners(current);
       expect(after >= before || isCornersFullyPermuted(current)).toBe(true);

@@ -35,6 +35,8 @@ export interface MoveSequenceDemoProps {
   demoSteps?: DemoStep[];
   /** Full prose instructions (from {@link expandDemoToInstructions}). */
   instructions?: Instruction[];
+  /** Move counts per instruction when one line covers multiple moves (e.g. zero-flow phases). */
+  instructionPhaseLengths?: number[];
   meshRotation?: [number, number, number];
   frameClassName?: string;
   /** Rendered at the end of the demo control row (e.g. apply / continue). */
@@ -50,6 +52,7 @@ export function MoveSequenceDemo({
   moves,
   demoSteps,
   instructions,
+  instructionPhaseLengths,
   meshRotation = [0, 0, 0],
   frameClassName = 'h-[280px] w-full min-h-[240px] overflow-hidden rounded-lg border border-slate-600 bg-slate-950',
   trailingActions,
@@ -180,10 +183,21 @@ export function MoveSequenceDemo({
 
   const defaultHold = studentLessonHoldFaceCenters();
   const holdForCopy = hasMoves ? displayHold : defaultHold;
-  const instructionIndex =
-    animating && reverseAnimating
-      ? Math.max(0, applied - 1)
-      : Math.min(applied, Math.max(0, (instructions?.length ?? 1) - 1));
+  const completedMoves =
+    animating && reverseAnimating ? Math.max(0, applied - 1) : applied;
+
+  const instructionIndex = (() => {
+    if (!instructions?.length) return 0;
+    if (instructionPhaseLengths?.length) {
+      let end = 0;
+      for (let i = 0; i < instructionPhaseLengths.length; i += 1) {
+        end += instructionPhaseLengths[i]!;
+        if (completedMoves < end) return i;
+      }
+      return instructionPhaseLengths.length - 1;
+    }
+    return Math.min(completedMoves, instructions.length - 1);
+  })();
 
   return (
     <div className="flex flex-col gap-3 rounded-xl border border-slate-700 bg-slate-900/60 p-4">

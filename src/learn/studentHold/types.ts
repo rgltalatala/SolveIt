@@ -22,11 +22,15 @@ export type Instruction =
       type: 'rotation';
       rotation: YRotationStep;
       text: string;
+      /** Short list label; defaults to ↻ or the rotation notation. */
+      label?: string;
     }
   | {
       type: 'move';
       move: Move;
       text: string;
+      /** Short list label; defaults to the move notation. */
+      label?: string;
     };
 
 export type ExpandDemoResult = {

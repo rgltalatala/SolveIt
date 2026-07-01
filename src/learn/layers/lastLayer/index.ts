@@ -8,7 +8,6 @@ export type {
   LastLayerSubLesson,
   OrientEdgesOllCase,
   PermuteCornersCaseKind,
-  PermuteCornersZeroFlowStep,
   PermuteEdgesCaseKind,
   SeenLastLayerIntros,
   SimulateLastLayerLessonResult,
@@ -98,14 +97,20 @@ export {
   type PermuteCornersCase,
 } from './permuteCorners/permuteCornersCases';
 
-export { PERMUTE_CORNERS_ALG } from './permuteCorners/permuteCornersAlgs';
+export {
+  PERMUTE_CORNERS_ALG,
+  ZERO_FLOW_NONE_PERMUTED_SETUP,
+  ZERO_FLOW_PERMUTE_CORNERS_FULL,
+  ZERO_FLOW_PERMUTE_PHASES,
+} from './permuteCorners/permuteCornersAlgs';
+
+export { buildZeroFlowPermuteDemo } from './permuteCorners/zeroFlowDemo';
 
 export {
   findReorientToPlacePermutedCornerAtWorldUrf,
   holdIndexToBringSlotToWorldUrf,
   reorientMovesForCornerSetup,
   WORLD_URF_SLOT,
-  ZERO_FLOW_Y2_TARGET_HOLD,
 } from './permuteCorners/permuteHold';
 
 export {

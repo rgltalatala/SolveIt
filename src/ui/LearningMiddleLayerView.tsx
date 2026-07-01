@@ -23,6 +23,10 @@ import {
   SAME_HOLD_NOTE,
 } from '../content/tips';
 import { ui } from '../content/ui';
+import {
+  continueToLesson,
+  leaveLessonToOverview,
+} from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { LAST_LAYER_LESSON_ID } from '../learn/layers/lastLayer';
 import { useMiddleLayerLessonStep } from './lessons/middleLayer/useMiddleLayerLessonStep';
@@ -62,7 +66,6 @@ export function LearningMiddleLayerView() {
   const cubeState = useCubeStore((state) => state.cubeState);
   const setAppPhase = useCubeStore((state) => state.setAppPhase);
   const setActiveLesson = useCubeStore((state) => state.setActiveLesson);
-  const activeLesson = useCubeStore((state) => state.activeLesson);
   const applyLessonDemoMoves = useCubeStore(
     (state) => state.applyLessonDemoMoves,
   );
@@ -89,7 +92,11 @@ export function LearningMiddleLayerView() {
     advanceAfterStep,
     undoMiddleSessionStep,
     resetMiddleSession,
-  } = useMiddleLayerLessonStep(studentFrame, { resetKey: activeLesson });
+  } = useMiddleLayerLessonStep(studentFrame);
+
+  const leaveLesson = () => {
+    leaveLessonToOverview();
+  };
 
   const demoMoves = useMemo((): Move[] => {
     if (
@@ -139,7 +146,7 @@ export function LearningMiddleLayerView() {
   const canUndo = lastSessionEntry !== null && canUndoLesson;
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={() => setAppPhase('ready')} />;
+    return <LessonUnavailable onBack={leaveLesson} />;
   }
 
   const displayStep =
@@ -262,7 +269,7 @@ export function LearningMiddleLayerView() {
           canUndo={canUndo}
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
-          onBack={() => setAppPhase('ready')}
+          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
           extraActions={
             <button
@@ -361,10 +368,7 @@ export function LearningMiddleLayerView() {
               <button
                 type="button"
                 className="inline-flex rounded-lg bg-amber-700 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-600"
-                onClick={() => {
-                  resetLessonSession();
-                  setActiveLesson(LAST_LAYER_LESSON_ID);
-                }}
+                onClick={() => continueToLesson(LAST_LAYER_LESSON_ID)}
               >
                 {middleLayerLesson.continueLastLayer}
               </button>

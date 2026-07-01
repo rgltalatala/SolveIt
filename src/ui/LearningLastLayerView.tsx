@@ -31,6 +31,7 @@ import {
   SAME_HOLD_NOTE,
 } from '../content/tips';
 import { ui } from '../content/ui';
+import { leaveLessonToOverview } from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { useLastLayerLessonStep } from './lessons/lastLayer/useLastLayerLessonStep';
 import {
@@ -69,7 +70,6 @@ export function LearningLastLayerView() {
   const cubeState = useCubeStore((state) => state.cubeState);
   const setAppPhase = useCubeStore((state) => state.setAppPhase);
   const setActiveLesson = useCubeStore((state) => state.setActiveLesson);
-  const activeLesson = useCubeStore((state) => state.activeLesson);
   const applyLessonDemoMoves = useCubeStore(
     (state) => state.applyLessonDemoMoves,
   );
@@ -99,7 +99,11 @@ export function LearningLastLayerView() {
     isEdgePermutePhase,
     isCornerPermutePhase,
     isCornerOrientPhase,
-  } = useLastLayerLessonStep(studentFrame, { resetKey: activeLesson });
+  } = useLastLayerLessonStep(studentFrame);
+
+  const leaveLesson = () => {
+    leaveLessonToOverview();
+  };
 
   const demoMoves = useMemo((): Move[] => {
     if (
@@ -151,7 +155,7 @@ export function LearningLastLayerView() {
     (!lastSessionEntry.withCubeApply || canUndoLesson);
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={() => setAppPhase('ready')} />;
+    return <LessonUnavailable onBack={leaveLesson} />;
   }
 
   const isOrientEdgesLessonStep =
@@ -336,7 +340,7 @@ export function LearningLastLayerView() {
           canUndo={canUndo}
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
-          onBack={() => setAppPhase('ready')}
+          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
         />
       </header>

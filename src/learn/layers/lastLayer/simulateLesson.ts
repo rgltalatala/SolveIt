@@ -13,7 +13,6 @@ import { isLastLayerComplete } from './permuteCorners/uLayerCornerPermuteModel';
 import type {
   LastLayerLessonStep,
   LastLayerLessonStepOptions,
-  PermuteCornersZeroFlowStep,
   SeenLastLayerIntros,
   SimulateLastLayerLessonResult,
 } from './types';
@@ -80,20 +79,6 @@ function advanceHoldAfterStep(
   return currentHoldIndex;
 }
 
-function advanceZeroFlowAfterStep(
-  step: LastLayerLessonStep,
-  permuteCornersZeroFlowStep: PermuteCornersZeroFlowStep | undefined,
-): PermuteCornersZeroFlowStep | undefined {
-  if (step.kind === 'permute-corners') {
-    if (step.permuteCase === 'zero-flow-first') return 1;
-    if (step.permuteCase === 'zero-flow-second') return undefined;
-  }
-  if (step.kind === 'reorient-hold' && step.zeroFlowStep === 1) {
-    return 2;
-  }
-  return permuteCornersZeroFlowStep;
-}
-
 function isLastLayerLessonComplete(
   student: CubeState,
   holdIndex: CornerHoldIndex,
@@ -115,10 +100,6 @@ function applyStepToSimulation(
     session: {
       ...session,
       currentHoldIndex: advanceHoldAfterStep(step, session.currentHoldIndex),
-      permuteCornersZeroFlowStep: advanceZeroFlowAfterStep(
-        step,
-        session.permuteCornersZeroFlowStep,
-      ),
     },
   };
 }

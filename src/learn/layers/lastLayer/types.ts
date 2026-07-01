@@ -55,14 +55,10 @@ export type PermuteEdgesCaseKind = 'u-only' | 'adjacent' | 'opposite';
 export type PermuteCornersCaseKind =
   | 'none-permuted'
   | 'one-permuted'
-  | 'zero-flow-first'
-  | 'zero-flow-second';
-
-export type PermuteCornersZeroFlowStep = 0 | 1 | 2;
+  | 'zero-flow-first';
 
 export interface LastLayerLessonStepOptions {
   currentHoldIndex?: CornerHoldIndex;
-  permuteCornersZeroFlowStep?: PermuteCornersZeroFlowStep;
   /** Set once orient-corners starts; F2L may be temporarily disturbed until all corners are oriented. */
   inOrientCornersPhase?: boolean;
   /** Strategy intros shown once per session before each sub-lesson (and once for the overview). */
@@ -139,7 +135,6 @@ export type LastLayerLessonStep =
       demoMoves: Move[];
       targetHoldIndex?: CornerHoldIndex;
       returnToInitialHold?: boolean;
-      zeroFlowStep?: 1;
     };
 
 export interface SimulateLastLayerLessonResult {

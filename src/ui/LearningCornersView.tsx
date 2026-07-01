@@ -23,6 +23,10 @@ import {
   SAME_HOLD_NOTE,
 } from '../content/tips';
 import { ui } from '../content/ui';
+import {
+  continueToLesson,
+  leaveLessonToOverview,
+} from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { useWhiteCornerLessonStep } from './lessons/bottomLayer/useWhiteCornerLessonStep';
 import {
@@ -63,7 +67,6 @@ export function LearningCornersView() {
   const cubeState = useCubeStore((state) => state.cubeState);
   const setAppPhase = useCubeStore((state) => state.setAppPhase);
   const setActiveLesson = useCubeStore((state) => state.setActiveLesson);
-  const activeLesson = useCubeStore((state) => state.activeLesson);
   const applyLessonDemoMoves = useCubeStore(
     (state) => state.applyLessonDemoMoves,
   );
@@ -98,7 +101,11 @@ export function LearningCornersView() {
     advanceAfterStep,
     undoCornerSessionStep,
     resetCornerSession,
-  } = useWhiteCornerLessonStep(studentFrame, { resetKey: activeLesson });
+  } = useWhiteCornerLessonStep(studentFrame);
+
+  const leaveLesson = () => {
+    leaveLessonToOverview();
+  };
 
   const demoMoves = useMemo((): Move[] => {
     if (
@@ -193,7 +200,7 @@ export function LearningCornersView() {
   const canUndo = lastSessionEntry !== null && canUndoLesson;
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={() => setAppPhase('ready')} />;
+    return <LessonUnavailable onBack={leaveLesson} />;
   }
 
   const displayStep =
@@ -330,7 +337,7 @@ export function LearningCornersView() {
           canUndo={canUndo}
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
-          onBack={() => setAppPhase('ready')}
+          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
           extraActions={
             <button
@@ -434,10 +441,7 @@ export function LearningCornersView() {
               <button
                 type="button"
                 className="inline-flex rounded-lg bg-sky-700 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-600"
-                onClick={() => {
-                  resetLessonSession();
-                  setActiveLesson(MIDDLE_LAYER_EDGES_LESSON_ID);
-                }}
+                onClick={() => continueToLesson(MIDDLE_LAYER_EDGES_LESSON_ID)}
               >
                 {whiteCornersLesson.continueMiddleLayer}
               </button>

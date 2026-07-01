@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import {
   applyMoves,
@@ -7,14 +7,19 @@ import {
 } from '../../../cube/cubeState';
 import { parseFaceTurnAlgToMoves } from '../../../cube/parseFaceTurnAlg';
 import { useWhiteCornerLessonStep } from './useWhiteCornerLessonStep';
+import { useLessonSessionStore } from '../../../store/lessonSessionStore';
 
 describe('useWhiteCornerLessonStep', () => {
+  beforeEach(() => {
+    useLessonSessionStore.getState().clearAllSessions();
+  });
+
   it('returns strategy intro before first corner solve', async () => {
     const storage = applyMoves(createSolvedCubeState(), ['F', 'D', "F'"]);
     const studentFrame = cubeStateToStudentFrame(storage);
 
     const { result } = renderHook(() =>
-      useWhiteCornerLessonStep(studentFrame, { resetKey: 'white-corners' }),
+      useWhiteCornerLessonStep(studentFrame),
     );
 
     await waitFor(() => {
@@ -32,7 +37,7 @@ describe('useWhiteCornerLessonStep', () => {
     const studentFrame = cubeStateToStudentFrame(storage);
 
     const { result } = renderHook(() =>
-      useWhiteCornerLessonStep(studentFrame, { resetKey: 'white-corners' }),
+      useWhiteCornerLessonStep(studentFrame),
     );
 
     await waitFor(() => {

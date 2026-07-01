@@ -31,7 +31,8 @@ export function LessonInstructionDemo({
         {instructions.map((inst, i) => {
           const done = i < clampedIndex;
           const active = i === clampedIndex;
-          const prefix = inst.type === 'rotation' ? '↻' : inst.move;
+          const prefix =
+            inst.label ?? (inst.type === 'rotation' ? '↻' : inst.move);
           return (
             <li
               key={`${prefix}-${i}`}

@@ -121,17 +121,6 @@ function threeUnsolvedOrientStudent(): CubeState {
         step.returnToInitialHold ? 0 : step.targetHoldIndex ?? session.currentHoldIndex
       ) as 0 | 1 | 2 | 3;
     }
-    if (step.kind === 'permute-corners') {
-      if (step.permuteCase === 'zero-flow-first') {
-        session.permuteCornersZeroFlowStep = 1;
-      }
-      if (step.permuteCase === 'zero-flow-second') {
-        session.permuteCornersZeroFlowStep = undefined;
-      }
-    }
-    if (step.kind === 'reorient-hold' && step.zeroFlowStep === 1) {
-      session.permuteCornersZeroFlowStep = 2;
-    }
   }
 
   throw new Error('threeUnsolvedOrientStudent: timed out before orient phase');

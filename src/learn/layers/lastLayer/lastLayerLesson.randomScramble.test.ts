@@ -40,9 +40,9 @@ import { markLastLayerIntroSeen } from './introSteps';
 
 type SimulationSession = {
   currentHoldIndex: CornerHoldIndex;
-  permuteCornersZeroFlowStep?: 0 | 1 | 2;
   inOrientCornersPhase?: boolean;
   seenIntros: SeenLastLayerIntros;
+  hasAcknowledgedOrientEdgesComplete?: boolean;
 };
 
 type PhaseMilestones = Record<LastLayerSubLesson, boolean>;
@@ -90,18 +90,8 @@ function advanceSessionAfterStep(
     }
   }
 
-  let zeroFlow = session.permuteCornersZeroFlowStep;
-  if (step.kind === 'permute-corners') {
-    if (step.permuteCase === 'zero-flow-first') zeroFlow = 1;
-    if (step.permuteCase === 'zero-flow-second') zeroFlow = undefined;
-  }
-  if (step.kind === 'reorient-hold' && step.zeroFlowStep === 1) {
-    zeroFlow = 2;
-  }
-
   return {
     currentHoldIndex: hold,
-    permuteCornersZeroFlowStep: zeroFlow,
     inOrientCornersPhase: session.inOrientCornersPhase,
     seenIntros: session.seenIntros,
     hasAcknowledgedOrientEdgesComplete:
@@ -125,20 +115,15 @@ function stepBelongsToSubLesson(
       return (
         step.kind === 'permute-edges' ||
         (step.kind === 'align-u' && step.subLesson === 'permute-edges') ||
-        (step.kind === 'reorient-hold' && step.zeroFlowStep === undefined)
+        (step.kind === 'reorient-hold' && !step.returnToInitialHold)
       );
     case 'permute-corners':
-      return (
-        step.kind === 'permute-corners' ||
-        (step.kind === 'reorient-hold' && step.zeroFlowStep !== undefined)
-      );
+      return step.kind === 'permute-corners';
     case 'orient-corners':
       return (
         step.kind === 'orient-corners' ||
         (step.kind === 'align-u' && step.subLesson === 'orient-corners') ||
-        (step.kind === 'reorient-hold' &&
-          step.returnToInitialHold === true &&
-          step.zeroFlowStep === undefined)
+        (step.kind === 'reorient-hold' && step.returnToInitialHold === true)
       );
     default:
       return false;

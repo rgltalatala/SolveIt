@@ -6,14 +6,16 @@ import {
   cubeStateToStudentFrame,
 } from '../../../cube/cubeState';
 import { useWhiteCrossLessonStep } from './useWhiteCrossLessonStep';
+import { useLessonSessionStore } from '../../../store/lessonSessionStore';
 
 describe('useWhiteCrossLessonStep', () => {
   it('returns strategy intro before first edge solve', async () => {
+    useLessonSessionStore.getState().clearAllSessions();
     const storage = applyMoves(createSolvedCubeState(), ['F']);
     const studentFrame = cubeStateToStudentFrame(storage);
 
     const { result } = renderHook(() =>
-      useWhiteCrossLessonStep(studentFrame, { resetKey: 'white-cross' }),
+      useWhiteCrossLessonStep(studentFrame),
     );
 
     await waitFor(() => {

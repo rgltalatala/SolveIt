@@ -15,6 +15,10 @@ import {
   SAME_HOLD_NOTE,
 } from '../content/tips';
 import { ui } from '../content/ui';
+import {
+  continueToLesson,
+  leaveLessonToOverview,
+} from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { useWhiteCrossLessonStep } from './lessons/bottomLayer/useWhiteCrossLessonStep';
 import { LessonApplyButton, LessonApplyPanel } from './lessons/LessonApplyPanel';
@@ -27,8 +31,6 @@ import { useLessonDemoPipeline } from './lessons/useLessonDemoPipeline';
 export function LearningCrossView() {
   const cubeState = useCubeStore((state) => state.cubeState);
   const setAppPhase = useCubeStore((state) => state.setAppPhase);
-  const setActiveLesson = useCubeStore((state) => state.setActiveLesson);
-  const activeLesson = useCubeStore((state) => state.activeLesson);
   const applyLessonDemoMoves = useCubeStore(
     (state) => state.applyLessonDemoMoves,
   );
@@ -59,7 +61,11 @@ export function LearningCrossView() {
     recomputeStep,
     advanceAfterStep,
     resetStrategyIntro,
-  } = useWhiteCrossLessonStep(studentFrame, { resetKey: activeLesson });
+  } = useWhiteCrossLessonStep(studentFrame);
+
+  const leaveLesson = () => {
+    leaveLessonToOverview();
+  };
 
   const demoMoves = useMemo((): Move[] => {
     if (
@@ -104,7 +110,7 @@ export function LearningCrossView() {
   );
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={() => setAppPhase('ready')} />;
+    return <LessonUnavailable onBack={leaveLesson} />;
   }
 
   const displayStep =
@@ -231,7 +237,7 @@ export function LearningCrossView() {
           canUndo={canUndoLesson}
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
-          onBack={() => setAppPhase('ready')}
+          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
         />
       </header>
@@ -300,10 +306,7 @@ export function LearningCrossView() {
               <button
                 type="button"
                 className="inline-flex rounded-lg bg-violet-700 px-4 py-2 text-sm font-semibold text-white hover:bg-violet-600"
-                onClick={() => {
-                  resetLessonSession();
-                  setActiveLesson('white-corners');
-                }}
+                onClick={() => continueToLesson('white-corners')}
               >
                 {whiteCrossLesson.continueWhiteCorners}
               </button>

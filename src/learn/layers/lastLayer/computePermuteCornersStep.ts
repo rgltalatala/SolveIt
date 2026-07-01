@@ -2,7 +2,6 @@ import type { CubeState, Move } from '../../../cube/cubeState';
 import { lastLayerSteps } from '../../../content/lastLayer';
 import {
   formatHoldFaceLabel,
-  relativeY,
   returnToBlueY,
   type CornerHoldIndex,
 } from '../bottomLayer/corners/cornerHold';
@@ -11,7 +10,6 @@ import { PERMUTE_CORNERS_ALG } from './permuteCorners/permuteCornersAlgs';
 import {
   findReorientToPlacePermutedCornerAtWorldUrf,
   WORLD_URF_SLOT,
-  ZERO_FLOW_Y2_TARGET_HOLD,
 } from './permuteCorners/permuteHold';
 import { cornerPermutedAtSlot } from './permuteCorners/uLayerCornerPermuteModel';
 import type {
@@ -55,19 +53,6 @@ function buildReorientForCornerStep(
   };
 }
 
-function buildZeroFlowY2Step(
-  currentHoldIndex: CornerHoldIndex,
-): LastLayerLessonStep {
-  return {
-    kind: 'reorient-hold',
-    title: lastLayerSteps.turnCubeOver.title,
-    body: lastLayerSteps.turnCubeOver.body,
-    demoMoves: relativeY(currentHoldIndex, ZERO_FLOW_Y2_TARGET_HOLD),
-    targetHoldIndex: ZERO_FLOW_Y2_TARGET_HOLD,
-    zeroFlowStep: 1,
-  };
-}
-
 function buildPermuteCornersStep(
   permuteCase: PermuteCornersCaseKind,
 ): LastLayerLessonStep {
@@ -76,16 +61,6 @@ function buildPermuteCornersStep(
       kind: 'permute-corners',
       title: lastLayerSteps.permuteCornersZeroFlowFirst.title,
       body: lastLayerSteps.permuteCornersZeroFlowFirst.body,
-      demoMoves: PERMUTE_CORNERS_ALG,
-      permuteCase,
-    };
-  }
-
-  if (permuteCase === 'zero-flow-second') {
-    return {
-      kind: 'permute-corners',
-      title: lastLayerSteps.permuteCornersZeroFlowSecond.title,
-      body: lastLayerSteps.permuteCornersZeroFlowSecond.body,
       demoMoves: PERMUTE_CORNERS_ALG,
       permuteCase,
     };
@@ -105,18 +80,6 @@ export function computePermuteCornersStep(
   options: LastLayerLessonStepOptions = {},
 ): LastLayerLessonStep {
   const currentHoldIndex = (options.currentHoldIndex ?? 0) as CornerHoldIndex;
-  const zeroFlowStep = options.permuteCornersZeroFlowStep;
-
-  if (zeroFlowStep === 1) {
-    if (currentHoldIndex === ZERO_FLOW_Y2_TARGET_HOLD) {
-      return buildPermuteCornersStep('zero-flow-second');
-    }
-    return buildZeroFlowY2Step(currentHoldIndex);
-  }
-
-  if (zeroFlowStep === 2) {
-    return buildPermuteCornersStep('zero-flow-second');
-  }
 
   const permuteCase = recognizePermuteCornersCase(
     studentState,

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { parseFaceTurnAlgToMoves } from '../cube/parseFaceTurnAlg';
+import { prepareFreshLessonStart } from '../learn/lessonSessionPersistence';
 import { practiceBar as practiceBarCopy } from '../content/ui';
 import { useCubeStore } from '../store/cubeStore';
 import { randomScrambleForEvent } from 'cubing/scramble';
@@ -22,6 +23,7 @@ export function RandomScrambleLessonBar() {
       const alg = await randomScrambleForEvent('333');
       const algStr = alg.toString().replace(/\u2032/g, "'");
       const moves = parseFaceTurnAlgToMoves(algStr);
+      prepareFreshLessonStart('white-cross');
       loadScrambledCubeIntoLesson(moves);
       setLastAlg(algStr);
     } catch (e) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { CubeState } from '../../../cube/cubeState';
 import { cubeStateToStudentFrame } from '../../../cube/cubeState';
 import {
@@ -6,6 +6,7 @@ import {
   countSolvedMiddleEdgeSlots,
   edgeSlotSolved,
   getMiddleLayerEdgeLessonStepAsync,
+  MIDDLE_LAYER_EDGES_LESSON_ID,
   normalizeHoldToBlue,
   slotIdForExpectedEdgeColors,
   type CornerHoldIndex,
@@ -13,52 +14,41 @@ import {
   type MiddleLayerEdgesLessonStep,
 } from '../../../learn/layers/middleLayer/edges';
 import { useCubeStore } from '../../../store/cubeStore';
+import {
+  useLessonSessionStore,
+  type MiddleLayerSession,
+} from '../../../store/lessonSessionStore';
 import { useLessonStep } from '../useLessonStep';
-
-type MiddleSessionUndoEntry =
-  | { kind: 'reorient'; previousHoldIndex: CornerHoldIndex }
-  | { kind: 'solve'; previousSolvedSlots: MiddleEdgeSlotId[] };
-
-type MiddleSession = {
-  currentHoldIndex: CornerHoldIndex;
-  solvedMiddleEdgeSlots: MiddleEdgeSlotId[];
-  hasSeenStrategyIntro: boolean;
-};
 
 function initialSolvedSlots(studentFrame: CubeState): MiddleEdgeSlotId[] {
   const normalized = normalizeHoldToBlue(studentFrame, 0);
   return MIDDLE_EDGE_SLOTS.filter((id) => edgeSlotSolved(normalized, id));
 }
 
-function emptyMiddleSession(): MiddleSession {
+function emptyMiddleSession(): MiddleLayerSession {
   return {
     currentHoldIndex: 0,
     solvedMiddleEdgeSlots: [],
     hasSeenStrategyIntro: false,
+    sessionUndoStack: [],
   };
 }
 
-export function useMiddleLayerLessonStep(
-  studentFrame: CubeState | null,
-  options?: { resetKey?: string },
-) {
-  const [currentHoldIndex, setCurrentHoldIndex] = useState<CornerHoldIndex>(0);
-  const [solvedMiddleEdgeSlots, setSolvedMiddleEdgeSlots] = useState<
-    MiddleEdgeSlotId[]
-  >([]);
-  const [hasSeenStrategyIntro, setHasSeenStrategyIntro] = useState(false);
-  const [sessionUndoStack, setSessionUndoStack] = useState<
-    MiddleSessionUndoEntry[]
-  >([]);
-  const lastResetKey = useRef<string | null>(null);
-  const sessionRef = useRef<MiddleSession>(emptyMiddleSession());
+export function useMiddleLayerLessonStep(studentFrame: CubeState | null) {
+  const storedSession = useLessonSessionStore(
+    (state) => state.sessionsByLesson[MIDDLE_LAYER_EDGES_LESSON_ID],
+  );
+  const setStoredSession = useLessonSessionStore((state) => state.setSession);
+  const initializedRef = useRef(false);
+  const sessionRef = useRef<MiddleLayerSession>(emptyMiddleSession());
 
-  const applyMiddleSession = useCallback((session: MiddleSession) => {
-    sessionRef.current = session;
-    setCurrentHoldIndex(session.currentHoldIndex);
-    setSolvedMiddleEdgeSlots(session.solvedMiddleEdgeSlots);
-    setHasSeenStrategyIntro(session.hasSeenStrategyIntro);
-  }, []);
+  const applyMiddleSession = useCallback(
+    (session: MiddleLayerSession) => {
+      sessionRef.current = session;
+      setStoredSession(MIDDLE_LAYER_EDGES_LESSON_ID, session);
+    },
+    [setStoredSession],
+  );
 
   const resetMiddleSession = useCallback(
     (frame: CubeState) => {
@@ -67,29 +57,51 @@ export function useMiddleLayerLessonStep(
         currentHoldIndex: 0,
         solvedMiddleEdgeSlots: initial,
         hasSeenStrategyIntro: false,
+        sessionUndoStack: [],
       });
-      setSessionUndoStack([]);
     },
     [applyMiddleSession],
   );
 
   useEffect(() => {
-    if (!studentFrame || options?.resetKey === undefined) return;
-    if (lastResetKey.current === options.resetKey) return;
-    lastResetKey.current = options.resetKey;
+    if (!studentFrame) return;
+    const existing = useLessonSessionStore
+      .getState()
+      .getSession(MIDDLE_LAYER_EDGES_LESSON_ID);
+    if (existing) {
+      sessionRef.current = existing;
+      initializedRef.current = true;
+      return;
+    }
+    if (initializedRef.current) return;
+    initializedRef.current = true;
     resetMiddleSession(studentFrame);
-  }, [studentFrame, options?.resetKey, resetMiddleSession]);
+  }, [studentFrame, resetMiddleSession]);
 
-  const sessionKey = `${currentHoldIndex}:${solvedMiddleEdgeSlots.join(',')}:${hasSeenStrategyIntro}`;
+  useEffect(() => {
+    if (storedSession) {
+      sessionRef.current = storedSession;
+    }
+  }, [storedSession]);
+
+  const session = storedSession ?? sessionRef.current;
+  const {
+    currentHoldIndex,
+    solvedMiddleEdgeSlots,
+    hasSeenStrategyIntro,
+    sessionUndoStack,
+  } = session;
+
+  const sessionKey = `${currentHoldIndex}:${solvedMiddleEdgeSlots.join(',')}:${hasSeenStrategyIntro}:${sessionUndoStack.length}`;
 
   const getStepAsync = useCallback(async (_frame: CubeState) => {
     const cube = useCubeStore.getState().cubeState;
     const frame = cube ? cubeStateToStudentFrame(cube) : _frame;
-    const session = sessionRef.current;
+    const current = sessionRef.current;
     return getMiddleLayerEdgeLessonStepAsync(frame, {
-      currentHoldIndex: session.currentHoldIndex,
-      solvedMiddleEdgeSlots: session.solvedMiddleEdgeSlots,
-      hasSeenStrategyIntro: session.hasSeenStrategyIntro,
+      currentHoldIndex: current.currentHoldIndex,
+      solvedMiddleEdgeSlots: current.solvedMiddleEdgeSlots,
+      hasSeenStrategyIntro: current.hasSeenStrategyIntro,
     });
   }, []);
 
@@ -124,30 +136,30 @@ export function useMiddleLayerLessonStep(
 
   const advanceAfterStep = useCallback(
     (appliedStep: MiddleLayerEdgesLessonStep, frame: CubeState) => {
-      const session = sessionRef.current;
+      const current = sessionRef.current;
       if (appliedStep.kind === 'intro') {
         applyMiddleSession({
-          ...session,
+          ...current,
           hasSeenStrategyIntro: true,
         });
         return;
       }
 
       if (appliedStep.kind === 'reorient-hold') {
-        setSessionUndoStack((stack) => [
-          ...stack,
-          { kind: 'reorient', previousHoldIndex: session.currentHoldIndex },
-        ]);
         const nextHold = (
           appliedStep.returnToInitialHold
             ? 0
             : appliedStep.targetHoldIndex !== undefined
               ? appliedStep.targetHoldIndex
-              : session.currentHoldIndex
+              : current.currentHoldIndex
         ) as CornerHoldIndex;
         applyMiddleSession({
-          ...session,
+          ...current,
           currentHoldIndex: nextHold,
+          sessionUndoStack: [
+            ...current.sessionUndoStack,
+            { kind: 'reorient', previousHoldIndex: current.currentHoldIndex },
+          ],
         });
         return;
       }
@@ -156,22 +168,22 @@ export function useMiddleLayerLessonStep(
         appliedStep.kind === 'solve-edge' &&
         appliedStep.action === 'insert'
       ) {
-        setSessionUndoStack((stack) => [
-          ...stack,
-          { kind: 'solve', previousSolvedSlots: session.solvedMiddleEdgeSlots },
-        ]);
         const slotId = slotIdForExpectedEdgeColors(
           frame,
           appliedStep.edgeColors,
-          session.currentHoldIndex,
+          current.currentHoldIndex,
         );
         const nextSlots =
-          slotId && !session.solvedMiddleEdgeSlots.includes(slotId)
-            ? [...session.solvedMiddleEdgeSlots, slotId]
-            : session.solvedMiddleEdgeSlots;
+          slotId && !current.solvedMiddleEdgeSlots.includes(slotId)
+            ? [...current.solvedMiddleEdgeSlots, slotId]
+            : current.solvedMiddleEdgeSlots;
         applyMiddleSession({
-          ...session,
+          ...current,
           solvedMiddleEdgeSlots: nextSlots,
+          sessionUndoStack: [
+            ...current.sessionUndoStack,
+            { kind: 'solve', previousSolvedSlots: current.solvedMiddleEdgeSlots },
+          ],
         });
       }
     },
@@ -179,22 +191,25 @@ export function useMiddleLayerLessonStep(
   );
 
   const undoMiddleSessionStep = useCallback((): 'reorient' | 'solve' | null => {
-    const last = sessionUndoStack[sessionUndoStack.length - 1];
+    const current = sessionRef.current;
+    const last = current.sessionUndoStack[current.sessionUndoStack.length - 1];
     if (!last) return null;
-    setSessionUndoStack((stack) => stack.slice(0, -1));
+    const nextStack = current.sessionUndoStack.slice(0, -1);
     if (last.kind === 'reorient') {
       applyMiddleSession({
-        ...sessionRef.current,
+        ...current,
         currentHoldIndex: last.previousHoldIndex,
+        sessionUndoStack: nextStack,
       });
       return 'reorient';
     }
     applyMiddleSession({
-      ...sessionRef.current,
+      ...current,
       solvedMiddleEdgeSlots: last.previousSolvedSlots,
+      sessionUndoStack: nextStack,
     });
     return 'solve';
-  }, [sessionUndoStack, applyMiddleSession]);
+  }, [applyMiddleSession]);
 
   return {
     step,

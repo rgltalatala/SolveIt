@@ -10,6 +10,7 @@ import { parseFaceTurnAlgToMoves } from '../../../cube/parseFaceTurnAlg';
 import { RIGHT_INSERT } from '../../../learn/layers/middleLayer/edges';
 import { useCubeStore } from '../../../store/cubeStore';
 import { useMiddleLayerLessonStep } from './useMiddleLayerLessonStep';
+import { useLessonSessionStore } from '../../../store/lessonSessionStore';
 
 function invertMoves(moves: Move[]): Move[] {
   const inverted: Move[] = [];
@@ -26,6 +27,7 @@ function invertMoves(moves: Move[]): Move[] {
 describe('useMiddleLayerLessonStep', () => {
   beforeEach(() => {
     useCubeStore.setState({ cubeState: null });
+    useLessonSessionStore.getState().clearAllSessions();
   });
 
   it('returns cross-corners-prerequisite when bottom layer is incomplete', async () => {
@@ -36,9 +38,7 @@ describe('useMiddleLayerLessonStep', () => {
     const studentFrame = cubeStateToStudentFrame(storage);
 
     const { result } = renderHook(() =>
-      useMiddleLayerLessonStep(studentFrame, {
-        resetKey: 'middle-layer-edges',
-      }),
+      useMiddleLayerLessonStep(studentFrame),
     );
 
     await waitFor(() => {
@@ -55,9 +55,7 @@ describe('useMiddleLayerLessonStep', () => {
     );
 
     const { result } = renderHook(() =>
-      useMiddleLayerLessonStep(studentFrame, {
-        resetKey: 'middle-layer-edges',
-      }),
+      useMiddleLayerLessonStep(studentFrame),
     );
 
     await waitFor(() => {
@@ -74,9 +72,7 @@ describe('useMiddleLayerLessonStep', () => {
     );
 
     const { result } = renderHook(() =>
-      useMiddleLayerLessonStep(studentFrame, {
-        resetKey: 'middle-layer-edges',
-      }),
+      useMiddleLayerLessonStep(studentFrame),
     );
 
     await waitFor(() => {
@@ -118,9 +114,7 @@ describe('useMiddleLayerLessonStep', () => {
     const studentFrame = cubeStateToStudentFrame(createSolvedCubeState());
 
     const { result } = renderHook(() =>
-      useMiddleLayerLessonStep(studentFrame, {
-        resetKey: 'middle-layer-edges',
-      }),
+      useMiddleLayerLessonStep(studentFrame),
     );
 
     await waitFor(() => {

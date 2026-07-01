@@ -17,9 +17,6 @@ const SETUP_SLOT_BY_TARGET_HOLD: Record<CornerHoldIndex, ULayerCornerId> = {
 
 export const WORLD_URF_SLOT: ULayerCornerId = 'URF';
 
-/** y2 used in the zero-permuted corner recipe (blue front → green front). */
-export const ZERO_FLOW_Y2_TARGET_HOLD = 2 as CornerHoldIndex;
-
 export function holdIndexToBringSlotToWorldUrf(
   slotId: ULayerCornerId,
 ): CornerHoldIndex {

@@ -1,17 +1,16 @@
 import { useCubeStore } from '../store/cubeStore';
 import { CubeView } from '../cube3d/CubeView';
 import { cubeStateToFaceletString } from '../cube/cubeStateToFacelets';
+import { prepareFreshLessonStart } from '../learn/lessonSessionPersistence';
 import { cubeOverview } from '../content/ui';
 
 import { MIDDLE_LAYER_EDGES_LESSON_ID } from '../learn/layers/middleLayer/edges';
 import { LAST_LAYER_LESSON_ID } from '../learn/layers/lastLayer';
 import { WHITE_CORNERS_LESSON_ID } from '../learn/layers/bottomLayer/corners';
 
-export function CubeEditorView() {
+export function CubeEditorView({ embedded = false }: { embedded?: boolean }) {
   const cubeState = useCubeStore((state) => state.cubeState);
   const setAppPhase = useCubeStore((state) => state.setAppPhase);
-  const setActiveLesson = useCubeStore((state) => state.setActiveLesson);
-  const resetLessonSession = useCubeStore((state) => state.resetLessonSession);
 
   const startLesson = (
     lesson:
@@ -20,15 +19,16 @@ export function CubeEditorView() {
       | typeof MIDDLE_LAYER_EDGES_LESSON_ID
       | typeof LAST_LAYER_LESSON_ID,
   ) => {
-    resetLessonSession();
-    setActiveLesson(lesson);
+    prepareFreshLessonStart(lesson);
     setAppPhase('learning');
   };
 
   if (!cubeState) {
     return (
       <section className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-6">
-        <h1 className="text-3xl font-bold">{cubeOverview.notReadyTitle}</h1>
+        {!embedded ? (
+          <h1 className="text-3xl font-bold">{cubeOverview.notReadyTitle}</h1>
+        ) : null}
         <p className="text-slate-300">{cubeOverview.notReadyBody}</p>
       </section>
     );

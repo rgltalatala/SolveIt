@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { CubeState } from '../../../cube/cubeState';
 import { cubeStateToStudentFrame } from '../../../cube/cubeState';
 import {
@@ -11,8 +11,8 @@ import {
   isEdgesFullyPermuted,
   isLastLayerComplete,
   isYellowCrossComplete,
+  LAST_LAYER_LESSON_ID,
   type CornerHoldIndex,
-  type PermuteCornersZeroFlowStep,
 } from '../../../learn/layers/lastLayer';
 import type {
   LastLayerLessonStep,
@@ -20,100 +20,90 @@ import type {
 } from '../../../learn/layers/lastLayer/types';
 import { markLastLayerIntroSeen } from '../../../learn/layers/lastLayer/introSteps';
 import { useCubeStore } from '../../../store/cubeStore';
+import {
+  useLessonSessionStore,
+  type LastLayerSession,
+} from '../../../store/lessonSessionStore';
 import { useLessonStep } from '../useLessonStep';
 
-type LastSession = {
-  currentHoldIndex: CornerHoldIndex;
-  permuteCornersZeroFlowStep?: PermuteCornersZeroFlowStep;
-  inOrientCornersPhase?: boolean;
-  seenIntros: SeenLastLayerIntros;
-  hasAcknowledgedOrientEdgesComplete?: boolean;
-};
-
-type LastSessionUndoEntry = {
-  previousSession: LastSession;
-  /** True when the paired apply also pushed a lessonHistory snapshot. */
-  withCubeApply: boolean;
-};
-
-function emptyLastSession(): LastSession {
-  return { currentHoldIndex: 0, seenIntros: {} };
+function emptyLastSession(): LastLayerSession {
+  return { currentHoldIndex: 0, seenIntros: {}, sessionUndoStack: [] };
 }
 
-function cloneLastSession(session: LastSession): LastSession {
+function cloneSessionWithoutUndo(session: LastLayerSession): Omit<
+  LastLayerSession,
+  'sessionUndoStack'
+> {
   return {
-    ...session,
+    currentHoldIndex: session.currentHoldIndex,
+    inOrientCornersPhase: session.inOrientCornersPhase,
     seenIntros: { ...session.seenIntros },
+    hasAcknowledgedOrientEdgesComplete: session.hasAcknowledgedOrientEdgesComplete,
   };
 }
 
-function advanceZeroFlowAfterStep(
-  step: LastLayerLessonStep,
-  permuteCornersZeroFlowStep: PermuteCornersZeroFlowStep | undefined,
-): PermuteCornersZeroFlowStep | undefined {
-  if (step.kind === 'permute-corners') {
-    if (step.permuteCase === 'zero-flow-first') return 1;
-    if (step.permuteCase === 'zero-flow-second') return undefined;
-  }
-  if (step.kind === 'reorient-hold' && step.zeroFlowStep === 1) {
-    return 2;
-  }
-  return permuteCornersZeroFlowStep;
-}
+export function useLastLayerLessonStep(studentFrame: CubeState | null) {
+  const storedSession = useLessonSessionStore(
+    (state) => state.sessionsByLesson[LAST_LAYER_LESSON_ID],
+  );
+  const setStoredSession = useLessonSessionStore((state) => state.setSession);
+  const initializedRef = useRef(false);
+  const sessionRef = useRef<LastLayerSession>(emptyLastSession());
 
-export function useLastLayerLessonStep(
-  studentFrame: CubeState | null,
-  options?: { resetKey?: string },
-) {
-  const [currentHoldIndex, setCurrentHoldIndex] = useState<CornerHoldIndex>(0);
-  const [permuteCornersZeroFlowStep, setPermuteCornersZeroFlowStep] = useState<
-    PermuteCornersZeroFlowStep | undefined
-  >(undefined);
-  const [inOrientCornersPhase, setInOrientCornersPhase] = useState(false);
-  const [seenIntros, setSeenIntros] = useState<SeenLastLayerIntros>({});
-  const [hasAcknowledgedOrientEdgesComplete, setHasAcknowledgedOrientEdgesComplete] =
-    useState(false);
-  const [sessionUndoStack, setSessionUndoStack] = useState<
-    LastSessionUndoEntry[]
-  >([]);
-  const lastResetKey = useRef<string | null>(null);
-  const sessionRef = useRef<LastSession>(emptyLastSession());
-
-  const applyLastSession = useCallback((session: LastSession) => {
-    sessionRef.current = session;
-    setCurrentHoldIndex(session.currentHoldIndex);
-    setPermuteCornersZeroFlowStep(session.permuteCornersZeroFlowStep);
-    setInOrientCornersPhase(session.inOrientCornersPhase ?? false);
-    setSeenIntros(session.seenIntros);
-    setHasAcknowledgedOrientEdgesComplete(
-      session.hasAcknowledgedOrientEdgesComplete ?? false,
-    );
-  }, []);
+  const applyLastSession = useCallback(
+    (session: LastLayerSession) => {
+      sessionRef.current = session;
+      setStoredSession(LAST_LAYER_LESSON_ID, session);
+    },
+    [setStoredSession],
+  );
 
   const resetLastSession = useCallback(() => {
     applyLastSession(emptyLastSession());
-    setSessionUndoStack([]);
   }, [applyLastSession]);
 
   useEffect(() => {
-    if (!studentFrame || options?.resetKey === undefined) return;
-    if (lastResetKey.current === options.resetKey) return;
-    lastResetKey.current = options.resetKey;
+    if (!studentFrame) return;
+    const existing = useLessonSessionStore
+      .getState()
+      .getSession(LAST_LAYER_LESSON_ID);
+    if (existing) {
+      sessionRef.current = existing;
+      initializedRef.current = true;
+      return;
+    }
+    if (initializedRef.current) return;
+    initializedRef.current = true;
     resetLastSession();
-  }, [studentFrame, options?.resetKey, resetLastSession]);
+  }, [studentFrame, resetLastSession]);
 
-  const sessionKey = `${currentHoldIndex}:${permuteCornersZeroFlowStep ?? 'none'}:${inOrientCornersPhase}:${hasAcknowledgedOrientEdgesComplete}:${JSON.stringify(seenIntros)}`;
+  useEffect(() => {
+    if (storedSession) {
+      sessionRef.current = storedSession;
+    }
+  }, [storedSession]);
+
+  const session = storedSession ?? sessionRef.current;
+  const {
+    currentHoldIndex,
+    inOrientCornersPhase,
+    seenIntros,
+    hasAcknowledgedOrientEdgesComplete,
+    sessionUndoStack,
+  } = session;
+
+  const sessionKey = `${currentHoldIndex}:${inOrientCornersPhase}:${hasAcknowledgedOrientEdgesComplete}:${JSON.stringify(seenIntros)}:${sessionUndoStack.length}`;
 
   const getStepAsync = useCallback(async (_frame: CubeState) => {
     const cube = useCubeStore.getState().cubeState;
     const frame = cube ? cubeStateToStudentFrame(cube) : _frame;
+    const current = sessionRef.current;
     return getLastLayerLessonStepAsync(frame, {
-      currentHoldIndex: sessionRef.current.currentHoldIndex,
-      permuteCornersZeroFlowStep: sessionRef.current.permuteCornersZeroFlowStep,
-      inOrientCornersPhase: sessionRef.current.inOrientCornersPhase,
-      seenIntros: sessionRef.current.seenIntros,
+      currentHoldIndex: current.currentHoldIndex,
+      inOrientCornersPhase: current.inOrientCornersPhase,
+      seenIntros: current.seenIntros,
       hasAcknowledgedOrientEdgesComplete:
-        sessionRef.current.hasAcknowledgedOrientEdgesComplete,
+        current.hasAcknowledgedOrientEdgesComplete,
     });
   }, []);
 
@@ -152,44 +142,44 @@ export function useLastLayerLessonStep(
     sessionKey,
   });
 
-  const pushSessionUndo = useCallback(
-    (session: LastSession, withCubeApply: boolean) => {
-      setSessionUndoStack((stack) => [
-        ...stack,
-        { previousSession: cloneLastSession(session), withCubeApply },
-      ]);
-    },
-    [],
-  );
-
   const advanceAfterStep = useCallback(
     (appliedStep: LastLayerLessonStep, _frame: CubeState) => {
-      const session = sessionRef.current;
+      const current = sessionRef.current;
 
       if (appliedStep.kind === 'intro') {
-        pushSessionUndo(session, false);
         applyLastSession({
-          ...session,
+          ...current,
           seenIntros: markLastLayerIntroSeen(
-            session.seenIntros,
+            current.seenIntros,
             appliedStep.introId,
           ),
+          sessionUndoStack: [
+            ...current.sessionUndoStack,
+            {
+              previousSession: cloneSessionWithoutUndo(current),
+              withCubeApply: false,
+            },
+          ],
         });
         return;
       }
 
       if (appliedStep.kind === 'orient-edges-already-complete') {
-        pushSessionUndo(session, false);
         applyLastSession({
-          ...session,
+          ...current,
           hasAcknowledgedOrientEdgesComplete: true,
+          sessionUndoStack: [
+            ...current.sessionUndoStack,
+            {
+              previousSession: cloneSessionWithoutUndo(current),
+              withCubeApply: false,
+            },
+          ],
         });
         return;
       }
 
-      pushSessionUndo(session, true);
-
-      let nextHold = session.currentHoldIndex;
+      let nextHold = current.currentHoldIndex;
 
       if (appliedStep.kind === 'reorient-hold') {
         nextHold = (
@@ -197,38 +187,45 @@ export function useLastLayerLessonStep(
             ? 0
             : appliedStep.targetHoldIndex !== undefined
               ? appliedStep.targetHoldIndex
-              : session.currentHoldIndex
+              : current.currentHoldIndex
         ) as CornerHoldIndex;
       }
 
-      const nextZeroFlow = advanceZeroFlowAfterStep(
-        appliedStep,
-        session.permuteCornersZeroFlowStep,
-      );
-
       const nextInOrient =
-        session.inOrientCornersPhase ||
+        current.inOrientCornersPhase ||
         appliedStep.kind === 'orient-corners' ||
         (appliedStep.kind === 'align-u' &&
           appliedStep.subLesson === 'orient-corners');
 
       applyLastSession({
-        ...session,
         currentHoldIndex: nextHold,
-        permuteCornersZeroFlowStep: nextZeroFlow,
         inOrientCornersPhase: nextInOrient,
+        seenIntros: current.seenIntros,
+        hasAcknowledgedOrientEdgesComplete:
+          current.hasAcknowledgedOrientEdgesComplete,
+        sessionUndoStack: [
+          ...current.sessionUndoStack,
+          {
+            previousSession: cloneSessionWithoutUndo(current),
+            withCubeApply: true,
+          },
+        ],
       });
     },
-    [applyLastSession, pushSessionUndo],
+    [applyLastSession],
   );
 
   const undoLastSessionStep = useCallback((): boolean => {
-    const last = sessionUndoStack[sessionUndoStack.length - 1];
+    const current = sessionRef.current;
+    const last = current.sessionUndoStack[current.sessionUndoStack.length - 1];
     if (!last) return false;
-    setSessionUndoStack((stack) => stack.slice(0, -1));
-    applyLastSession(cloneLastSession(last.previousSession));
+    const nextStack = current.sessionUndoStack.slice(0, -1);
+    applyLastSession({
+      ...last.previousSession,
+      sessionUndoStack: nextStack,
+    });
     return last.withCubeApply;
-  }, [sessionUndoStack, applyLastSession]);
+  }, [applyLastSession]);
 
   const isCornerPermutePhase =
     studentFrame !== null &&
