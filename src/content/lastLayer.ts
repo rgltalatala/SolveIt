@@ -84,10 +84,6 @@ export const lastLayerSteps = {
     title: 'Top edges permuted',
     body: "All four top edge side stickers match their centers. Hold blue toward you (white on bottom, yellow on top) and confirm the diagram.",
   },
-  lastLayerCornersPermuted: {
-    title: 'Top corners permuted',
-    body: "All four top corner side stickers match their centers. Hold blue toward you (white on bottom, yellow on top) and confirm the diagram.",
-  },
   faceBlueEdges: {
     title: 'Face the blue side',
     body: 'Top edges are permuted. Turn the cube so blue is toward you again. White on bottom, yellow on top.',
@@ -141,10 +137,6 @@ export const lastLayerSteps = {
     `One top corner already has its side colors in place. Turn the whole cube so ${faceLabel} is toward you, with that corner at front-right on U. Then run the permutation algorithm on the next step.`,
   alignPattern: (pattern: string, target: string) =>
     `Two top edges show yellow on U in a ${pattern} pattern. Turn U so those edges sit at ${target}. Then you can run the matching algorithm on the next step.`,
-  turnCubeOver: {
-    title: 'Turn the cube over in your hands',
-    body: 'Turn the whole cube halfway (y2) so green is toward you, then run the same corner permutation algorithm again on the next step.',
-  },
   permuteCornersZeroFlowFirst: {
     title: 'Permute top corners',
     body: "No top corners have their side colors in place yet. Run U R U' L' U R' U' L once.",

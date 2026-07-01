@@ -26,13 +26,6 @@ export function holdIndexToBringSlotToWorldUrf(
   return 0;
 }
 
-export function reorientMovesForCornerSetup(
-  fromHold: CornerHoldIndex,
-  toHold: CornerHoldIndex,
-): Move[] {
-  return relativeY(fromHold, toHold);
-}
-
 /** Pick a whole-cube y reorient that places the permuted corner at world URF. */
 export function findReorientToPlacePermutedCornerAtWorldUrf(
   state: CubeState,

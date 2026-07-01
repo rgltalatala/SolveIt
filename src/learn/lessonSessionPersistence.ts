@@ -66,6 +66,24 @@ export function clearLessonSession(): void {
   }
 }
 
+type SessionResetOptions = {
+  clearStorage?: boolean;
+  resetUi?: boolean;
+  clearDemoCaches?: boolean;
+  clearScan?: boolean;
+  clearValidation?: boolean;
+};
+
+function resetSessionStores(options: SessionResetOptions = {}): void {
+  if (options.clearStorage) clearLessonSession();
+  if (options.clearDemoCaches) clearAllLessonDemoCaches();
+  useLessonSessionStore.getState().clearAllSessions();
+  if (options.resetUi) useLessonSessionStore.getState().resetUiState();
+  useCubeStore.getState().resetLessonSession();
+  if (options.clearScan) useCubeStore.getState().clearScannedFaces();
+  if (options.clearValidation) useCubeStore.getState().clearValidationResult();
+}
+
 function shouldPersistPhase(phase: string): phase is 'ready' | 'learning' {
   return phase === 'ready' || phase === 'learning';
 }
@@ -169,20 +187,19 @@ export function hydrateLessonSession(): boolean {
 
 /** Leave an active lesson and return to the cube overview (cube scan preserved). */
 export function leaveLessonToOverview(): void {
-  useLessonSessionStore.getState().clearAllSessions();
-  useCubeStore.getState().resetLessonSession();
+  resetSessionStores();
   useCubeStore.setState({ appPhase: 'ready', lessonHistory: [] });
   saveLessonSession();
 }
 
 export function restartFromBeginning(): void {
-  clearLessonSession();
-  clearAllLessonDemoCaches();
-  useLessonSessionStore.getState().clearAllSessions();
-  useLessonSessionStore.getState().resetUiState();
-  useCubeStore.getState().resetLessonSession();
-  useCubeStore.getState().clearScannedFaces();
-  useCubeStore.getState().clearValidationResult();
+  resetSessionStores({
+    clearStorage: true,
+    resetUi: true,
+    clearDemoCaches: true,
+    clearScan: true,
+    clearValidation: true,
+  });
   useCubeStore.setState({
     cubeState: null,
     appPhase: 'notation',
@@ -192,10 +209,8 @@ export function restartFromBeginning(): void {
 }
 
 export function prepareFreshLessonStart(lessonId: ActiveLessonId): void {
-  clearLessonSession();
-  useLessonSessionStore.getState().clearAllSessions();
+  resetSessionStores({ clearStorage: true });
   useLessonSessionStore.getState().setLearningSection('lesson');
-  useCubeStore.getState().resetLessonSession();
   useCubeStore.setState({
     activeLesson: lessonId,
     lessonHistory: [],

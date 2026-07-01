@@ -123,9 +123,9 @@ export function getLastLayerLessonStep(
   return computeLastLayerLessonStep(studentState, options);
 }
 
-export async function getLastLayerLessonStepAsync(
+export function getLastLayerLessonStepAsync(
   studentState: CubeState,
   options?: LastLayerLessonStepOptions,
 ): Promise<LastLayerLessonStep> {
-  return computeLastLayerLessonStep(studentState, options);
+  return Promise.resolve(computeLastLayerLessonStep(studentState, options));
 }

@@ -1,10 +1,5 @@
 import type { Move } from '../cube/cubeState';
-import {
-  applyMoves,
-  createSolvedCubeState,
-  cubeStateToStudentFrame,
-  type CubeState,
-} from '../cube/cubeState';
+import type { CubeState } from '../cube/cubeState';
 import { invertMoves } from '../cube/invertMoves';
 import {
   FRD_WHITE_ON_F,
@@ -23,21 +18,19 @@ import {
 } from '../learn/layers/lastLayer/orientEdges/orientEdgesAlgs';
 import { PERMUTE_EDGES_ALG } from '../learn/layers/lastLayer/permuteEdges/permuteEdgesAlgs';
 import type { Instruction } from '../learn/studentHold';
+import { studentFrameFromSetupMoves } from '../learn/studentFrame';
 import {
   PERMUTE_CORNERS_ALG,
   ZERO_FLOW_NONE_PERMUTED_SETUP,
   ZERO_FLOW_PERMUTE_CORNERS_FULL,
   ZERO_FLOW_PERMUTE_PHASES,
 } from '../learn/layers/lastLayer/permuteCorners/permuteCornersAlgs';
-import {
-  ORIENT_CORNER_ALG,
-  repeatOrientAlg,
-} from '../learn/layers/lastLayer/orientCorners/orientCornersAlgs';
+import { zeroFlowCaseDemoMetadata } from '../learn/layers/lastLayer/permuteCorners/zeroFlowDemo';
+import { repeatOrientAlg } from '../learn/layers/lastLayer/orientCorners/orientCornersAlgs';
 import { LAST_LAYER_SUB_LESSON_LABELS } from './lastLayer';
 import { whiteCornersLesson } from './whiteCorners';
 import { middleLayerLesson } from './middleLayer';
 import { lastLayerLesson } from './lastLayer';
-import type { ActiveLessonId } from '../store/cubeStore';
 
 export type CaseReferenceEntry = {
   id: string;
@@ -53,31 +46,20 @@ export type CaseReferenceGroup = {
   cases: CaseReferenceEntry[];
 };
 
-export type CaseReferenceCatalog = {
-  lessonId: ActiveLessonId;
-  groups: CaseReferenceGroup[];
-};
-
-function movesToAlgString(moves: readonly Move[]): string {
-  return moves.join(' ');
-}
-
 export type CaseReferenceLessonSection = {
   lessonTitle: string;
   groups: CaseReferenceGroup[];
 };
 
-function solvedStudent(): CubeState {
-  return cubeStateToStudentFrame(createSolvedCubeState());
-}
+export type CaseDemo = {
+  setupCube: CubeState;
+  moves: Move[];
+  instructions?: Instruction[];
+  instructionPhaseLengths?: number[];
+};
 
-/** Default solved cube for the cases viewer (yellow U, blue F, white D). */
-export function solvedStudentFrameCube(): CubeState {
-  return solvedStudent();
-}
-
-function studentSetupFromMoves(moves: readonly Move[]): CubeState {
-  return applyMoves(solvedStudent(), moves);
+function movesToAlgString(moves: readonly Move[]): string {
+  return moves.join(' ');
 }
 
 function entry(
@@ -93,9 +75,12 @@ function entry(
     title,
     alg: movesToAlgString(algMoves),
     algMoves,
-    setupMoves,
+    setupMoves: setupMoves ?? invertMoves(algMoves),
   };
 }
+
+const ORIENT_CORNERS_F_ALG = repeatOrientAlg(2);
+const ORIENT_CORNERS_R_ALG = repeatOrientAlg(4);
 
 const WHITE_CORNERS_GROUPS: CaseReferenceGroup[] = [
   {
@@ -106,21 +91,18 @@ const WHITE_CORNERS_GROUPS: CaseReferenceGroup[] = [
         'URF (corner on top)',
         'White on U',
         FRD_URF_WHITE_ON_U,
-        invertMoves(FRD_URF_WHITE_ON_U),
       ),
       entry(
         'white-corners:urf:white-r',
         'URF (corner on top)',
         'White on R',
         FRD_URF_WHITE_ON_R,
-        invertMoves(FRD_URF_WHITE_ON_R),
       ),
       entry(
         'white-corners:urf:white-f',
         'URF (corner on top)',
         'White on F',
         FRD_URF_WHITE_ON_F,
-        invertMoves(FRD_URF_WHITE_ON_F),
       ),
     ],
   },
@@ -132,14 +114,12 @@ const WHITE_CORNERS_GROUPS: CaseReferenceGroup[] = [
         'FRD (corner in slot, twisted)',
         'White on F',
         FRD_WHITE_ON_F,
-        invertMoves(FRD_WHITE_ON_F),
       ),
       entry(
         'white-corners:frd:white-r',
         'FRD (corner in slot, twisted)',
         'White on R',
         FRD_WHITE_ON_R,
-        invertMoves(FRD_WHITE_ON_R),
       ),
     ],
   },
@@ -154,14 +134,12 @@ const MIDDLE_LAYER_GROUPS: CaseReferenceGroup[] = [
         'Front slots',
         'Front-left slot',
         LEFT_INSERT,
-        invertMoves(LEFT_INSERT),
       ),
       entry(
         'middle-layer:right',
         'Front slots',
         'Front-right slot',
         RIGHT_INSERT,
-        invertMoves(RIGHT_INSERT),
       ),
     ],
   },
@@ -171,9 +149,9 @@ const LAST_LAYER_GROUPS: CaseReferenceGroup[] = [
   {
     heading: LAST_LAYER_SUB_LESSON_LABELS.orientEdges,
     cases: [
-      entry('last-layer:dot', LAST_LAYER_SUB_LESSON_LABELS.orientEdges, 'Dot', DOT_ALG, invertMoves(DOT_ALG)),
-      entry('last-layer:l', LAST_LAYER_SUB_LESSON_LABELS.orientEdges, 'L', L_SHAPE_ALG, invertMoves(L_SHAPE_ALG)),
-      entry('last-layer:bar', LAST_LAYER_SUB_LESSON_LABELS.orientEdges, 'Bar', BAR_ALG, invertMoves(BAR_ALG)),
+      entry('last-layer:dot', LAST_LAYER_SUB_LESSON_LABELS.orientEdges, 'Dot', DOT_ALG),
+      entry('last-layer:l', LAST_LAYER_SUB_LESSON_LABELS.orientEdges, 'L', L_SHAPE_ALG),
+      entry('last-layer:bar', LAST_LAYER_SUB_LESSON_LABELS.orientEdges, 'Bar', BAR_ALG),
     ],
   },
   {
@@ -184,7 +162,6 @@ const LAST_LAYER_GROUPS: CaseReferenceGroup[] = [
         LAST_LAYER_SUB_LESSON_LABELS.permuteEdges,
         'Adjacent',
         PERMUTE_EDGES_ALG,
-        invertMoves(PERMUTE_EDGES_ALG),
       ),
       entry(
         'last-layer:permute-edges-opposite',
@@ -214,7 +191,6 @@ const LAST_LAYER_GROUPS: CaseReferenceGroup[] = [
         LAST_LAYER_SUB_LESSON_LABELS.permuteCorners,
         'One permuted',
         PERMUTE_CORNERS_ALG,
-        invertMoves(PERMUTE_CORNERS_ALG),
       ),
     ],
   },
@@ -225,40 +201,17 @@ const LAST_LAYER_GROUPS: CaseReferenceGroup[] = [
         'last-layer:orient-corners-f',
         LAST_LAYER_SUB_LESSON_LABELS.orientCorners,
         'Sticker on F',
-        repeatOrientAlg(2),
-        invertMoves(repeatOrientAlg(2)),
+        ORIENT_CORNERS_F_ALG,
       ),
       entry(
         'last-layer:orient-corners-r',
         LAST_LAYER_SUB_LESSON_LABELS.orientCorners,
         'Sticker on R',
-        repeatOrientAlg(4),
-        invertMoves(repeatOrientAlg(4)),
+        ORIENT_CORNERS_R_ALG,
       ),
     ],
   },
 ];
-
-const CATALOGS: Partial<Record<ActiveLessonId, CaseReferenceCatalog>> = {
-  'white-corners': {
-    lessonId: 'white-corners',
-    groups: WHITE_CORNERS_GROUPS,
-  },
-  'middle-layer-edges': {
-    lessonId: 'middle-layer-edges',
-    groups: MIDDLE_LAYER_GROUPS,
-  },
-  'last-layer': {
-    lessonId: 'last-layer',
-    groups: LAST_LAYER_GROUPS,
-  },
-};
-
-export function getCaseCatalogForLesson(
-  lessonId: ActiveLessonId,
-): CaseReferenceCatalog | null {
-  return CATALOGS[lessonId] ?? null;
-}
 
 const ALL_CASE_SECTIONS: CaseReferenceLessonSection[] = [
   {
@@ -275,72 +228,38 @@ const ALL_CASE_SECTIONS: CaseReferenceLessonSection[] = [
   },
 ];
 
+const CASE_BY_ID = new Map<string, CaseReferenceEntry>(
+  ALL_CASE_SECTIONS.flatMap((section) =>
+    section.groups.flatMap((group) =>
+      group.cases.map((caseEntry) => [caseEntry.id, caseEntry] as const),
+    ),
+  ),
+);
+
+const ZERO_FLOW_PERMUTE_CASE_ID = 'last-layer:permute-corners-zero-flow';
+
 export function getAllCaseReferenceSections(): CaseReferenceLessonSection[] {
   return ALL_CASE_SECTIONS;
 }
 
-export function getCaseSetupCubeState(entry: CaseReferenceEntry): CubeState {
+export function getCaseById(id: string): CaseReferenceEntry | null {
+  return CASE_BY_ID.get(id) ?? null;
+}
+
+export function getCaseDemo(entry: CaseReferenceEntry): CaseDemo {
   const setup = entry.setupMoves ?? invertMoves(entry.algMoves);
-  return studentSetupFromMoves(setup);
-}
+  const demo: CaseDemo = {
+    setupCube: studentFrameFromSetupMoves(setup),
+    moves: [...entry.algMoves],
+  };
 
-export function getCaseDemoMoves(entry: CaseReferenceEntry): Move[] {
-  return [...entry.algMoves];
-}
-
-const ZERO_FLOW_PERMUTE_CASE_ID = 'last-layer:permute-corners-zero-flow';
-
-function zeroFlowPermuteCaseInstructions(): Instruction[] {
-  const alg = movesToAlgString(PERMUTE_CORNERS_ALG);
-  const phases = ZERO_FLOW_PERMUTE_PHASES;
-  const instructions: Instruction[] = [
-    {
-      type: 'move',
-      move: PERMUTE_CORNERS_ALG[0]!,
-      label: 'Permute',
-      text: `Run ${alg} once.`,
-    },
-  ];
-
-  if (phases.length > 2) {
-    instructions.push({
-      type: 'rotation',
-      rotation: 'y2',
-      label: 'Reorient',
-      text: 'Turn the whole cube so the permuted corner sits at front-right on U.',
-    });
-  }
-
-  instructions.push({
-    type: 'move',
-    move: PERMUTE_CORNERS_ALG[0]!,
-    label: 'Permute',
-    text: `Repeat ${alg} until all four top corners are permuted.`,
-  });
-
-  return instructions;
-}
-
-export function getCaseDemoInstructions(
-  entry: CaseReferenceEntry,
-): Instruction[] | undefined {
   if (entry.id === ZERO_FLOW_PERMUTE_CASE_ID) {
-    return zeroFlowPermuteCaseInstructions();
+    const { instructions, phaseLengths } = zeroFlowCaseDemoMetadata(
+      ZERO_FLOW_PERMUTE_PHASES,
+    );
+    demo.instructions = instructions;
+    demo.instructionPhaseLengths = phaseLengths;
   }
-  return undefined;
-}
 
-export function getCaseInstructionPhaseLengths(
-  entry: CaseReferenceEntry,
-): number[] | undefined {
-  if (entry.id === ZERO_FLOW_PERMUTE_CASE_ID) {
-    const phases = ZERO_FLOW_PERMUTE_PHASES;
-    if (phases.length <= 2) {
-      return [phases[0]!.length, phases[1]!.length];
-    }
-    return phases.map((phase) => phase.length);
-  }
-  return undefined;
+  return demo;
 }
-
-export { ORIENT_CORNER_ALG };

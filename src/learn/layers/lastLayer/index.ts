@@ -104,12 +104,16 @@ export {
   ZERO_FLOW_PERMUTE_PHASES,
 } from './permuteCorners/permuteCornersAlgs';
 
-export { buildZeroFlowPermuteDemo } from './permuteCorners/zeroFlowDemo';
+export {
+  reorientPermutedCornerToUrfIfNeeded,
+  runPermuteCornersUntilFullyPermuted,
+} from './permuteCorners/permuteCycle';
+
+export { buildZeroFlowPermuteDemo, zeroFlowCaseDemoMetadata } from './permuteCorners/zeroFlowDemo';
 
 export {
   findReorientToPlacePermutedCornerAtWorldUrf,
   holdIndexToBringSlotToWorldUrf,
-  reorientMovesForCornerSetup,
   WORLD_URF_SLOT,
 } from './permuteCorners/permuteHold';
 
@@ -138,7 +142,6 @@ export {
 
 export {
   computePermuteCornersStep,
-  lastLayerCornersPermuteCompleteStep,
 } from './computePermuteCornersStep';
 
 export {
@@ -148,7 +151,6 @@ export {
 
 export {
   simulateLastLayerLessonOnStorageCube,
-  simulateLastLayerLessonOnStorageCubeAsync,
 } from './simulateLesson';
 
 export type { CornerHoldIndex } from '../bottomLayer/corners/cornerHold';

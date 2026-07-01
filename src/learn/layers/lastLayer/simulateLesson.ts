@@ -6,7 +6,6 @@ import {
 import type { CornerHoldIndex } from '../bottomLayer/corners/cornerHold';
 import {
   getLastLayerLessonStep,
-  getLastLayerLessonStepAsync,
 } from './computeLessonStep';
 import { markLastLayerIntroSeen } from './introSteps';
 import { isLastLayerComplete } from './permuteCorners/uLayerCornerPermuteModel';
@@ -194,82 +193,4 @@ export function simulateLastLayerLessonOnStorageCube(
   return simulateLoop(studentFrame, maxLessonSteps, (student, options) =>
     getLastLayerLessonStep(student, options),
   );
-}
-
-export async function simulateLastLayerLessonOnStorageCubeAsync(
-  studentFrame: CubeState,
-  maxLessonSteps = 48,
-): Promise<SimulateLastLayerLessonResult> {
-  let session: SimulationSession = { currentHoldIndex: 0, seenIntros: {} };
-  let student = cloneCubeState(studentFrame);
-  let lessonStepsSimulated = 0;
-  let lastStepKind: LastLayerLessonStep['kind'] | undefined;
-
-  for (let i = 0; i < maxLessonSteps; i += 1) {
-    if (isLastLayerLessonComplete(student, session.currentHoldIndex)) {
-      return {
-        lessonStepsSimulated,
-        lastLayerComplete: true,
-        lastStepKind: 'complete',
-        stuckNoDemo: false,
-        finalHoldIndex: session.currentHoldIndex,
-      };
-    }
-
-    const step = await getLastLayerLessonStepAsync(student, session);
-    lastStepKind = step.kind;
-    markOrientCornersPhase(step, session);
-
-    if (step.kind === 'complete') {
-      return {
-        lessonStepsSimulated,
-        lastLayerComplete: true,
-        lastStepKind,
-        stuckNoDemo: false,
-        finalHoldIndex: session.currentHoldIndex,
-      };
-    }
-
-    if (step.kind === 'prerequisite') {
-      return {
-        lessonStepsSimulated,
-        lastLayerComplete: false,
-        lastStepKind,
-        stuckNoDemo: true,
-        finalHoldIndex: session.currentHoldIndex,
-      };
-    }
-
-    if (isContinueOnlyStep(step)) {
-      session = advanceContinueOnlyStep(step, session);
-      continue;
-    }
-
-    if (!('demoMoves' in step) || !step.demoMoves?.length) {
-      return {
-        lessonStepsSimulated,
-        lastLayerComplete: isLastLayerComplete(student),
-        lastStepKind,
-        stuckNoDemo: true,
-        finalHoldIndex: session.currentHoldIndex,
-      };
-    }
-
-    const applied = applyStepToSimulation(step, student, session);
-    student = applied.student;
-    session = applied.session;
-    lessonStepsSimulated += 1;
-  }
-
-  const lastLayerComplete = isLastLayerLessonComplete(
-    student,
-    session.currentHoldIndex,
-  );
-  return {
-    lessonStepsSimulated,
-    lastLayerComplete,
-    lastStepKind,
-    stuckNoDemo: !lastLayerComplete,
-    finalHoldIndex: session.currentHoldIndex,
-  };
 }

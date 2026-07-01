@@ -1,11 +1,7 @@
-import {
-  applyMoves,
-  createSolvedCubeState,
-  cubeStateToStudentFrame,
-} from '../../../../cube/cubeState';
 import { parseFaceTurnAlgToMoves } from '../../../../cube/parseFaceTurnAlg';
 import type { Move } from '../../../../cube/cubeState';
 import { invertMoves } from '../../../../cube/invertMoves';
+import { studentFrameFromSetupMoves } from '../../../studentFrame';
 import { buildZeroFlowPermuteDemo } from './zeroFlowDemo';
 
 export const PERMUTE_CORNERS_ALG: Move[] = parseFaceTurnAlgToMoves(
@@ -20,10 +16,7 @@ export const ZERO_FLOW_NONE_PERMUTED_SETUP: Move[] = [
 ];
 
 const ZERO_FLOW_DEMO = buildZeroFlowPermuteDemo(
-  applyMoves(
-    cubeStateToStudentFrame(createSolvedCubeState()),
-    ZERO_FLOW_NONE_PERMUTED_SETUP,
-  ),
+  studentFrameFromSetupMoves(ZERO_FLOW_NONE_PERMUTED_SETUP),
 );
 
 /** Full zero-flow demo moves for the cases viewer. */

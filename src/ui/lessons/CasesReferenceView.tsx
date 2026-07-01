@@ -3,43 +3,27 @@ import { CubeView } from '../../cube3d/CubeView';
 import { learningNav } from '../../content/learningNav';
 import {
   getAllCaseReferenceSections,
-  getCaseDemoInstructions,
-  getCaseDemoMoves,
-  getCaseInstructionPhaseLengths,
-  getCaseSetupCubeState,
-  solvedStudentFrameCube,
+  getCaseById,
+  getCaseDemo,
   type CaseReferenceEntry,
 } from '../../content/caseReference';
+import { solvedStudentFrameCube } from '../../learn/studentFrame';
 import { MoveSequenceDemo } from '../MoveSequenceDemo';
 import { CaseReferenceCard } from './CaseReferenceCard';
-
-function findCaseById(caseId: string): CaseReferenceEntry | null {
-  for (const section of getAllCaseReferenceSections()) {
-    for (const group of section.groups) {
-      const match = group.cases.find((entry) => entry.id === caseId);
-      if (match) return match;
-    }
-  }
-  return null;
-}
 
 export function CasesReferenceView() {
   const sections = getAllCaseReferenceSections();
   const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
 
   const selectedCase = useMemo(
-    () => (selectedCaseId ? findCaseById(selectedCaseId) : null),
+    () => (selectedCaseId ? getCaseById(selectedCaseId) : null),
     [selectedCaseId],
   );
 
-  const setupCube = selectedCase ? getCaseSetupCubeState(selectedCase) : null;
-  const demoMoves = selectedCase ? getCaseDemoMoves(selectedCase) : [];
-  const demoInstructions = selectedCase
-    ? getCaseDemoInstructions(selectedCase)
-    : undefined;
-  const instructionPhaseLengths = selectedCase
-    ? getCaseInstructionPhaseLengths(selectedCase)
-    : undefined;
+  const caseDemo = useMemo(
+    () => (selectedCase ? getCaseDemo(selectedCase) : null),
+    [selectedCase],
+  );
 
   const fallbackCube = solvedStudentFrameCube();
   const cubeFrameClass =
@@ -54,12 +38,12 @@ export function CasesReferenceView() {
       <p className="mb-4 text-sm text-slate-300">{learningNav.casesIntro}</p>
       <div className="grid gap-6 lg:grid-cols-2">
         <div className="lg:sticky lg:top-24 lg:self-start">
-          {selectedCase && setupCube ? (
+          {selectedCase && caseDemo ? (
             <MoveSequenceDemo
-              baseCubeState={setupCube}
-              moves={demoMoves}
-              instructions={demoInstructions}
-              instructionPhaseLengths={instructionPhaseLengths}
+              baseCubeState={caseDemo.setupCube}
+              moves={caseDemo.moves}
+              instructions={caseDemo.instructions}
+              instructionPhaseLengths={caseDemo.instructionPhaseLengths}
               meshRotation={[0, 0, 0]}
               frameClassName={cubeFrameClass}
             />

@@ -18,14 +18,6 @@ import type {
   PermuteCornersCaseKind,
 } from './types';
 
-export function lastLayerCornersPermuteCompleteStep(): LastLayerLessonStep {
-  return {
-    kind: 'complete',
-    title: lastLayerSteps.lastLayerCornersPermuted.title,
-    body: lastLayerSteps.lastLayerCornersPermuted.body,
-  };
-}
-
 function buildReturnToBlueStep(
   currentHoldIndex: CornerHoldIndex,
 ): LastLayerLessonStep {
