@@ -30,7 +30,6 @@ export const cubeOverview = {
   startLessonWhiteCorners: 'Start lesson: White corners',
   startLessonMiddleLayer: 'Start lesson: Middle layer edges',
   startLessonLastLayer: 'Start lesson: Last layer',
-  faceletStringLabel: 'Facelet string (URFDLB):',
 } as const;
 
 export const practiceBar = {

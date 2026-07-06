@@ -1,6 +1,5 @@
 import { useCubeStore } from '../store/cubeStore';
 import { CubeView } from '../cube3d/CubeView';
-import { cubeStateToFaceletString } from '../cube/cubeStateToFacelets';
 import { prepareFreshLessonStart } from '../learn/lessonSessionPersistence';
 import { cubeOverview } from '../content/ui';
 
@@ -33,8 +32,6 @@ export function CubeEditorView({ embedded = false }: { embedded?: boolean }) {
       </section>
     );
   }
-
-  const facelets = cubeStateToFaceletString(cubeState);
 
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col gap-4 p-6">
@@ -71,13 +68,6 @@ export function CubeEditorView({ embedded = false }: { embedded?: boolean }) {
         </button>
       </div>
       <CubeView cubeState={cubeState} />
-      <p className="text-xs text-slate-400">
-        {cubeOverview.faceletStringLabel}{' '}
-        <span className="font-mono text-slate-300">{facelets}</span>
-      </p>
-      <pre className="overflow-auto rounded-lg border border-slate-700 bg-slate-900 p-3 text-left text-xs text-slate-200">
-        {JSON.stringify(cubeState, null, 2)}
-      </pre>
     </section>
   );
 }
