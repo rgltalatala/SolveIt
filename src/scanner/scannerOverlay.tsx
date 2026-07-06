@@ -26,11 +26,8 @@ export function ScannerOverlay({
         />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
           <div
-            className="grid grid-cols-3 grid-rows-3"
-            style={{
-              width: `${SCAN_GRID_FRACTION * 100}%`,
-              height: `${SCAN_GRID_FRACTION * 100}%`,
-            }}
+            className="grid aspect-square grid-cols-3 grid-rows-3"
+            style={{ height: `${SCAN_GRID_FRACTION * 100}%` }}
           >
             {Array.from({ length: 9 }).map((_, idx) => (
               <div key={idx} className="border border-white/90 bg-white/5" />
