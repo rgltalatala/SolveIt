@@ -25,7 +25,6 @@ import {
 import { ui } from '../content/ui';
 import {
   continueToLesson,
-  leaveLessonToOverview,
 } from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { useWhiteCornerLessonStep } from './lessons/bottomLayer/useWhiteCornerLessonStep';
@@ -103,10 +102,6 @@ export function LearningCornersView() {
     undoCornerSessionStep,
     resetCornerSession,
   } = useWhiteCornerLessonStep(studentFrame);
-
-  const leaveLesson = () => {
-    leaveLessonToOverview();
-  };
 
   const demoMoves = useMemo((): Move[] => {
     if (
@@ -201,7 +196,7 @@ export function LearningCornersView() {
   const canUndo = lastSessionEntry !== null && canUndoLesson;
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={leaveLesson} />;
+    return <LessonUnavailable />;
   }
 
   const displayStep =
@@ -339,7 +334,6 @@ export function LearningCornersView() {
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
           onRescan={startLessonRescan}
-          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
           extraActions={
             <button

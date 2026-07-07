@@ -52,7 +52,6 @@ export interface CubeStore {
     | 'notation'
     | 'scanning'
     | 'correcting'
-    | 'ready'
     | 'learning'
     | 'lessonResync';
   setAppPhase: (phase: CubeStore['appPhase']) => void;

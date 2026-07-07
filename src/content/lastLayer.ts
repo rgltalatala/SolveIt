@@ -56,8 +56,9 @@ export const lastLayerLesson = {
   goToWhiteCross: 'Go to white cross lesson',
   goToWhiteCorners: 'Go to white corners lesson',
   goToMiddleLayer: 'Go to middle layer edges lesson',
+  completeTitle: 'You solved the cube!',
   completeBody:
-    "The last layer is done. You've worked through orient edges, permute edges, permute corners, and orient corners. Head back to the cube overview whenever you're ready.",
+    "You've worked through the white cross, white corners, middle layer, and all four last-layer stages. Take a moment to enjoy it. When you're ready for another scramble, use End lesson or Re-scan cube.",
   preparingSubtitle: 'Finding a demo for this last-layer step…',
   progress: {
     orientEdges: (solved: number) =>

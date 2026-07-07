@@ -1,7 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
+import type { ReactNode } from 'react';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import type { Group } from 'three';
 import type { CubeState, Face } from '../cube/cubeState';
 import { isWholeCubeRotation } from '../cube/cubeState';
 import type { CubeAnatomyHighlight } from './cubeAnatomy';
@@ -36,6 +38,34 @@ export interface CubeViewProps {
   anatomyHighlight?: CubeAnatomyHighlight | null;
   /** Face letter labels for the notation face-names tab. */
   faceLabels?: { highlightedFace: Face | null };
+  /** Slowly spin the cube (e.g. solve celebration). Disables orbit controls. */
+  autoRotate?: boolean;
+}
+
+const AUTO_ROTATE_SPEED = 0.35;
+
+function AutoRotateGroup({
+  rotation,
+  autoRotate,
+  children,
+}: {
+  rotation: [number, number, number];
+  autoRotate: boolean;
+  children: ReactNode;
+}) {
+  const groupRef = useRef<Group>(null);
+
+  useFrame((_, delta) => {
+    if (autoRotate && groupRef.current) {
+      groupRef.current.rotation.y += delta * AUTO_ROTATE_SPEED;
+    }
+  });
+
+  return (
+    <group ref={groupRef} rotation={rotation}>
+      {children}
+    </group>
+  );
 }
 
 export function CubeView({
@@ -49,6 +79,7 @@ export function CubeView({
   enableOrbitControls = true,
   anatomyHighlight = null,
   faceLabels,
+  autoRotate = false,
 }: CubeViewProps) {
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
   const lessonCameraRef = useRef<LessonCameraSnapshot | null>(null);
@@ -103,7 +134,7 @@ export function CubeView({
         <ambientLight intensity={0.62} />
         <directionalLight position={[6, 8, 5]} intensity={0.9} castShadow />
         <directionalLight position={[-5, 4, -4]} intensity={0.4} />
-        <group rotation={meshRotation}>
+        <AutoRotateGroup rotation={meshRotation} autoRotate={autoRotate}>
           <AnimatedCubeMesh
             cubeState={cubeState}
             animation={activeAnimation}
@@ -112,7 +143,7 @@ export function CubeView({
           {faceLabels ? (
             <FaceAnatomyLabels highlightedFace={faceLabels.highlightedFace} />
           ) : null}
-        </group>
+        </AutoRotateGroup>
 
         <OrbitControls
           ref={(node) => {
@@ -121,7 +152,7 @@ export function CubeView({
               lessonCameraRef.current = captureLessonCamera(node);
             }
           }}
-          enabled={enableOrbitControls}
+          enabled={enableOrbitControls && !autoRotate}
           enablePan={false}
           minDistance={5}
           maxDistance={11}

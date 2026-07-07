@@ -1,4 +1,3 @@
-import { CubeEditorView } from './CubeEditorView';
 import { LearningCrossView } from './LearningCrossView';
 import { LearningCornersView } from './LearningCornersView';
 import { LearningMiddleLayerView } from './LearningMiddleLayerView';
@@ -44,7 +43,7 @@ function LessonTabContent() {
   if (appPhase === 'learning') {
     return <ActiveLessonView />;
   }
-  return <CubeEditorView embedded />;
+  return null;
 }
 
 export function ReferenceShell() {

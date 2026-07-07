@@ -19,7 +19,7 @@ export const whiteCornersLesson = {
   resetCornerSession: 'Reset corner session',
   goToWhiteCross: 'Go to white cross lesson',
   completeBody:
-    "All four white corners are in. When you're ready, move on to middle-layer edges, or head back to the cube overview.",
+    "All four white corners are in. When you're ready, move on to middle-layer edges.",
   continueMiddleLayer: 'Continue: Middle layer edges',
   preparingSubtitle: 'Finding a short demo for this corner…',
   sessionNotesSummary: 'Lesson session & reset',

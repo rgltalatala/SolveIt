@@ -15,7 +15,6 @@ describe('LessonHeaderActions', () => {
         isStepPending={false}
         onUndo={vi.fn()}
         onRescan={onRescan}
-        onBack={vi.fn()}
         onResetTips={vi.fn()}
       />,
     );

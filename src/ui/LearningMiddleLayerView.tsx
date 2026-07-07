@@ -25,7 +25,6 @@ import {
 import { ui } from '../content/ui';
 import {
   continueToLesson,
-  leaveLessonToOverview,
 } from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { LAST_LAYER_LESSON_ID } from '../learn/layers/lastLayer';
@@ -95,9 +94,6 @@ export function LearningMiddleLayerView() {
     resetMiddleSession,
   } = useMiddleLayerLessonStep(studentFrame);
 
-  const leaveLesson = () => {
-    leaveLessonToOverview();
-  };
 
   const demoMoves = useMemo((): Move[] => {
     if (
@@ -147,7 +143,7 @@ export function LearningMiddleLayerView() {
   const canUndo = lastSessionEntry !== null && canUndoLesson;
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={leaveLesson} />;
+    return <LessonUnavailable />;
   }
 
   const displayStep =
@@ -271,7 +267,6 @@ export function LearningMiddleLayerView() {
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
           onRescan={startLessonRescan}
-          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
           extraActions={
             <button

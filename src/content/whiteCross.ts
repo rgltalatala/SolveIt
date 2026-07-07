@@ -6,7 +6,7 @@ export const whiteCrossLesson = {
   progress: (solved: number) =>
     `Progress: ${solved}/4 cross edges in place (white on the bottom, side sticker matching its center).`,
   completeBody:
-    "Nice work. You've got all four cross edges. When you're ready, move on to white corners, or head back to the cube overview.",
+    "Nice work. You've got all four cross edges. When you're ready, move on to white corners.",
   continueWhiteCorners: 'Continue: White corners',
   sessionNotesSummary: 'Lesson session & reset',
   sessionNotes: [
@@ -25,10 +25,6 @@ export const whiteCrossLesson = {
     {
       label: 'Reset lesson tips',
       text: 'clears the one-time rotation tip and hold flag only. Your scramble stays as-is.',
-    },
-    {
-      label: 'Start lesson',
-      text: 'from the cube overview runs the same session reset before opening this view.',
     },
     {
       label: null,

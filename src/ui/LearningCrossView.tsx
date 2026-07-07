@@ -17,7 +17,6 @@ import {
 import { ui } from '../content/ui';
 import {
   continueToLesson,
-  leaveLessonToOverview,
 } from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { useWhiteCrossLessonStep } from './lessons/bottomLayer/useWhiteCrossLessonStep';
@@ -64,10 +63,6 @@ export function LearningCrossView() {
     resetStrategyIntro,
   } = useWhiteCrossLessonStep(studentFrame);
 
-  const leaveLesson = () => {
-    leaveLessonToOverview();
-  };
-
   const demoMoves = useMemo((): Move[] => {
     if (
       step &&
@@ -111,7 +106,7 @@ export function LearningCrossView() {
   );
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={leaveLesson} />;
+    return <LessonUnavailable />;
   }
 
   const displayStep =
@@ -239,7 +234,6 @@ export function LearningCrossView() {
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
           onRescan={startLessonRescan}
-          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
         />
       </header>

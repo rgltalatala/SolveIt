@@ -19,7 +19,7 @@ const SAVE_DEBOUNCE_MS = 300;
 
 export type PersistedLessonSession = {
   version: typeof PERSISTENCE_VERSION;
-  appPhase: 'ready' | 'learning';
+  appPhase: 'learning';
   activeLesson: ActiveLessonId;
   learningSection: LearningSection;
   notationSection: NotationSectionId;
@@ -41,7 +41,7 @@ function readStorage(): PersistedLessonSession | null {
     const parsed = JSON.parse(raw) as PersistedLessonSession;
     if (parsed.version !== PERSISTENCE_VERSION) return null;
     if (!parsed.cubeState) return null;
-    if (parsed.appPhase !== 'ready' && parsed.appPhase !== 'learning') {
+    if (parsed.appPhase !== 'learning') {
       return null;
     }
     return parsed;
@@ -84,8 +84,8 @@ function resetSessionStores(options: SessionResetOptions = {}): void {
   if (options.clearValidation) useCubeStore.getState().clearValidationResult();
 }
 
-function shouldPersistPhase(phase: string): phase is 'ready' | 'learning' {
-  return phase === 'ready' || phase === 'learning';
+function shouldPersistPhase(phase: string): phase is 'learning' {
+  return phase === 'learning';
 }
 
 function buildPersistedSnapshot(): PersistedLessonSession | null {
@@ -183,13 +183,6 @@ export function hydrateLessonSession(): boolean {
   });
 
   return true;
-}
-
-/** Leave an active lesson and return to the cube overview (cube scan preserved). */
-export function leaveLessonToOverview(): void {
-  resetSessionStores();
-  useCubeStore.setState({ appPhase: 'ready', lessonHistory: [] });
-  saveLessonSession();
 }
 
 export function restartFromBeginning(): void {

@@ -31,7 +31,6 @@ import {
   SAME_HOLD_NOTE,
 } from '../content/tips';
 import { ui } from '../content/ui';
-import { leaveLessonToOverview } from '../learn/lessonSessionPersistence';
 import { useCubeStore } from '../store/cubeStore';
 import { useLastLayerLessonStep } from './lessons/lastLayer/useLastLayerLessonStep';
 import {
@@ -102,9 +101,6 @@ export function LearningLastLayerView() {
     isCornerOrientPhase,
   } = useLastLayerLessonStep(studentFrame);
 
-  const leaveLesson = () => {
-    leaveLessonToOverview();
-  };
 
   const demoMoves = useMemo((): Move[] => {
     if (
@@ -156,7 +152,7 @@ export function LearningLastLayerView() {
     (!lastSessionEntry.withCubeApply || canUndoLesson);
 
   if (!cubeState || !studentFrame) {
-    return <LessonUnavailable onBack={leaveLesson} />;
+    return <LessonUnavailable />;
   }
 
   const isOrientEdgesLessonStep =
@@ -315,41 +311,51 @@ export function LearningLastLayerView() {
     <section className="mx-auto flex w-full max-w-5xl flex-col gap-4 p-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{lastLayerLesson.title}</h1>
-          <p className="mt-1 text-sm text-violet-300">
-            {lastLayerLesson.subLessonPrefix} {subLessonLabel}
-          </p>
-          <p className="mt-1 text-slate-300">
-            Hold your cube with{' '}
-            <span className="text-slate-100">white on the bottom</span> and{' '}
-            <span className="text-slate-100">yellow on top</span>. Face{' '}
-            <span className="text-slate-100">
-              {formatColorLabel(lessonHold.F)} toward you
-            </span>{' '}
-            . That is the <span className="text-slate-100">front (F)</span> face
-            in the diagram below.
-          </p>
-          {!isLessonComplete ? (
-            <p className="mt-2 text-sm text-slate-400">
-              {PHYSICAL_CUBE_MATCH_NOTE}
-            </p>
-          ) : null}
-          {step &&
-          step.kind !== 'complete' &&
-          step.kind !== 'prerequisite' &&
-          step.kind !== 'intro' ? (
-            <p className="mt-2 text-sm text-slate-400">
-              {lastLayerLesson.progressPrefix}{' '}
-              <span className="text-slate-200">{progressLabel}</span>
-            </p>
-          ) : null}
+          {isLessonComplete ? (
+            <>
+              <h1 className="text-3xl font-bold text-emerald-100">
+                {lastLayerLesson.completeTitle}
+              </h1>
+              <p className="mt-2 text-slate-300">
+                {lastLayerLesson.completeBody}
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-3xl font-bold">{lastLayerLesson.title}</h1>
+              <p className="mt-1 text-sm text-violet-300">
+                {lastLayerLesson.subLessonPrefix} {subLessonLabel}
+              </p>
+              <p className="mt-1 text-slate-300">
+                Hold your cube with{' '}
+                <span className="text-slate-100">white on the bottom</span> and{' '}
+                <span className="text-slate-100">yellow on top</span>. Face{' '}
+                <span className="text-slate-100">
+                  {formatColorLabel(lessonHold.F)} toward you
+                </span>{' '}
+                . That is the <span className="text-slate-100">front (F)</span>{' '}
+                face in the diagram below.
+              </p>
+              <p className="mt-2 text-sm text-slate-400">
+                {PHYSICAL_CUBE_MATCH_NOTE}
+              </p>
+              {step &&
+              step.kind !== 'complete' &&
+              step.kind !== 'prerequisite' &&
+              step.kind !== 'intro' ? (
+                <p className="mt-2 text-sm text-slate-400">
+                  {lastLayerLesson.progressPrefix}{' '}
+                  <span className="text-slate-200">{progressLabel}</span>
+                </p>
+              ) : null}
+            </>
+          )}
         </div>
         <LessonHeaderActions
           canUndo={canUndo}
           isStepPending={isStepPending}
           onUndo={handleUndoLessonStep}
           onRescan={startLessonRescan}
-          onBack={leaveLesson}
           onResetTips={handleRestartLessonTips}
         />
       </header>
@@ -362,8 +368,10 @@ export function LearningLastLayerView() {
         showPreparingOverlay={showPreparingOverlay}
         preparingSubtitle={lastLayerLesson.preparingSubtitle}
         trailingActions={trailingActions}
+        celebrate={isLessonComplete}
       />
 
+      {!isLessonComplete ? (
       <article
         className={`rounded-xl border border-slate-700 bg-slate-900/80 p-4 ${showPreparingOverlay ? 'opacity-60' : ''}`}
       >
@@ -445,13 +453,8 @@ export function LearningLastLayerView() {
         {canApplyDemo ? (
           <LessonApplyPanel hint={applyHints.solve} />
         ) : null}
-
-        {isLessonComplete ? (
-          <p className="mt-4 text-sm text-slate-400">
-            {lastLayerLesson.completeBody}
-          </p>
-        ) : null}
       </article>
+      ) : null}
     </section>
   );
 }

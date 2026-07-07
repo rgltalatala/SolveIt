@@ -8,7 +8,6 @@ export const ui = {
   rescan: 'Re-scan',
   reset: 'Reset',
   undoLastExample: 'Undo last example',
-  backToCubeOverview: 'Back to cube overview',
   resetLessonTips: 'Reset lesson tips',
   applyExampleContinue: 'Apply on my cube & continue',
   revalidateCube: 'Re-validate cube',
@@ -49,19 +48,6 @@ export const resyncCopy = {
 export const lessonUnavailable = {
   title: 'Lesson unavailable',
   body: 'Scan and validate your cube first, then come back to start a lesson.',
-} as const;
-
-export const cubeOverview = {
-  notReadyTitle: 'Cube not ready',
-  notReadyBody:
-    'Scan and confirm all six faces first. We need a full picture before we can build your virtual cube.',
-  readyTitle: 'Cube ready',
-  readyBody:
-    'Your virtual cube matches your scanned scramble. Drag to rotate and take a look around. You can also pick a lesson below. If you drift off during a lesson, use Re-scan cube on the lesson page to sync back up.',
-  startLessonWhiteCross: 'Start lesson: White cross',
-  startLessonWhiteCorners: 'Start lesson: White corners',
-  startLessonMiddleLayer: 'Start lesson: Middle layer edges',
-  startLessonLastLayer: 'Start lesson: Last layer',
 } as const;
 
 export const practiceBar = {

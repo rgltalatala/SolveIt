@@ -7,7 +7,7 @@ export const middleLayerLesson = {
   goToWhiteCross: 'Go to white cross lesson',
   goToWhiteCorners: 'Go to white corners lesson',
   completeBody:
-    "All four middle-layer edges are in. When you're ready, tackle the last layer, or head back to the cube overview.",
+    "All four middle-layer edges are in. When you're ready, tackle the last layer.",
   continueLastLayer: 'Continue: Last layer',
   preparingSubtitle: 'Finding a demo for this middle-layer edge…',
   sessionNotesSummary: 'Lesson session & reset',

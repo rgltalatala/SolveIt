@@ -13,6 +13,7 @@ type LessonCubeStageProps = {
   showPreparingOverlay: boolean;
   preparingSubtitle?: string;
   trailingActions?: ReactNode;
+  celebrate?: boolean;
 };
 
 export function LessonCubeStage({
@@ -23,6 +24,7 @@ export function LessonCubeStage({
   showPreparingOverlay,
   preparingSubtitle,
   trailingActions,
+  celebrate = false,
 }: LessonCubeStageProps) {
   if (isComplete) {
     return (
@@ -31,6 +33,7 @@ export function LessonCubeStage({
         meshRotation={[0, 0, 0]}
         frameClassName="h-[420px] w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950"
         canvasKey={completeCanvasKey}
+        autoRotate={celebrate}
       />
     );
   }

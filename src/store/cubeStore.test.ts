@@ -35,9 +35,9 @@ describe('cubeStore lesson session', () => {
     resetStore();
   });
 
-  it('does not reset studentHold when entering learning from ready', () => {
+  it('does not reset studentHold when entering learning from scanning', () => {
     useCubeStore.setState({
-      appPhase: 'ready',
+      appPhase: 'scanning',
       studentHold: { y: 'y2' },
       hasSeenAvoidBackCallout: true,
     });
@@ -155,11 +155,11 @@ describe('cubeStore lesson session', () => {
     expect(useCubeStore.getState().lessonHistory).toHaveLength(0);
   });
 
-  it('entering learning clears lesson history', () => {
+  it('leaving learning clears lesson history', () => {
     useCubeStore.getState().applyLessonDemoMoves(['F']);
     expect(useCubeStore.getState().lessonHistory.length).toBeGreaterThan(0);
 
-    useCubeStore.getState().setAppPhase('ready');
+    useCubeStore.getState().setAppPhase('scanning');
     expect(useCubeStore.getState().lessonHistory).toEqual([]);
 
     useCubeStore.getState().setAppPhase('learning');
