@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { createSolvedCubeState } from '../../cube/cubeState';
 import { MoveSequenceDemoProvider } from '../MoveSequenceDemo';
 import { LessonExampleWorkflow } from './LessonExampleWorkflow';
 import { ui } from '../../content/ui';
@@ -10,14 +11,7 @@ describe('LessonExampleWorkflow', () => {
     const onApply = vi.fn();
     render(
       <MoveSequenceDemoProvider
-        baseCubeState={{
-          U: Array(9).fill('yellow'),
-          D: Array(9).fill('white'),
-          F: Array(9).fill('blue'),
-          B: Array(9).fill('green'),
-          R: Array(9).fill('red'),
-          L: Array(9).fill('orange'),
-        }}
+        baseCubeState={createSolvedCubeState()}
         moves={['R', 'U']}
         instructions={[
           { type: 'move', move: 'R', text: 'Right face clockwise.' },
