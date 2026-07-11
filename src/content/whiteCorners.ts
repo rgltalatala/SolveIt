@@ -1,4 +1,3 @@
-import type { Color } from '../cube/cubeState';
 import { whiteCornerIdentity } from './pieceIdentity';
 
 export { whiteCornerIdentity };

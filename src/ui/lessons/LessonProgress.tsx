@@ -30,7 +30,6 @@ type LessonProgressProps = {
 
 function pieceColors(slot: LessonProgressSlot): readonly Color[] {
   if (slot.colors && slot.colors.length > 0) return slot.colors;
-  if (slot.color) return [slot.color];
   return [];
 }
 

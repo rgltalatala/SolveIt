@@ -211,10 +211,7 @@ export function stuckPartnerStep(studentState: CubeState): WhiteCrossLessonStep 
   return {
     kind: 'solve-edge',
     title: whitePartnerEdgeHeading(stuckPartner),
-    body: whiteCrossSteps.stuck(
-      formatColor(stuckPartner),
-      whiteEdgeIdentity(stuckPartner),
-    ),
+    body: whiteCrossSteps.stuck(whiteEdgeIdentity(stuckPartner)),
     edgeLabel: `${formatColor(stuckPartner)} edge`,
     partnerColor: stuckPartner,
   };

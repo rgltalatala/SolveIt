@@ -56,7 +56,7 @@ Repeat for the other three white edges, being careful not to undo the ones you'v
     `Match the ${partner} sticker on this ${edgeLabel} to the ${partner} center, then slot white on the bottom. The demo finds a path that won't knock out cross edges you've already solved.`,
   solveEdge: (partner: string, edgeLabel: string) =>
     `Work this ${edgeLabel}: line up its ${partner} sticker with the ${partner} center, then slot white on the bottom. The demo handles setup and keeps solved cross edges in place.`,
-  stuck: (partner: string, edgeLabel: string) =>
+  stuck: (edgeLabel: string) =>
     `We couldn't build a safe demo for this ${edgeLabel} from here. Match the side sticker to its center and slot white on the bottom yourself, or reset the scramble and try again.`,
   middleLayer: (partner: string, edgeLabel: string) =>
     `This ${edgeLabel} is in the middle layer. Line up its ${partner} sticker with the ${partner} center, then slot white on the bottom. The demo walks you through it without disturbing solved cross edges.`,
