@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { lessonLayout } from '../../content/tips';
 
 type LessonCasePanelProps = {
