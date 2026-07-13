@@ -13,6 +13,7 @@ export type LearningSection = 'lesson' | 'notation' | 'cases';
 export type NotationSectionId =
   | 'cubePieces'
   | 'faceNames'
+  | 'positionLabels'
   | 'faceTurns'
   | 'cubeRotations';
 

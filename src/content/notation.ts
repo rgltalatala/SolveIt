@@ -34,6 +34,20 @@ export const notationFaceNames = {
   } as Record<Face, string>,
 } as const;
 
+export const notationPositionLabels = {
+  heading: 'Position labels',
+  intro:
+    "Positions are named by the faces that meet there. An edge sits on two faces, so it gets two letters (UF). A corner sits on three faces, so it gets three (URF). Hover a card (tap on mobile) to see that spot on the cube.",
+  edgesHeading: 'Edges',
+  cornersHeading: 'Corners',
+  examples: {
+    UF: 'Up and Front',
+    DR: 'Down and Right',
+    URF: 'Up, Right, and Front',
+    FRD: 'Front, Right, and Down',
+  },
+} as const;
+
 export const notationFaceTurns = {
   heading: 'Face turns',
   intro:

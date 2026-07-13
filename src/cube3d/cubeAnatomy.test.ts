@@ -66,4 +66,31 @@ describe('cubeAnatomy', () => {
       ),
     ).toBe(ANATOMY_DIM);
   });
+
+  it('highlights a single cubie position and dims the rest', () => {
+    expect(
+      resolveAnatomyStickerColor(
+        { mode: 'cubie', position: [0, 1, 1] },
+        [0, 1, 1],
+        'U',
+      ),
+    ).toBe(ANATOMY_PIECE_HIGHLIGHT);
+    expect(
+      resolveAnatomyStickerColor(
+        { mode: 'cubie', position: [0, 1, 1] },
+        [1, 1, 1],
+        'U',
+      ),
+    ).toBe(ANATOMY_DIM);
+  });
+
+  it('dims all stickers when cubie highlight is null', () => {
+    expect(
+      resolveAnatomyStickerColor(
+        { mode: 'cubie', position: null },
+        [0, 1, 1],
+        'U',
+      ),
+    ).toBe(ANATOMY_DIM);
+  });
 });

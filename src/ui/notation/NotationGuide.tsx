@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Face } from '../../cube/cubeState';
 import type { CubiePieceType } from '../../cube3d/cubeAnatomy';
+import type { CubiePosition } from '../../cube3d/cubeGeometry';
 import { CubeView } from '../../cube3d/CubeView';
 import {
   notationCubePieces,
@@ -8,11 +9,13 @@ import {
   notationFaceNames,
   notationFaceTurns,
   notationGuide as notationGuideCopy,
+  notationPositionLabels,
 } from '../../content/notation';
 import type { NotationSectionId } from '../../store/lessonSessionStore';
 import { FaceNameCard } from './FaceNameCard';
 import { NotationMoveCard } from './NotationMoveCard';
 import { PieceTypeCard } from './PieceTypeCard';
+import { PositionLabelCard } from './PositionLabelCard';
 import {
   CUBE_ROTATION_MOVES,
   FACE_NAME_LABELS,
@@ -31,6 +34,7 @@ type NotationGuideProps = {
 const NOTATION_SECTIONS: { id: NotationSectionId; label: string }[] = [
   { id: 'cubePieces', label: notationCubePieces.heading },
   { id: 'faceNames', label: notationFaceNames.heading },
+  { id: 'positionLabels', label: notationPositionLabels.heading },
   { id: 'faceTurns', label: notationFaceTurns.heading },
   { id: 'cubeRotations', label: notationCubeRotations.heading },
 ];
@@ -57,6 +61,17 @@ const PIECE_TYPE_CARDS: {
   },
 ];
 
+const POSITION_LABEL_EXAMPLES: {
+  label: keyof typeof notationPositionLabels.examples;
+  position: CubiePosition;
+  kind: 'edge' | 'corner';
+}[] = [
+  { label: 'UF', position: [0, 1, 1], kind: 'edge' },
+  { label: 'DR', position: [1, -1, 0], kind: 'edge' },
+  { label: 'URF', position: [1, 1, 1], kind: 'corner' },
+  { label: 'FRD', position: [1, -1, 1], kind: 'corner' },
+];
+
 export function NotationGuide({
   activeSection: controlledSection,
   onSectionChange,
@@ -66,7 +81,11 @@ export function NotationGuide({
   const activeSection = controlledSection ?? internalSection;
   const setActiveSection = onSectionChange ?? setInternalSection;
   const [highlightedFace, setHighlightedFace] = useState<Face | null>(null);
-  const [highlightedPieceType, setHighlightedPieceType] = useState<CubiePieceType | null>(null);
+  const [highlightedPieceType, setHighlightedPieceType] =
+    useState<CubiePieceType | null>(null);
+  const [highlightedPositionLabel, setHighlightedPositionLabel] = useState<
+    string | null
+  >(null);
   const [replayAnimations, setReplayAnimations] = useState(false);
   const prefersHover = usePrefersHover();
   const {
@@ -82,7 +101,9 @@ export function NotationGuide({
 
   const canvasKey = 'notation-guide-cube';
   const isAnatomySection =
-    activeSection === 'cubePieces' || activeSection === 'faceNames';
+    activeSection === 'cubePieces' ||
+    activeSection === 'faceNames' ||
+    activeSection === 'positionLabels';
   const showReplayCheckbox =
     activeSection === 'faceTurns' || activeSection === 'cubeRotations';
 
@@ -92,6 +113,7 @@ export function NotationGuide({
     resetOrientation();
     setHighlightedFace(null);
     setHighlightedPieceType(null);
+    setHighlightedPositionLabel(null);
     setActiveSection(sectionId);
   };
 
@@ -121,14 +143,41 @@ export function NotationGuide({
     );
   };
 
+  const handlePositionActivate = (label: string) => {
+    setHighlightedPositionLabel(label);
+  };
+
+  const handlePositionDeactivate = () => {
+    setHighlightedPositionLabel(null);
+  };
+
+  const handlePositionSelect = (label: string) => {
+    setHighlightedPositionLabel((current) =>
+      current === label ? null : label,
+    );
+  };
+
+  const highlightedCubiePosition =
+    POSITION_LABEL_EXAMPLES.find((example) => example.label === highlightedPositionLabel)
+      ?.position ?? null;
+
   const anatomyHighlight = isAnatomySection
     ? activeSection === 'faceNames'
       ? { mode: 'face' as const, face: highlightedFace }
-      : { mode: 'pieceType' as const, pieceType: highlightedPieceType }
+      : activeSection === 'positionLabels'
+        ? { mode: 'cubie' as const, position: highlightedCubiePosition }
+        : { mode: 'pieceType' as const, pieceType: highlightedPieceType }
     : null;
 
   const cubeFrameClass =
     'h-[320px] w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950 lg:h-[420px] lg:sticky lg:top-6';
+
+  const edgeExamples = POSITION_LABEL_EXAMPLES.filter(
+    (example) => example.kind === 'edge',
+  );
+  const cornerExamples = POSITION_LABEL_EXAMPLES.filter(
+    (example) => example.kind === 'corner',
+  );
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -243,6 +292,56 @@ export function NotationGuide({
                   onActivate={handleFaceActivate}
                   onDeactivate={handleFaceDeactivate}
                   onSelect={handleFaceSelect}
+                />
+              ))}
+            </div>
+          </article>
+        ) : null}
+
+        {activeSection === 'positionLabels' ? (
+          <article
+            id="notation-panel-positionLabels"
+            role="tabpanel"
+            aria-labelledby="notation-tab-positionLabels"
+            className="rounded-xl border border-slate-700 bg-slate-900/80 p-4"
+          >
+            <h2 className="text-lg font-semibold text-slate-100">
+              {notationPositionLabels.heading}
+            </h2>
+            <p className="mt-2 text-sm text-slate-300">
+              {notationPositionLabels.intro}
+            </p>
+            <h3 className="mt-4 text-sm font-semibold text-slate-200">
+              {notationPositionLabels.edgesHeading}
+            </h3>
+            <div className="mt-2 grid grid-cols-2 gap-3">
+              {edgeExamples.map(({ label }) => (
+                <PositionLabelCard
+                  key={label}
+                  label={label}
+                  description={notationPositionLabels.examples[label]}
+                  isActive={highlightedPositionLabel === label}
+                  prefersHover={prefersHover}
+                  onActivate={handlePositionActivate}
+                  onDeactivate={handlePositionDeactivate}
+                  onSelect={handlePositionSelect}
+                />
+              ))}
+            </div>
+            <h3 className="mt-4 text-sm font-semibold text-slate-200">
+              {notationPositionLabels.cornersHeading}
+            </h3>
+            <div className="mt-2 grid grid-cols-2 gap-3">
+              {cornerExamples.map(({ label }) => (
+                <PositionLabelCard
+                  key={label}
+                  label={label}
+                  description={notationPositionLabels.examples[label]}
+                  isActive={highlightedPositionLabel === label}
+                  prefersHover={prefersHover}
+                  onActivate={handlePositionActivate}
+                  onDeactivate={handlePositionDeactivate}
+                  onSelect={handlePositionSelect}
                 />
               ))}
             </div>

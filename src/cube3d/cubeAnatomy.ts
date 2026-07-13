@@ -9,7 +9,12 @@ export const ANATOMY_PIECE_HIGHLIGHT = '#FFD500';
 
 export type CubeAnatomyHighlight =
   | { mode: 'face'; face: Face | null }
-  | { mode: 'pieceType'; pieceType: CubiePieceType | null };
+  | { mode: 'pieceType'; pieceType: CubiePieceType | null }
+  | { mode: 'cubie'; position: CubiePosition | null };
+
+function sameCubiePosition(a: CubiePosition, b: CubiePosition): boolean {
+  return a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
+}
 
 export function getCubiePieceType(position: CubiePosition): CubiePieceType {
   const definition = cubieDefinitions.find(
@@ -34,6 +39,13 @@ export function resolveAnatomyStickerColor(
   if (highlight.mode === 'face') {
     if (highlight.face === null) return ANATOMY_DIM;
     return stickerFace === highlight.face
+      ? ANATOMY_PIECE_HIGHLIGHT
+      : ANATOMY_DIM;
+  }
+
+  if (highlight.mode === 'cubie') {
+    if (highlight.position === null) return ANATOMY_DIM;
+    return sameCubiePosition(cubiePosition, highlight.position)
       ? ANATOMY_PIECE_HIGHLIGHT
       : ANATOMY_DIM;
   }
