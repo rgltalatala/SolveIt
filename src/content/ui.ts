@@ -4,6 +4,7 @@ export const ui = {
   back: 'Back',
   continue: 'Continue',
   confirm: 'Confirm',
+  cancel: 'Cancel',
   capture: 'Capture',
   rescan: 'Re-scan',
   reset: 'Reset',
