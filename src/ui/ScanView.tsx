@@ -45,7 +45,14 @@ export function ScanView() {
       partialScansToDisplayCubeState(
         scannedFaces,
         isCorrecting && detectedFace && currentFace
-          ? { face: currentFace, faceState: detectedFace }
+          ? {
+              face: currentFace,
+              // Preview uses cubejs sticker order; confirmation keeps camera/grid order.
+              faceState: detectorFaceToCubeJsFaceOrder(
+                currentFace,
+                detectedFace,
+              ),
+            }
           : undefined,
       ),
     [currentFace, detectedFace, isCorrecting, scannedFaces],
@@ -63,18 +70,14 @@ export function ScanView() {
     clearValidationResult();
     const frame = captureFrame();
     if (!frame) return;
-    setDetectedFace(
-      detectorFaceToCubeJsFaceOrder(
-        currentFace,
-        detectFaceColorsFromImageData(frame),
-      ),
-    );
+    // Keep camera-view order for the confirmation grid so it matches what the user scanned.
+    setDetectedFace(detectFaceColorsFromImageData(frame));
     setIsCorrecting(true);
     setAppPhase('correcting');
   };
 
   const handleConfirm = (faceState: FaceState) => {
-    submitFace(faceState);
+    submitFace(detectorFaceToCubeJsFaceOrder(currentFace, faceState));
     setDetectedFace(null);
     setIsCorrecting(false);
   };

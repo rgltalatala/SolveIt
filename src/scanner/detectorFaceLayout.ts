@@ -9,6 +9,9 @@ import type { Face, FaceState } from '../cube/cubeState';
  * matches cubejs **front** row (slots 6–8), not the back row (0–2). We also mirror **left↔right**
  * on U so the sampled grid matches how the live preview aligns with L/R (other faces stay
  * row-major; a global horizontal remap on every face mirrored them vs the camera).
+ *
+ * Apply this when committing a scan into cube state / 3D preview. Keep detector order on the
+ * confirmation grid so stickers match what the user saw in the camera.
  */
 export function detectorFaceToCubeJsFaceOrder(
   face: Face,
