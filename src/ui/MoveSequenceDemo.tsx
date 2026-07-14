@@ -370,34 +370,36 @@ export function MoveSequenceDemoControls({
     <div className={showSummary ? 'flex flex-col gap-3 rounded-xl border border-slate-700 bg-slate-900/60 p-4' : undefined}>
       {showSummary ? <MoveSequenceDemoSummary /> : null}
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex flex-wrap gap-2">
+      <div className="flex flex-nowrap items-center gap-1 sm:gap-1.5">
+        <div className="flex min-w-0 flex-1 flex-nowrap gap-1 sm:gap-1.5">
           <button
             type="button"
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700"
+            className="min-w-0 flex-1 truncate rounded-lg border border-slate-600 bg-slate-800 px-1.5 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 sm:px-3"
             onClick={handleReset}
           >
             {moveSequenceDemo.reset}
           </button>
           <button
             type="button"
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-40"
+            className="min-w-0 flex-1 truncate rounded-lg border border-slate-600 bg-slate-800 px-1.5 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-40 sm:px-3"
             onClick={handlePrev}
             disabled={!hasMoves || animating || applied <= 0}
+            aria-label={moveSequenceDemo.previousMove}
           >
-            {moveSequenceDemo.previousMove}
+            {moveSequenceDemo.previousMoveShort}
           </button>
           <button
             type="button"
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-40"
+            className="min-w-0 flex-1 truncate rounded-lg border border-slate-600 bg-slate-800 px-1.5 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-40 sm:px-3"
             onClick={handleNext}
             disabled={!hasMoves || animating || applied >= moves.length}
+            aria-label={moveSequenceDemo.nextMove}
           >
-            {moveSequenceDemo.nextMove}
+            {moveSequenceDemo.nextMoveShort}
           </button>
           <button
             type="button"
-            className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
+            className="min-w-0 flex-1 truncate rounded-lg bg-emerald-700 px-1.5 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-40 sm:px-3"
             onClick={handlePlayAll}
             disabled={!hasMoves || (animating && !playing)}
           >

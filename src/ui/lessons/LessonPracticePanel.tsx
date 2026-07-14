@@ -10,7 +10,7 @@ import { demoMoveChipClassName } from './demoMoveChipClassName';
 const SPEED_CYCLE: PlaybackSpeed[] = [0.5, 1, 2];
 
 function controlButtonClass(disabled?: boolean): string {
-  return `rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 ${
+  return `min-w-0 flex-1 truncate rounded-lg border border-slate-600 bg-slate-800 px-1.5 py-1.5 text-xs font-medium text-slate-100 hover:bg-slate-700 sm:px-3 ${
     disabled ? 'opacity-40' : ''
   }`;
 }
@@ -107,11 +107,15 @@ export function LessonPracticePanel({
         </p>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-col gap-1.5">
         <h3 className="text-sm font-semibold text-slate-200">
           {lessonLayout.practiceHeading}
         </h3>
-        <div className="flex flex-wrap gap-1.5">
+        <div
+          className="flex flex-nowrap items-center gap-1 sm:gap-1.5"
+          role="group"
+          aria-label={lessonLayout.practiceHeading}
+        >
           <button
             type="button"
             className={controlButtonClass()}
@@ -124,16 +128,18 @@ export function LessonPracticePanel({
             className={controlButtonClass(animating || applied <= 0)}
             onClick={handlePrev}
             disabled={animating || applied <= 0}
+            aria-label={moveSequenceDemo.previousMove}
           >
-            {moveSequenceDemo.previousMove}
+            {moveSequenceDemo.previousMoveShort}
           </button>
           <button
             type="button"
             className={controlButtonClass(animating || applied >= moves.length)}
             onClick={handleNext}
             disabled={animating || applied >= moves.length}
+            aria-label={moveSequenceDemo.nextMove}
           >
-            {moveSequenceDemo.nextMove}
+            {moveSequenceDemo.nextMoveShort}
           </button>
           <button
             type="button"
