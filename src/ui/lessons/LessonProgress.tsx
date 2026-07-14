@@ -26,6 +26,8 @@ export type LessonProgressConfig = {
 
 type LessonProgressProps = {
   progress: LessonProgressConfig;
+  /** Thin bar without per-slot text labels (default for lesson chrome). */
+  compact?: boolean;
 };
 
 function pieceColors(slot: LessonProgressSlot): readonly Color[] {
@@ -33,8 +35,9 @@ function pieceColors(slot: LessonProgressSlot): readonly Color[] {
   return [];
 }
 
-function segmentClassName(slot: LessonProgressSlot): string {
-  const base = 'flex h-2 flex-1 overflow-hidden rounded-full transition-colors';
+function segmentClassName(slot: LessonProgressSlot, compact: boolean): string {
+  const height = compact ? 'h-1.5' : 'h-2';
+  const base = `flex ${height} flex-1 overflow-hidden rounded-full transition-colors`;
   if (slot.solved) {
     return base;
   }
@@ -58,12 +61,18 @@ function legacyProgressSegmentClassName(done: boolean, active: boolean): string 
   return 'bg-slate-700';
 }
 
-function ProgressSegment({ slot }: { slot: LessonProgressSlot }) {
+function ProgressSegment({
+  slot,
+  compact,
+}: {
+  slot: LessonProgressSlot;
+  compact: boolean;
+}) {
   const colors = pieceColors(slot);
 
   if (slot.solved && colors.length > 0) {
     return (
-      <div title={slot.label} className={segmentClassName(slot)}>
+      <div title={slot.label} className={segmentClassName(slot, compact)}>
         {colors.map((color, index) => (
           <div
             key={`${slot.key}-${color}-${index}`}
@@ -78,25 +87,36 @@ function ProgressSegment({ slot }: { slot: LessonProgressSlot }) {
     );
   }
 
-  return <div title={slot.label} className={segmentClassName(slot)} />;
+  return <div title={slot.label} className={segmentClassName(slot, compact)} />;
 }
 
-export function LessonProgress({ progress }: LessonProgressProps) {
+export function LessonProgress({
+  progress,
+  compact = true,
+}: LessonProgressProps) {
   const { solved, total, slots, slotLabels, ariaLabel, phaseLabel } = progress;
 
   const useSlotMode = slots !== undefined && slots.length > 0;
   const legacySlots =
     slotLabels ?? Array.from({ length: total }, (_, i) => `${i + 1}`);
+  const barHeight = compact ? 'h-1.5' : 'h-2';
 
   return (
-    <div className="mt-3 flex flex-col gap-2" aria-label={ariaLabel}>
+    <div
+      className={`flex flex-col ${compact ? 'gap-1' : 'mt-3 gap-2'}`}
+      aria-label={ariaLabel}
+    >
       {phaseLabel ? (
-        <p className="text-xs font-medium text-violet-300">{phaseLabel}</p>
+        <p
+          className={`font-medium text-violet-300 ${compact ? 'text-[10px] leading-tight' : 'text-xs'}`}
+        >
+          {phaseLabel}
+        </p>
       ) : null}
-      <div className="flex gap-3">
+      <div className="flex items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col gap-1">
           <div
-            className="flex h-2 gap-1.5"
+            className={`flex ${barHeight} gap-1`}
             role="progressbar"
             aria-valuenow={solved}
             aria-valuemin={0}
@@ -104,7 +124,13 @@ export function LessonProgress({ progress }: LessonProgressProps) {
             aria-label={ariaLabel}
           >
             {useSlotMode
-              ? slots.map((slot) => <ProgressSegment key={slot.key} slot={slot} />)
+              ? slots.map((slot) => (
+                  <ProgressSegment
+                    key={slot.key}
+                    slot={slot}
+                    compact={compact}
+                  />
+                ))
               : legacySlots.map((label, index) => {
                   const done = index < solved;
                   const active = index === solved;
@@ -112,7 +138,7 @@ export function LessonProgress({ progress }: LessonProgressProps) {
                     <div
                       key={`${label}-${index}`}
                       title={label}
-                      className={`flex h-2 flex-1 rounded-full transition-colors ${legacyProgressSegmentClassName(
+                      className={`flex ${barHeight} flex-1 rounded-full transition-colors ${legacyProgressSegmentClassName(
                         done,
                         active,
                       )}`}
@@ -120,7 +146,7 @@ export function LessonProgress({ progress }: LessonProgressProps) {
                   );
                 })}
           </div>
-          {useSlotMode ? (
+          {!compact && useSlotMode ? (
             <div className="flex gap-1.5">
               {slots.map((slot) => (
                 <span key={slot.key} className={labelClassName(slot)}>
@@ -128,7 +154,8 @@ export function LessonProgress({ progress }: LessonProgressProps) {
                 </span>
               ))}
             </div>
-          ) : slotLabels ? (
+          ) : null}
+          {!compact && slotLabels ? (
             <div className="flex gap-1.5">
               {slotLabels.map((label, index) => {
                 const done = index < solved;
@@ -146,11 +173,11 @@ export function LessonProgress({ progress }: LessonProgressProps) {
             </div>
           ) : null}
         </div>
-        <div className="flex h-2 shrink-0 items-center self-start">
-          <span className="text-sm tabular-nums text-slate-400">
-            {solved} / {total}
-          </span>
-        </div>
+        <span
+          className={`shrink-0 tabular-nums text-slate-400 ${compact ? 'text-xs' : 'text-sm'}`}
+        >
+          {solved} / {total}
+        </span>
       </div>
     </div>
   );

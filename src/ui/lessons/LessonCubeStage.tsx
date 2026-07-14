@@ -1,10 +1,7 @@
 import type { ReactNode } from 'react';
 import { preparing } from '../../content/tips';
 import { MoveSequenceDemoCube } from '../MoveSequenceDemo';
-import { LessonSplitLayout } from './LessonSplitLayout';
-
-export const LESSON_CUBE_FRAME_CLASS =
-  'h-[320px] w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950 lg:h-[480px]';
+import { LearningSplitLayout } from './LearningSplitLayout';
 
 type LessonCubeStageProps = {
   showPreparingOverlay: boolean;
@@ -22,7 +19,7 @@ function LessonCubeColumn({
   preparingSubtitle?: string;
 }) {
   return (
-    <div className="relative">
+    <div className="relative h-full min-h-0 flex-1">
       {children}
       {showPreparingOverlay ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-xl bg-slate-950/75 px-4 text-center">
@@ -45,7 +42,7 @@ export function LessonCubeStage({
   sidebar,
 }: LessonCubeStageProps) {
   return (
-    <LessonSplitLayout
+    <LearningSplitLayout
       cube={
         <LessonCubeColumn
           showPreparingOverlay={showPreparingOverlay}

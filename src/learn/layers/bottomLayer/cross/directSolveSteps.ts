@@ -42,6 +42,9 @@ function buildInsertDoubleStep(
       formatColor(partner),
       whiteEdgeIdentity(partner),
     ),
+    practiceGoalSummary: whiteCrossSteps.directSolveSummary(
+      formatColor(partner),
+    ),
     face,
     demoMoves: demo,
   };

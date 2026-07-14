@@ -1,4 +1,5 @@
 import type { Color, Move } from '../../../../cube/cubeState';
+import type { CornerHoldIndex } from '../../bottomLayer/corners/cornerHold';
 
 export const MIDDLE_EDGE_SLOTS = ['FR', 'FL', 'BR', 'BL'] as const;
 
@@ -21,32 +22,37 @@ export type MiddleLayerEdgesLessonStep =
       kind: 'intro';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'complete';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'cross-corners-prerequisite';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'reorient-hold';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
-      targetHoldIndex?: number;
+      targetHoldIndex?: CornerHoldIndex;
       returnToInitialHold?: boolean;
     }
   | {
       kind: 'align-u';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       edgeColors: [Color, Color];
     }
@@ -54,6 +60,7 @@ export type MiddleLayerEdgesLessonStep =
       kind: 'solve-edge';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       edgeColors: [Color, Color];
       action: 'insert' | 'extract';
@@ -61,7 +68,7 @@ export type MiddleLayerEdgesLessonStep =
     };
 
 export interface MiddleLayerEdgeLessonStepOptions {
-  currentHoldIndex?: number;
+  currentHoldIndex?: CornerHoldIndex;
   solvedMiddleEdgeSlots?: readonly MiddleEdgeSlotId[];
   /** Strategy intro shown once per lesson session before the first edge solve. */
   hasSeenStrategyIntro?: boolean;

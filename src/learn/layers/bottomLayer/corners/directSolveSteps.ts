@@ -110,6 +110,7 @@ function buildTwistedInSlotStep(
     cornerId,
     title: label,
     body: whiteCornersSteps.twisted(label),
+    practiceGoalSummary: whiteCornersSteps.twistedSummary(label),
     demoMoves: demo,
   };
 }
@@ -126,6 +127,7 @@ function buildULayerInsertStep(
     cornerId,
     title: label,
     body: uLayerInsertStepBody(label, demo),
+    practiceGoalSummary: whiteCornersSteps.uLayerSummary(label),
     demoMoves: demo,
   };
 }
@@ -142,6 +144,7 @@ function buildWrongDLayerStep(
     cornerId,
     title: label,
     body: wrongDSlotStepBody(label, demo),
+    practiceGoalSummary: whiteCornersSteps.wrongDSlotSummary(label),
     demoMoves: demo,
   };
 }
@@ -158,6 +161,7 @@ function buildGenericSolveStep(
     cornerId,
     title: label,
     body: whiteCornersSteps.directSolve(label),
+    practiceGoalSummary: whiteCornersSteps.directSolveSummary(label),
     demoMoves: demo,
   };
 }

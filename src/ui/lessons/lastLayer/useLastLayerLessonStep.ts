@@ -12,7 +12,6 @@ import {
   isLastLayerComplete,
   isYellowCrossComplete,
   LAST_LAYER_LESSON_ID,
-  type CornerHoldIndex,
 } from '../../../learn/layers/lastLayer';
 import type {
   LastLayerLessonStep,
@@ -182,13 +181,11 @@ export function useLastLayerLessonStep(studentFrame: CubeState | null) {
       let nextHold = current.currentHoldIndex;
 
       if (appliedStep.kind === 'reorient-hold') {
-        nextHold = (
-          appliedStep.returnToInitialHold
-            ? 0
-            : appliedStep.targetHoldIndex !== undefined
-              ? appliedStep.targetHoldIndex
-              : current.currentHoldIndex
-        ) as CornerHoldIndex;
+        if (appliedStep.returnToInitialHold) {
+          nextHold = 0;
+        } else if (appliedStep.targetHoldIndex !== undefined) {
+          nextHold = appliedStep.targetHoldIndex;
+        }
       }
 
       const nextInOrient =

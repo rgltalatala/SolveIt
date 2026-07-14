@@ -115,6 +115,9 @@ export function tryRotateBottomStepForCrossId(
       formatColor(partner),
       whiteEdgeIdentity(partner),
     ),
+    practiceGoalSummary: whiteCrossSteps.dLayerRotateSummary(
+      formatColor(partner),
+    ),
     targetFace: slot.sideFace,
     demoMoves: bottomSpinMoves,
   };
@@ -145,6 +148,9 @@ export function tryDLayerInsertStepForCrossId(
     body: whiteCrossSteps.dLayerInsert(
       formatColor(partner),
       whiteEdgeIdentity(partner),
+    ),
+    practiceGoalSummary: whiteCrossSteps.dLayerInsertSummary(
+      formatColor(partner),
     ),
     face,
     demoMoves: insert,

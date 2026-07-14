@@ -32,6 +32,7 @@ function buildReturnToBlueStep(
     kind: 'reorient-hold',
     title: lastLayerSteps.faceBlueEdges.title,
     body: lastLayerSteps.faceBlueEdges.body,
+    practiceGoalSummary: lastLayerSteps.faceBlueEdgesSummary,
     demoMoves: returnToBlueY(currentHoldIndex),
     targetHoldIndex: 0,
     returnToInitialHold: true,
@@ -51,6 +52,7 @@ function buildReorientForPermuteStep(
     kind: 'reorient-hold',
     title: lastLayerSteps.faceSideTitle(faceLabel),
     body: lastLayerSteps.reorientEdges(faceLabel),
+    practiceGoalSummary: lastLayerSteps.reorientEdgesSummary(faceLabel),
     demoMoves: options?.syncHoldOnly
       ? []
       : reorientMovesForPermuteSetup(physicalHold, targetHoldIndex),
@@ -69,6 +71,7 @@ function buildPermuteEdgesStep(
     kind: 'permute-edges',
     title: lastLayerSteps.permuteTopEdges.title,
     body: lastLayerSteps.permuteTopEdges.body(caseNote),
+    practiceGoalSummary: lastLayerSteps.permuteTopEdgesSummary,
     demoMoves: PERMUTE_EDGES_ALG,
     permuteCase,
   };
@@ -102,6 +105,7 @@ export function computePermuteEdgesStep(
       subLesson: 'permute-edges',
       title: lastLayerSteps.alignTopLayer.title,
       body: lastLayerSteps.alignTopLayer.body,
+      practiceGoalSummary: lastLayerSteps.alignTopLayerSummary,
       demoMoves: permuteCase.alignMoves,
     };
   }
@@ -114,6 +118,7 @@ export function computePermuteEdgesStep(
         subLesson: 'permute-edges',
         title: lastLayerSteps.inspectTopLayer.title,
         body: lastLayerSteps.inspectTopLayer.body,
+        practiceGoalSummary: lastLayerSteps.inspectTopLayerSummary,
         demoMoves: permuteCase.inspectPrefix,
       };
     }

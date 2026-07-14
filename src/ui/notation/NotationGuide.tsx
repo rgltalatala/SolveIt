@@ -25,6 +25,10 @@ import {
 } from './notationMoves';
 import { useNotationCube } from './useNotationCube';
 import { usePrefersHover } from './usePrefersHover';
+import {
+  LearningSplitLayout,
+  LEARNING_CUBE_FRAME_CLASS,
+} from '../lessons/LearningSplitLayout';
 
 type NotationGuideProps = {
   activeSection?: NotationSectionId;
@@ -193,8 +197,7 @@ export function NotationGuide({
     highlightedPieceType,
   });
 
-  const cubeFrameClass =
-    'h-[320px] w-full overflow-hidden rounded-xl border border-slate-700 bg-slate-950 lg:h-[420px] lg:sticky lg:top-6';
+  const cubeFrameClass = LEARNING_CUBE_FRAME_CLASS;
 
   const edgeExamples = POSITION_LABEL_EXAMPLES.filter(
     (example) => example.kind === 'edge',
@@ -204,70 +207,76 @@ export function NotationGuide({
   );
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <CubeView
-        cubeState={displayState}
-        meshRotation={[0, 0, 0]}
-        frameClassName={cubeFrameClass}
-        canvasKey={canvasKey}
-        moveAnimation={isAnatomySection ? null : moveAnimation}
-        cameraBaselineKey={canvasKey}
-        snapCameraOnWholeCubeRotation={false}
-        enableOrbitControls={false}
-        anatomyHighlight={anatomyHighlight}
-        faceLabels={
-          activeSection === 'faceNames' ? { highlightedFace } : undefined
-        }
-      />
-
-      <div className="flex flex-col gap-4">
-        {showReplayCheckbox ? (
-          <label className="flex cursor-pointer items-center gap-2 self-start text-sm text-slate-300">
-            <input
-              type="checkbox"
-              className="rounded border-slate-600"
-              checked={replayAnimations}
-              onChange={(e) => setReplayAnimations(e.target.checked)}
-            />
-            {notationGuideCopy.replayAnimations}
-          </label>
-        ) : null}
-
-        <div
-          className="flex flex-wrap gap-2"
-          role="tablist"
-          aria-label="Notation topics"
-        >
-          {NOTATION_SECTIONS.map(({ id, label }) => {
-            const isActive = activeSection === id;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                id={`notation-tab-${id}`}
-                aria-selected={isActive}
-                aria-controls={`notation-panel-${id}`}
-                className={`rounded-lg border px-3 py-1.5 text-sm font-medium transition-colors ${
-                  isActive
-                    ? 'border-emerald-600 bg-emerald-900/60 text-emerald-100'
-                    : 'border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-slate-100'
-                }`}
-                onClick={() => handleSectionChange(id)}
-              >
-                {label}
-              </button>
-            );
-          })}
+    <LearningSplitLayout
+      cube={
+        <div className="h-full min-h-0">
+          <CubeView
+            cubeState={displayState}
+            meshRotation={[0, 0, 0]}
+            frameClassName={cubeFrameClass}
+            canvasKey={canvasKey}
+            moveAnimation={isAnatomySection ? null : moveAnimation}
+            cameraBaselineKey={canvasKey}
+            snapCameraOnWholeCubeRotation={false}
+            enableOrbitControls={false}
+            anatomyHighlight={anatomyHighlight}
+            faceLabels={
+              activeSection === 'faceNames' ? { highlightedFace } : undefined
+            }
+          />
         </div>
+      }
+      sidebar={
+        <div className="flex min-h-0 flex-1 flex-col gap-2">
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            <div
+              className="flex min-w-0 flex-1 flex-wrap gap-1.5"
+              role="tablist"
+              aria-label="Notation topics"
+            >
+              {NOTATION_SECTIONS.map(({ id, label }) => {
+                const isActive = activeSection === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    id={`notation-tab-${id}`}
+                    aria-selected={isActive}
+                    aria-controls={`notation-panel-${id}`}
+                    className={`rounded-lg border px-2.5 py-1.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? 'border-emerald-600 bg-emerald-900/60 text-emerald-100'
+                        : 'border-slate-600 bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-slate-100'
+                    }`}
+                    onClick={() => handleSectionChange(id)}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            {showReplayCheckbox ? (
+              <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs text-slate-300">
+                <input
+                  type="checkbox"
+                  className="rounded border-slate-600"
+                  checked={replayAnimations}
+                  onChange={(e) => setReplayAnimations(e.target.checked)}
+                />
+                {notationGuideCopy.replayAnimations}
+              </label>
+            ) : null}
+          </div>
 
-        {activeSection === 'cubePieces' ? (
-          <article
-            id="notation-panel-cubePieces"
-            role="tabpanel"
-            aria-labelledby="notation-tab-cubePieces"
-            className="rounded-xl border border-slate-700 bg-slate-900/80 p-4"
-          >
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {activeSection === 'cubePieces' ? (
+              <article
+                id="notation-panel-cubePieces"
+                role="tabpanel"
+                aria-labelledby="notation-tab-cubePieces"
+                className="rounded-xl border border-slate-700 bg-slate-900/80 p-4"
+              >
             <h2 className="text-lg font-semibold text-slate-100">
               {notationCubePieces.heading}
             </h2>
@@ -437,7 +446,9 @@ export function NotationGuide({
             </div>
           </article>
         ) : null}
-      </div>
-    </div>
+          </div>
+        </div>
+      }
+    />
   );
 }

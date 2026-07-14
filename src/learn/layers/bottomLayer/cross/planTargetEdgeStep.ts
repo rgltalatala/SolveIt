@@ -50,6 +50,7 @@ function buildAlignFromBfs(
     edgeLabel: label,
     partnerColor: partner,
     body: whiteCrossSteps.alignBfs(formatColor(partner), edgeLabel),
+    practiceGoalSummary: whiteCrossSteps.alignBfsSummary(formatColor(partner)),
     face: slot.sideFace,
     demoMoves: demo,
   };
@@ -67,6 +68,7 @@ function buildSolveEdgeStep(
     kind: 'solve-edge',
     title: whitePartnerEdgeHeading(partner),
     body: whiteCrossSteps.solveEdge(formatColor(partner), edgeLabel),
+    practiceGoalSummary: whiteCrossSteps.solveEdgeSummary(formatColor(partner)),
     edgeLabel: label,
     partnerColor: partner,
     demoMoves: demo,

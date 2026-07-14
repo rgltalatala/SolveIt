@@ -132,6 +132,9 @@ export function tryULayerAlignStepForCrossId(
       formatColor(partner),
       whiteEdgeIdentity(partner),
     ),
+    practiceGoalSummary: whiteCrossSteps.uLayerAlignSummary(
+      formatColor(partner),
+    ),
     face: turnFace,
     demoMoves: demo,
   };
@@ -174,6 +177,9 @@ export function tryULayerInsertStepForCrossId(
     body: whiteCrossSteps.uLayerInsert(
       formatColor(partner),
       whiteEdgeIdentity(partner),
+    ),
+    practiceGoalSummary: whiteCrossSteps.uLayerInsertSummary(
+      formatColor(partner),
     ),
     face,
     demoMoves: best,

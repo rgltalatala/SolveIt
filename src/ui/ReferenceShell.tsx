@@ -32,16 +32,32 @@ function LessonTabContent() {
   const appPhase = useCubeStore((state) => state.appPhase);
 
   if (appPhase === 'notation') {
-    return <NotationIntroPanel />;
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <NotationIntroPanel />
+      </div>
+    );
   }
   if (appPhase === 'scanning' || appPhase === 'correcting') {
-    return <ScanView />;
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <ScanView />
+      </div>
+    );
   }
   if (appPhase === 'lessonResync') {
-    return <LessonResyncView />;
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <LessonResyncView />
+      </div>
+    );
   }
   if (appPhase === 'learning') {
-    return <ActiveLessonView />;
+    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <ActiveLessonView />
+      </div>
+    );
   }
   return null;
 }
@@ -51,13 +67,29 @@ export function ReferenceShell() {
   const learningSection = useLessonSessionStore((state) => state.learningSection);
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-dvh flex-col overflow-hidden">
       <LessonTopNav showEndLesson={appPhase === 'learning'} />
-      <div className={learningSection === 'lesson' ? undefined : 'hidden'}>
-        <LessonTabContent />
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div
+          className={
+            learningSection === 'lesson'
+              ? 'flex min-h-0 flex-1 flex-col overflow-hidden'
+              : 'hidden'
+          }
+        >
+          <LessonTabContent />
+        </div>
+        {learningSection === 'notation' ? (
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <LessonNotationView />
+          </div>
+        ) : null}
+        {learningSection === 'cases' ? (
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <CasesReferenceView />
+          </div>
+        ) : null}
       </div>
-      {learningSection === 'notation' ? <LessonNotationView /> : null}
-      {learningSection === 'cases' ? <CasesReferenceView /> : null}
     </div>
   );
 }

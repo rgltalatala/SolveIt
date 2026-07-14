@@ -72,6 +72,7 @@ export type LastLayerLessonStep =
       kind: 'intro';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       introId: LastLayerIntroId;
       demoMoves?: Move[];
     }
@@ -79,18 +80,21 @@ export type LastLayerLessonStep =
       kind: 'complete';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'prerequisite';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'align-u';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       subLesson: 'orient-edges' | 'permute-edges' | 'orient-corners';
       ollCase?: 'l-shape' | 'bar';
@@ -99,6 +103,7 @@ export type LastLayerLessonStep =
       kind: 'orient-edges';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       ollCase: OrientEdgesOllCase;
     }
@@ -106,11 +111,13 @@ export type LastLayerLessonStep =
       kind: 'orient-edges-already-complete';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
     }
   | {
       kind: 'permute-edges';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       permuteCase: PermuteEdgesCaseKind;
     }
@@ -118,6 +125,7 @@ export type LastLayerLessonStep =
       kind: 'permute-corners';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       permuteCase: PermuteCornersCaseKind;
     }
@@ -125,6 +133,7 @@ export type LastLayerLessonStep =
       kind: 'orient-corners';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       reps: 2 | 4;
     }
@@ -132,6 +141,7 @@ export type LastLayerLessonStep =
       kind: 'reorient-hold';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       targetHoldIndex?: CornerHoldIndex;
       returnToInitialHold?: boolean;

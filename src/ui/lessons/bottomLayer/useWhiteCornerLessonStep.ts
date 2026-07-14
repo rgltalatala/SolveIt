@@ -9,7 +9,6 @@ import {
   normalizeHoldToBlue,
   targetHoldIndex,
   WHITE_CORNERS_LESSON_ID,
-  type CornerHoldIndex,
   type CornerSlotId,
   type WhiteCornersLessonStep,
 } from '../../../learn/layers/bottomLayer/corners';
@@ -140,13 +139,12 @@ export function useWhiteCornerLessonStep(studentFrame: CubeState | null) {
       }
 
       if (appliedStep.kind === 'reorient-hold') {
-        const nextHold = (
-          appliedStep.returnToInitialHold
-            ? 0
-            : appliedStep.targetCornerId
-              ? targetHoldIndex(appliedStep.targetCornerId)
-              : current.currentHoldIndex
-        ) as CornerHoldIndex;
+        let nextHold = current.currentHoldIndex;
+        if (appliedStep.returnToInitialHold) {
+          nextHold = 0;
+        } else if (appliedStep.targetCornerId) {
+          nextHold = targetHoldIndex(appliedStep.targetCornerId);
+        }
         applyCornerSession({
           ...current,
           currentHoldIndex: nextHold,

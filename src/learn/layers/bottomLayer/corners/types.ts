@@ -19,23 +19,27 @@ export type WhiteCornersLessonStep =
       kind: 'complete';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'cross-prerequisite';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'intro';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
     }
   | {
       kind: 'reorient-hold';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves: Move[];
       targetCornerId?: CornerSlotId;
       returnToInitialHold?: boolean;
@@ -44,6 +48,7 @@ export type WhiteCornersLessonStep =
       kind: 'solve-corner';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       cornerId: CornerSlotId;
       demoMoves?: Move[];
     };

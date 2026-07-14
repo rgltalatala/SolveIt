@@ -9,7 +9,6 @@ import {
   MIDDLE_LAYER_EDGES_LESSON_ID,
   normalizeHoldToBlue,
   slotIdForExpectedEdgeColors,
-  type CornerHoldIndex,
   type MiddleEdgeSlotId,
   type MiddleLayerEdgesLessonStep,
 } from '../../../learn/layers/middleLayer/edges';
@@ -146,13 +145,12 @@ export function useMiddleLayerLessonStep(studentFrame: CubeState | null) {
       }
 
       if (appliedStep.kind === 'reorient-hold') {
-        const nextHold = (
-          appliedStep.returnToInitialHold
-            ? 0
-            : appliedStep.targetHoldIndex !== undefined
-              ? appliedStep.targetHoldIndex
-              : current.currentHoldIndex
-        ) as CornerHoldIndex;
+        let nextHold = current.currentHoldIndex;
+        if (appliedStep.returnToInitialHold) {
+          nextHold = 0;
+        } else if (appliedStep.targetHoldIndex !== undefined) {
+          nextHold = appliedStep.targetHoldIndex;
+        }
         applyMiddleSession({
           ...current,
           currentHoldIndex: nextHold,

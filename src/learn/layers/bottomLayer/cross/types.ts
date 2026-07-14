@@ -21,17 +21,20 @@ export type WhiteCrossLessonStep =
       kind: 'complete';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       demoMoves?: Move[];
     }
   | {
       kind: 'intro';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
     }
   | {
       kind: 'solve-edge';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       edgeLabel: string;
       partnerColor: Color;
       demoMoves?: Move[];
@@ -40,6 +43,7 @@ export type WhiteCrossLessonStep =
       kind: 'rotate-bottom';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       edgeLabel: string;
       partnerColor: Color;
       targetFace: Face;
@@ -49,6 +53,7 @@ export type WhiteCrossLessonStep =
       kind: 'align-to-center';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       edgeLabel: string;
       partnerColor: Color;
       face: Face;
@@ -58,6 +63,7 @@ export type WhiteCrossLessonStep =
       kind: 'insert-double';
       title: string;
       body: string;
+      practiceGoalSummary?: string;
       edgeLabel: string;
       partnerColor: Color;
       face: Face;

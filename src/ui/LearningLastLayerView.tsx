@@ -411,6 +411,9 @@ export function LearningLastLayerView() {
         body: isLessonComplete
           ? lastLayerLesson.completeBody
           : displayStep.body || undefined,
+        practiceGoalSummary: isLessonComplete
+          ? undefined
+          : displayStep.practiceGoalSummary,
         dimmed: showPreparingOverlay,
       }}
       cube={{

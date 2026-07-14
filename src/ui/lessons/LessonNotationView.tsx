@@ -8,7 +8,7 @@ export function LessonNotationView() {
   );
 
   return (
-    <section className="mx-auto w-full max-w-5xl p-4 sm:p-6">
+    <section className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col px-3 py-2 sm:px-4">
       <NotationGuide
         activeSection={notationSection}
         onSectionChange={setNotationSection}

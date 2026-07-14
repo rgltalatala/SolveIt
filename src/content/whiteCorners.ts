@@ -56,21 +56,33 @@ Once a corner is solved, rotate the entire cube so the next unsolved corner's ho
     title: 'Face the blue side',
     body: "Corners are done. Turn the cube so blue is toward you again. White on bottom, yellow on top, same as when you started.",
   },
+  faceBlueSummary:
+    'Turn the cube so blue faces you again. Keep white on the bottom.',
   faceSideTitle: (faceLabel: string) => `Face the ${faceLabel} side`,
   reorient: (faceLabel: string, cornerLabel: string, skipNote: string) =>
     `Turn the whole cube so ${faceLabel} is toward you. White stays on bottom, yellow on top. You're setting up to solve the ${cornerLabel}.${skipNote}`,
+  reorientSummary: (faceLabel: string) =>
+    `Turn the cube so ${faceLabel} faces you. Keep white on the bottom.`,
   reorientSkipAlignNote:
     " The next piece is on the top layer; we'll line it up at URF before inserting into FRD.",
   placeholder: (corner: string) =>
     `Slot the ${corner}: white on the bottom, side colors matching their centers. Line it up on your own, or reset the scramble and try again.`,
   twisted: (corner: string) =>
     `The ${corner} is in FRD but twisted. The demo orients white onto the bottom without disturbing your cross or corners you've already placed.`,
+  twistedSummary: (corner: string) =>
+    `${corner} is in FRD but twisted. Orient white onto the bottom.`,
   wrongDSlot: (corner: string) =>
     `The ${corner} is in the wrong bottom slot. The demo lifts it to the top layer, brings it to URF, then runs the matching insert into FRD. Your cross and solved corners stay put.`,
+  wrongDSlotSummary: (corner: string) =>
+    `${corner} is in the wrong bottom slot. Lift it, then insert into FRD.`,
   directSolve: (corner: string) =>
     `Slot the ${corner} into FRD with the demo. Your white cross and any corners you've already solved stay put.`,
+  directSolveSummary: (corner: string) =>
+    `Slot the ${corner} into FRD with white on the bottom.`,
   uLayer: (corner: string) =>
     `The ${corner} is on the top layer. The demo brings it to URF and inserts it into FRD with white on the bottom, without touching your cross or solved corners.`,
+  uLayerSummary: (corner: string) =>
+    `${corner} is on top. Bring it to URF, then insert into FRD.`,
   uLayerAlignHabitNote:
     "Some U turns might look redundant, like U then U' or U2 then U. That's on purpose. We're building the habit of lining up every top-layer corner at URF before you insert into FRD. Check how white is facing, then run the matching insert. Once you're comfortable, skip the extra U turns and go straight to the insert.",
 } as const;

@@ -21,6 +21,7 @@ function buildReturnToBlueStep(
     kind: 'reorient-hold',
     title: lastLayerSteps.faceBlueOriented.title,
     body: lastLayerSteps.faceBlueOriented.body,
+    practiceGoalSummary: lastLayerSteps.faceBlueOrientedSummary,
     demoMoves: returnToBlueY(currentHoldIndex),
     targetHoldIndex: 0,
     returnToInitialHold: true,
@@ -35,6 +36,7 @@ function buildAlignUStep(alignMoves: Move[]): LastLayerLessonStep {
     subLesson: 'orient-corners',
     title: lastLayerSteps.alignOrientCorners.title,
     body: lastLayerSteps.alignOrientCorners.body,
+    practiceGoalSummary: lastLayerSteps.alignOrientCornersSummary,
     demoMoves,
   };
 }
@@ -48,6 +50,7 @@ function buildOrientCornersStep(reps: 2 | 4): LastLayerLessonStep {
     kind: 'orient-corners',
     title: lastLayerSteps.orientFrontRightCorner.title,
     body: lastLayerSteps.orientFrontRightCorner.body(repLabel),
+    practiceGoalSummary: lastLayerSteps.orientFrontRightCornerSummary,
     demoMoves: repeatOrientAlg(reps),
     reps,
   };

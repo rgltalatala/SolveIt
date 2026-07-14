@@ -22,10 +22,10 @@ import {
   type DemoStep,
   type Instruction,
 } from '../learn/studentHold';
-import { MOVE_ANIMATION_PAUSE_MS } from '../cube3d/moveAnimation';
+import { MOVE_ANIMATION_MS, MOVE_ANIMATION_PAUSE_MS } from '../cube3d/moveAnimation';
 import type { CubeMoveAnimation } from '../cube3d/CubeView';
 import { CubeView } from '../cube3d/CubeView';
-import { moveSequenceDemo } from '../content/tips';
+import { lessonLayout, moveSequenceDemo } from '../content/tips';
 import { getMoveSequenceSummary } from './getMoveSequenceSummary';
 import { demoMoveChipClassName } from './lessons/demoMoveChipClassName';
 import { LessonInstructionDemo } from './LessonInstructionDemo';
@@ -59,6 +59,7 @@ type MoveSequenceDemoContextValue = {
   instructionIndex: number;
   activeMoveIndex: number;
   reverseAnimating: boolean;
+  playbackSpeed: PlaybackSpeed;
   displayState: CubeState;
   meshRotation: [number, number, number];
   frameClassName: string;
@@ -68,9 +69,14 @@ type MoveSequenceDemoContextValue = {
   handlePrev: () => void;
   handleNext: () => void;
   handlePlayAll: () => void;
+  handlePause: () => void;
+  handleJumpTo: (moveIndex: number) => void;
+  setPlaybackSpeed: (speed: PlaybackSpeed) => void;
   moveAnimation: CubeMoveAnimation | null;
   canvasKey: string;
 };
+
+export type PlaybackSpeed = 0.5 | 1 | 2;
 
 const MoveSequenceDemoContext =
   createContext<MoveSequenceDemoContextValue | null>(null);
@@ -99,6 +105,7 @@ function useMoveSequenceDemoState({
   const [animDirection, setAnimDirection] =
     useState<MoveAnimDirection>('forward');
   const [playing, setPlaying] = useState(false);
+  const [playbackSpeed, setPlaybackSpeed] = useState<PlaybackSpeed>(1);
   const animDirectionRef = useRef<MoveAnimDirection>('forward');
 
   useEffect(() => {
@@ -107,6 +114,8 @@ function useMoveSequenceDemoState({
 
   const hasMoves = moves.length > 0;
   const canvasKey = 'lesson-move-demo';
+  const animationDurationMs = MOVE_ANIMATION_MS / playbackSpeed;
+  const pauseMs = MOVE_ANIMATION_PAUSE_MS / playbackSpeed;
 
   const movesSignature = moves.join(' ');
   const baseStateKey = useMemo(
@@ -135,11 +144,10 @@ function useMoveSequenceDemoState({
   );
 
   const reverseAnimating = animating && animDirection === 'reverse';
-  const activeMoveIndex = animating
-    ? reverseAnimating
-      ? applied - 1
-      : applied
-    : -1;
+  let activeMoveIndex = -1;
+  if (animating) {
+    activeMoveIndex = reverseAnimating ? applied - 1 : applied;
+  }
   const pendingMove =
     animating && activeMoveIndex >= 0 && activeMoveIndex < moves.length
       ? moves[activeMoveIndex]
@@ -163,16 +171,26 @@ function useMoveSequenceDemoState({
     const t = window.setTimeout(() => {
       setAnimDirection('forward');
       setAnimating(true);
-    }, MOVE_ANIMATION_PAUSE_MS);
+    }, pauseMs);
     return () => window.clearTimeout(t);
-  }, [playing, animating, applied, moves.length]);
+  }, [playing, animating, applied, moves.length, pauseMs]);
 
   const handlePlayAll = () => {
     if (!hasMoves) return;
-    setApplied(0);
-    setAnimating(false);
-    setAnimDirection('forward');
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
+    if (applied >= moves.length) {
+      setApplied(0);
+      setAnimating(false);
+      setAnimDirection('forward');
+    }
     setPlaying(true);
+  };
+
+  const handlePause = () => {
+    setPlaying(false);
   };
 
   const handleReset = () => {
@@ -196,11 +214,22 @@ function useMoveSequenceDemoState({
     setAnimating(true);
   };
 
+  /** Jump to a move index and animate that move (cube shows state before it). */
+  const handleJumpTo = (moveIndex: number) => {
+    if (!hasMoves || animating) return;
+    if (moveIndex < 0 || moveIndex >= moves.length) return;
+    setPlaying(false);
+    setAnimDirection('forward');
+    setApplied(moveIndex);
+    setAnimating(true);
+  };
+
   const moveAnimation: CubeMoveAnimation | null = pendingMove
     ? {
         move: pendingMove,
         direction: animDirection,
         onComplete: handleAnimationComplete,
+        durationMs: animationDurationMs,
       }
     : null;
 
@@ -242,6 +271,7 @@ function useMoveSequenceDemoState({
     instructionIndex,
     activeMoveIndex,
     reverseAnimating,
+    playbackSpeed,
     displayState,
     meshRotation,
     frameClassName,
@@ -251,6 +281,9 @@ function useMoveSequenceDemoState({
     handlePrev,
     handleNext,
     handlePlayAll,
+    handlePause,
+    handleJumpTo,
+    setPlaybackSpeed,
     moveAnimation,
     canvasKey,
   };
@@ -366,9 +399,9 @@ export function MoveSequenceDemoControls({
             type="button"
             className="rounded-lg bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-600 disabled:opacity-40"
             onClick={handlePlayAll}
-            disabled={!hasMoves || animating}
+            disabled={!hasMoves || (animating && !playing)}
           >
-            {playing ? moveSequenceDemo.playing : moveSequenceDemo.playAll}
+            {playing ? lessonLayout.pause : lessonLayout.play}
           </button>
         </div>
         {trailingActions ? (

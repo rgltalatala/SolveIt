@@ -57,6 +57,7 @@ function buildAlignToCenterStep(
       partnerLabel,
       whiteEdgeIdentity(partner),
     ),
+    practiceGoalSummary: whiteCrossSteps.middleLayerSummary(partnerLabel),
     face: turnFace,
     demoMoves: demo,
   };

@@ -27,12 +27,12 @@ export function LessonTopNav({ showEndLesson = false }: LessonTopNavProps) {
   };
 
   return (
-    <header className="sticky top-0 z-20 border-b border-slate-700 bg-slate-900/95 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <div className="flex flex-wrap items-center gap-3">
+    <header className="z-20 shrink-0 border-b border-slate-700 bg-slate-900/95 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-3 py-2 sm:px-4">
+        <div className="flex min-w-0 items-center gap-2">
           <button
             type="button"
-            className="rounded-lg border border-slate-600 bg-slate-800 p-1.5 hover:bg-slate-700"
+            className="shrink-0 rounded-lg border border-slate-600 bg-slate-800 p-1 hover:bg-slate-700"
             aria-label={learningNav.homeLabel}
             title={learningNav.homeLabel}
             onClick={handleRestart}
@@ -40,11 +40,11 @@ export function LessonTopNav({ showEndLesson = false }: LessonTopNavProps) {
             <img
               src="/home-cube.png"
               alt=""
-              className="h-8 w-8 object-contain"
+              className="h-7 w-7 object-contain"
             />
           </button>
           <div
-            className="flex flex-wrap gap-2"
+            className="flex flex-wrap gap-1.5"
             role="tablist"
             aria-label="Lesson sections"
           >
@@ -56,7 +56,7 @@ export function LessonTopNav({ showEndLesson = false }: LessonTopNavProps) {
                   type="button"
                   role="tab"
                   aria-selected={isActive}
-                  className={`rounded-full border px-4 py-1.5 text-sm font-medium transition-colors ${
+                  className={`rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
                     isActive
                       ? 'border-emerald-600 bg-emerald-950/50 text-emerald-100'
                       : 'border-slate-600 text-slate-300 hover:border-slate-500 hover:text-slate-100'
@@ -72,7 +72,7 @@ export function LessonTopNav({ showEndLesson = false }: LessonTopNavProps) {
         {showEndLesson ? (
           <button
             type="button"
-            className="rounded-lg border border-slate-600 bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-200 hover:bg-slate-700"
+            className="shrink-0 rounded-lg border border-slate-600 bg-slate-800 px-2.5 py-1 text-sm font-medium text-slate-200 hover:bg-slate-700"
             onClick={handleRestart}
           >
             {learningNav.endLesson}

@@ -25,6 +25,7 @@ function buildReturnToBlueStep(
     kind: 'reorient-hold',
     title: lastLayerSteps.faceBlueCorners.title,
     body: lastLayerSteps.faceBlueCorners.body,
+    practiceGoalSummary: lastLayerSteps.faceBlueCornersSummary,
     demoMoves: returnToBlueY(currentHoldIndex),
     targetHoldIndex: 0,
     returnToInitialHold: true,
@@ -40,6 +41,7 @@ function buildReorientForCornerStep(
     kind: 'reorient-hold',
     title: lastLayerSteps.faceSideTitle(faceLabel),
     body: lastLayerSteps.reorientCorners(faceLabel),
+    practiceGoalSummary: lastLayerSteps.reorientCornersSummary(faceLabel),
     demoMoves,
     targetHoldIndex,
   };
@@ -53,6 +55,7 @@ function buildPermuteCornersStep(
       kind: 'permute-corners',
       title: lastLayerSteps.permuteCornersZeroFlowFirst.title,
       body: lastLayerSteps.permuteCornersZeroFlowFirst.body,
+      practiceGoalSummary: lastLayerSteps.permuteCornersZeroFlowFirstSummary,
       demoMoves: PERMUTE_CORNERS_ALG,
       permuteCase,
     };
@@ -62,6 +65,7 @@ function buildPermuteCornersStep(
     kind: 'permute-corners',
     title: lastLayerSteps.permuteCornersOne.title,
     body: lastLayerSteps.permuteCornersOne.body,
+    practiceGoalSummary: lastLayerSteps.permuteCornersOneSummary,
     demoMoves: PERMUTE_CORNERS_ALG,
     permuteCase,
   };

@@ -1,20 +1,23 @@
-import type { ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { CubeState, Color } from '../../cube/cubeState';
-import {
-  MoveSequenceDemoProvider,
-  useMoveSequenceDemoContext,
-} from '../MoveSequenceDemo';
+import type { LessonWorkspaceMode, LessonWorkspaceTabId } from './useLessonWorkspaceTab';
+import { MoveSequenceDemoProvider } from '../MoveSequenceDemo';
 import type { DemoSnapshot } from './lessonDemo';
 import { LessonCasePanel } from './LessonCasePanel';
-import { LessonCurrentInstruction } from './LessonCurrentInstruction';
-import { LessonExampleWorkflow } from './LessonExampleWorkflow';
+import { LessonApplyFooter } from './LessonApplyPanel';
 import { LessonHeader, type SessionNote } from './LessonHeader';
 import { LessonCubeStage } from './LessonCubeStage';
 import { LessonSecondaryPanels } from './LessonSecondaryPanels';
-import { LessonSplitLayout } from './LessonSplitLayout';
+import { LessonAvoidBackPanel } from './LessonAvoidBackPanel';
+import { LearningSplitLayout } from './LearningSplitLayout';
 import { CubeView } from '../../cube3d/CubeView';
-import { LESSON_CUBE_FRAME_CLASS } from './LessonCubeStage';
+import { LEARNING_CUBE_FRAME_CLASS } from './LearningSplitLayout';
 import type { LessonProgressConfig } from './LessonProgress';
+import { LessonProgress } from './LessonProgress';
+import { LessonWorkspaceTabs } from './LessonWorkspaceTabs';
+import { useLessonWorkspaceTab } from './useLessonWorkspaceTab';
+import { LessonPracticePanel } from './LessonPracticePanel';
+import { lessonLayout } from '../../content/tips';
 
 type FaceCenters = {
   F: Color;
@@ -40,6 +43,7 @@ export type LessonViewShellProps = {
   step: {
     title: string;
     body?: string;
+    practiceGoalSummary?: string;
     dimmed?: boolean;
     caseChildren?: ReactNode;
   };
@@ -78,104 +82,288 @@ export type LessonViewShellProps = {
   };
 };
 
-function DemoSidebarContent({
-  step,
-  demo,
-  secondary,
-  isStepPending,
-}: {
-  step: LessonViewShellProps['step'];
-  demo: NonNullable<LessonViewShellProps['demo']>;
-  secondary: LessonViewShellProps['secondary'];
-  isStepPending: boolean;
-}) {
-  const { instructions, instructionIndex } = useMoveSequenceDemoContext();
-
+function hasHintsContent(
+  secondary: LessonViewShellProps['secondary'],
+  applyHint?: string,
+  sessionNotesCount = 0,
+): boolean {
   return (
-    <>
-      <LessonCasePanel
-        title={step.title}
-        body={step.body}
-        dimmed={step.dimmed}
-      >
-        {step.caseChildren}
-      </LessonCasePanel>
-      {instructions && instructions.length > 0 ? (
-        <LessonCurrentInstruction
-          instructions={instructions}
-          activeIndex={instructionIndex}
-        />
-      ) : null}
-      <LessonExampleWorkflow
-        canApply={demo.canApply}
-        applyLabel={demo.applyLabel}
-        applyHint={demo.applyHint}
-        disabled={isStepPending}
-        onApply={demo.onApply}
-        alternateActions={demo.alternateActions}
-      />
-      <LessonSecondaryPanels {...secondary} />
-    </>
+    Boolean(secondary.avoidBack) ||
+    Boolean(applyHint) ||
+    sessionNotesCount > 0
   );
 }
 
-function CompleteSidebarContent({
+function hasMoreContent(secondary: LessonViewShellProps['secondary']): boolean {
+  return (
+    secondary.showOrientationPanel !== false ||
+    Boolean(secondary.orientationExtra)
+  );
+}
+
+function HintsPanel({
+  secondary,
+  applyHint,
+  sessionNotesSummary,
+  sessionNotes,
+}: {
+  secondary: LessonViewShellProps['secondary'];
+  applyHint?: string;
+  sessionNotesSummary: string;
+  sessionNotes: readonly SessionNote[];
+}) {
+  return (
+    <div className="flex flex-col gap-2 text-sm text-slate-300">
+      {applyHint ? <p className="text-xs leading-relaxed">{applyHint}</p> : null}
+      {secondary.avoidBack ? (
+        <LessonAvoidBackPanel
+          frontColor={secondary.avoidBack.frontColor}
+          avoidBackMoves={secondary.avoidBack.avoidBackMoves}
+          onToggleAvoidBack={secondary.avoidBack.onToggleAvoidBack}
+          rememberAvoidBackDefault={
+            secondary.avoidBack.rememberAvoidBackDefault
+          }
+          onRememberDefaultChange={secondary.avoidBack.onRememberDefaultChange}
+          showRotationCallout={secondary.avoidBack.showRotationCallout}
+          onMarkCalloutSeen={secondary.avoidBack.onMarkCalloutSeen}
+          holdNote={secondary.avoidBack.holdNote}
+        />
+      ) : null}
+      {sessionNotes.length > 0 ? (
+        <div className="rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-xs text-slate-400">
+          <p className="font-medium text-slate-300">{sessionNotesSummary}</p>
+          <ul className="mt-1.5 list-disc space-y-1 pl-4 leading-relaxed">
+            {sessionNotes.map((note) => (
+              <li key={note.text}>
+                {note.label ? (
+                  <>
+                    <span className="text-slate-300">{note.label}</span>{' '}
+                    {note.text}
+                  </>
+                ) : (
+                  note.text
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function GoalPanel({
+  step,
+  progress,
+}: {
+  step: LessonViewShellProps['step'];
+  progress?: LessonProgressConfig;
+}) {
+  return (
+    <div className="space-y-3">
+      <div>
+        <h3 className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+          {lessonLayout.workspaceTabs.why}
+        </h3>
+        <p className="mt-1 whitespace-pre-wrap text-sm leading-relaxed text-slate-300">
+          {step.body ?? step.title}
+        </p>
+      </div>
+      {progress ? <LessonProgress progress={progress} compact={false} /> : null}
+    </div>
+  );
+}
+
+function WorkspaceTabPanel({
+  tab,
+  step,
+  progress,
+  secondary,
+  applyHint,
+  sessionNotesSummary,
+  sessionNotes,
+}: {
+  tab: LessonWorkspaceTabId | null;
+  step: LessonViewShellProps['step'];
+  progress?: LessonProgressConfig;
+  secondary: LessonViewShellProps['secondary'];
+  applyHint?: string;
+  sessionNotesSummary: string;
+  sessionNotes: readonly SessionNote[];
+}) {
+  if (!tab) return null;
+  if (tab === 'practice') {
+    return <LessonPracticePanel practiceGoalSummary={step.practiceGoalSummary} />;
+  }
+  if (tab === 'why') return <GoalPanel step={step} progress={progress} />;
+  if (tab === 'hints') {
+    return (
+      <HintsPanel
+        secondary={secondary}
+        applyHint={applyHint}
+        sessionNotesSummary={sessionNotesSummary}
+        sessionNotes={sessionNotes}
+      />
+    );
+  }
+  return (
+    <LessonSecondaryPanels
+      {...secondary}
+      avoidBack={undefined}
+      showOrientationPanel={secondary.showOrientationPanel !== false}
+    />
+  );
+}
+
+/**
+ * Single-pane lesson workflow:
+ * compact case title → tabs → one tab body → Continue pinned.
+ */
+function workspaceModeForDemo(
+  demo: LessonViewShellProps['demo'],
+): LessonWorkspaceMode {
+  if (!demo) return 'complete';
+  if (demo.alternateActions && !demo.canApply) return 'intro';
+  return 'active';
+}
+
+function LessonWorkflowColumn({
   step,
   demo,
   secondary,
+  progress,
+  sessionNotesSummary,
+  sessionNotes,
+  isStepPending,
+  hasPractice,
 }: {
   step: LessonViewShellProps['step'];
   demo?: LessonViewShellProps['demo'];
   secondary: LessonViewShellProps['secondary'];
+  progress?: LessonProgressConfig;
+  sessionNotesSummary: string;
+  sessionNotes: readonly SessionNote[];
+  isStepPending: boolean;
+  hasPractice: boolean;
 }) {
+  const mode = workspaceModeForDemo(demo);
+  const hasBody = Boolean(step.body);
+  const hasHints = hasHintsContent(
+    secondary,
+    demo?.applyHint,
+    sessionNotes.length,
+  );
+  const hasMore = hasMoreContent(secondary);
+
+  const { tab, setTab, tabs } = useLessonWorkspaceTab({
+    mode,
+    hasPractice,
+    hasBody,
+    hasHints,
+    hasMore,
+  });
+
   return (
-    <>
-      <LessonCasePanel
-        title={step.title}
-        body={step.body}
-        dimmed={step.dimmed}
-      >
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      <LessonCasePanel title={step.title} dimmed={step.dimmed}>
         {step.caseChildren}
       </LessonCasePanel>
-      {demo?.alternateActions ? (
-        <section className="rounded-xl border border-slate-700 bg-slate-900/60 p-4">
-          {demo.alternateActions}
-        </section>
+
+      {tabs.length > 0 ? (
+        <LessonWorkspaceTabs tabs={tabs} activeTab={tab} onChange={setTab} />
       ) : null}
-      <LessonSecondaryPanels
-        {...secondary}
-        showOrientationPanel={false}
-      />
-    </>
+
+      <div className="min-h-0 flex-1 overflow-y-auto pr-0.5">
+        <WorkspaceTabPanel
+          tab={tab}
+          step={step}
+          progress={progress}
+          secondary={secondary}
+          applyHint={demo?.applyHint}
+          sessionNotesSummary={sessionNotesSummary}
+          sessionNotes={sessionNotes}
+        />
+      </div>
+
+      {demo ? (
+        <LessonApplyFooter
+          canApply={demo.canApply}
+          applyLabel={demo.applyLabel}
+          applyHint={undefined}
+          disabled={isStepPending}
+          onApply={demo.onApply}
+          alternateActions={hasPractice ? undefined : demo.alternateActions}
+        />
+      ) : null}
+    </div>
   );
 }
 
-function IntroSidebarContent({
+function CompleteWorkflowColumn({
   step,
   demo,
   secondary,
+  progress,
+  sessionNotesSummary,
+  sessionNotes,
+  isStepPending,
 }: {
   step: LessonViewShellProps['step'];
-  demo: NonNullable<LessonViewShellProps['demo']>;
+  demo?: LessonViewShellProps['demo'];
   secondary: LessonViewShellProps['secondary'];
+  progress?: LessonProgressConfig;
+  sessionNotesSummary: string;
+  sessionNotes: readonly SessionNote[];
+  isStepPending: boolean;
 }) {
+  const hasBody = Boolean(step.body);
+  const tabs = useMemo<LessonWorkspaceTabId[]>(() => {
+    const next: LessonWorkspaceTabId[] = [];
+    if (hasBody) next.push('why');
+    if (secondary.showOrientationPanel !== false || secondary.orientationExtra) {
+      next.push('more');
+    }
+    return next;
+  }, [hasBody, secondary.showOrientationPanel, secondary.orientationExtra]);
+  const [tab, setTab] = useState<LessonWorkspaceTabId | null>(tabs[0] ?? null);
+
+  useEffect(() => {
+    if (tab !== null && !tabs.includes(tab)) {
+      setTab(tabs[0] ?? null);
+    }
+  }, [tabs, tab]);
+
   return (
-    <>
-      <LessonCasePanel
-        title={step.title}
-        body={step.body}
-        dimmed={step.dimmed}
-      >
+    <div className="flex min-h-0 flex-1 flex-col gap-2">
+      <LessonCasePanel title={step.title} dimmed={step.dimmed}>
         {step.caseChildren}
       </LessonCasePanel>
-      <LessonExampleWorkflow
-        canApply={false}
-        applyLabel={demo.applyLabel}
-        onApply={demo.onApply}
-        alternateActions={demo.alternateActions}
-      />
-      <LessonSecondaryPanels {...secondary} />
-    </>
+
+      {tabs.length > 0 ? (
+        <LessonWorkspaceTabs tabs={tabs} activeTab={tab} onChange={setTab} />
+      ) : null}
+
+      <div className="min-h-0 flex-1 overflow-y-auto pr-0.5">
+        <WorkspaceTabPanel
+          tab={tab}
+          step={step}
+          progress={progress}
+          secondary={{ ...secondary, showOrientationPanel: false }}
+          sessionNotesSummary={sessionNotesSummary}
+          sessionNotes={sessionNotes}
+        />
+      </div>
+
+      {demo?.alternateActions ? (
+        <LessonApplyFooter
+          canApply={false}
+          applyLabel={demo.applyLabel}
+          disabled={isStepPending}
+          onApply={demo.onApply}
+          alternateActions={demo.alternateActions}
+        />
+      ) : null}
+    </div>
   );
 }
 
@@ -186,43 +374,65 @@ export function LessonViewShell({
   demo,
   secondary,
 }: LessonViewShellProps) {
-  const isIntroOnly = demo?.alternateActions && !demo.canApply && !cube.isComplete;
+  const isIntroOnly =
+    Boolean(demo?.alternateActions) && !demo?.canApply && !cube.isComplete;
+  const hasPractice = Boolean(demo) && !isIntroOnly && !cube.isComplete;
 
-  const sidebarForActiveDemo =
-    demo && !cube.isComplete && !isIntroOnly ? (
-      <DemoSidebarContent
+  const showSecondaryInOverflow =
+    !cube.isComplete &&
+    (hasHintsContent(secondary, demo?.applyHint, header.sessionNotes.length) ||
+      hasMoreContent(secondary));
+
+  let sidebar: ReactNode = null;
+  if (cube.isComplete) {
+    sidebar = (
+      <CompleteWorkflowColumn
         step={step}
         demo={demo}
         secondary={secondary}
+        progress={header.progress}
+        sessionNotesSummary={header.sessionNotesSummary}
+        sessionNotes={header.sessionNotes}
         isStepPending={header.isStepPending}
       />
-    ) : null;
-
-  const sidebarForIntro =
-    demo && isIntroOnly ? (
-      <IntroSidebarContent step={step} demo={demo} secondary={secondary} />
-    ) : null;
-
-  const sidebarForComplete = cube.isComplete ? (
-    <CompleteSidebarContent step={step} demo={demo} secondary={secondary} />
-  ) : null;
-
-  const sidebar =
-    sidebarForComplete ?? sidebarForIntro ?? sidebarForActiveDemo ?? null;
+    );
+  } else if (demo) {
+    sidebar = (
+      <LessonWorkflowColumn
+        step={step}
+        demo={demo}
+        secondary={secondary}
+        progress={header.progress}
+        sessionNotesSummary={header.sessionNotesSummary}
+        sessionNotes={header.sessionNotes}
+        isStepPending={header.isStepPending}
+        hasPractice={hasPractice}
+      />
+    );
+  }
 
   return (
-    <section className="mx-auto flex w-full max-w-5xl flex-col gap-4 p-6">
-      <LessonHeader {...header} />
+    <section className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-2 px-3 py-2 sm:px-4">
+      <LessonHeader
+        {...header}
+        overflowExtra={
+          showSecondaryInOverflow ? (
+            <LessonSecondaryPanels {...secondary} />
+          ) : undefined
+        }
+      />
       {cube.isComplete ? (
-        <LessonSplitLayout
+        <LearningSplitLayout
           cube={
-            <CubeView
-              cubeState={cube.cubeState}
-              meshRotation={[0, 0, 0]}
-              frameClassName={LESSON_CUBE_FRAME_CLASS}
-              canvasKey={cube.completeCanvasKey}
-              autoRotate={cube.celebrate}
-            />
+            <div className="relative h-full min-h-0 flex-1">
+              <CubeView
+                cubeState={cube.cubeState}
+                meshRotation={[0, 0, 0]}
+                frameClassName={LEARNING_CUBE_FRAME_CLASS}
+                canvasKey={cube.completeCanvasKey}
+                autoRotate={cube.celebrate}
+              />
+            </div>
           }
           sidebar={sidebar}
         />
@@ -233,7 +443,7 @@ export function LessonViewShell({
           demoSteps={cube.visibleDemo?.demoSteps}
           instructions={cube.visibleDemo?.instructions}
           meshRotation={[0, 0, 0]}
-          frameClassName={LESSON_CUBE_FRAME_CLASS}
+          frameClassName={LEARNING_CUBE_FRAME_CLASS}
         >
           <LessonCubeStage
             showPreparingOverlay={cube.showPreparingOverlay}

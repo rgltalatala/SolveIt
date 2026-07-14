@@ -63,6 +63,7 @@ function buildReturnToBlueStep(
     kind: 'reorient-hold',
     title: whiteCornersSteps.faceBlue.title,
     body: whiteCornersSteps.faceBlue.body,
+    practiceGoalSummary: whiteCornersSteps.faceBlueSummary,
     demoMoves,
     returnToInitialHold: true,
   };
@@ -96,6 +97,7 @@ function buildReorientHoldStep(
       whiteCornerIdentity(colorA, colorB),
       skipNote,
     ),
+    practiceGoalSummary: whiteCornersSteps.reorientSummary(faceLabel),
     demoMoves,
     targetCornerId,
   };

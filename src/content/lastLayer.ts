@@ -90,28 +90,40 @@ export const lastLayerSteps = {
     title: 'Face the blue side',
     body: 'Top edges are permuted. Turn the cube so blue is toward you again. White on bottom, yellow on top.',
   },
+  faceBlueEdgesSummary:
+    'Turn the cube so blue faces you again. Keep white on the bottom.',
   faceBlueCorners: {
     title: 'Face the blue side',
     body: 'Top corners are permuted. Turn the cube so blue is toward you again. White on bottom, yellow on top.',
   },
+  faceBlueCornersSummary:
+    'Turn the cube so blue faces you again. Keep white on the bottom.',
   faceBlueOriented: {
     title: 'Face the blue side',
     body: 'Top corners are oriented. Turn the cube so blue is toward you again. White on bottom, yellow on top.',
   },
+  faceBlueOrientedSummary:
+    'Turn the cube so blue faces you again. Keep white on the bottom.',
   faceSideTitle: (faceLabel: string) => `Face the ${faceLabel} side`,
   alignPatternTitle: (pattern: string) => `Line up the ${pattern}`,
   yellowCrossDot: {
     title: 'Make the yellow cross (dot case)',
     body: "No top edges show yellow on U yet. Run the full sequence: L-shape algorithm, a U turn, then the bar algorithm. Your bottom and middle layers won't be touched.",
   },
+  yellowCrossDotSummary:
+    'No yellow edges on top yet. Build the yellow cross from the dot case.',
   orientEdgesL: {
     title: 'Orient edges. L shape',
     body: "Yellow-on-U edges sit at UB and UL. This algorithm flips the remaining edges into place. Run F U R U' R' F' to finish the yellow cross.",
   },
+  orientEdgesLSummary:
+    'L shape on top. Flip the remaining edges to finish the yellow cross.',
   orientEdgesBar: {
     title: 'Orient edges. Bar',
     body: "Yellow-on-U edges sit at UL and UR. Run F R U R' U' F' to complete the yellow cross.",
   },
+  orientEdgesBarSummary:
+    'Bar on top. Flip the remaining edges to finish the yellow cross.',
   orientEdgesAlreadyComplete: {
     title: 'Orient edges',
     body: "You've already got a yellow cross on top. All four edges show yellow on U, so there's nothing to do in this step. Continue when you're ready to permute edges into their correct positions.",
@@ -120,42 +132,62 @@ export const lastLayerSteps = {
     title: 'Line up the top layer',
     body: 'A single U turn can permute all four top edges. Turn U until each edge side sticker lines up with its center.',
   },
+  alignTopLayerSummary:
+    'Turn U until every top edge side sticker matches its center.',
   inspectTopLayer: {
     title: 'Check the top layer',
     body: "Turn U and look for edges that already match their side centers. You're aiming to spot two correct ones for the next step.",
   },
+  inspectTopLayerSummary:
+    'Turn U and look for two edges that already match their centers.',
   permuteTopEdges: {
     title: 'Permute top edges',
     body: (caseNote: string) =>
       `${caseNote} Run R U R' U R U2 R' U to cycle the top-layer edges. When you're done, each side sticker should match its center.`,
   },
+  permuteTopEdgesSummary:
+    'Cycle the top edges until each side sticker matches its center.',
   permuteEdgesAdjacentNote:
     'The two correct edges are at UB and UR.',
   permuteEdgesOppositeNote:
     'Two opposite edges match their centers. One pass of the algorithm usually sets up the adjacent case.',
   reorientEdges: (faceLabel: string) =>
     `Two top edges already match their side centers. Turn the whole cube so ${faceLabel} is toward you, with those edges at UB and UR. Then run the permutation algorithm on the next step.`,
+  reorientEdgesSummary: (faceLabel: string) =>
+    `Turn so ${faceLabel} faces you, with the two correct edges at UB and UR.`,
   reorientCorners: (faceLabel: string) =>
     `One top corner already has its side colors in place. Turn the whole cube so ${faceLabel} is toward you, with that corner at URF. Then run the permutation algorithm on the next step.`,
+  reorientCornersSummary: (faceLabel: string) =>
+    `Turn so ${faceLabel} faces you, with the correct corner at URF.`,
   alignPattern: (pattern: string, target: string) =>
     `Two top edges show yellow on U in a ${pattern} pattern. Turn U so those edges sit at ${target}. Then you can run the matching algorithm on the next step.`,
+  alignPatternSummary: (pattern: string, target: string) =>
+    `Turn U so the ${pattern} sits at ${target}.`,
   permuteCornersZeroFlowFirst: {
     title: 'Permute top corners',
     body: "No top corners have their side colors in place yet. Run U R U' L' U R' U' L once.",
   },
+  permuteCornersZeroFlowFirstSummary:
+    'No corners are placed yet. Run the corner permutation once.',
   permuteCornersOne: {
     title: 'Permute top corners',
     body: "The correct corner is at URF. Run U R U' L' U R' U' L to cycle the top-layer corners. If not all four side colors match afterward, run the same algorithm again.",
   },
+  permuteCornersOneSummary:
+    'Correct corner at URF. Cycle the top corners until all side colors match.',
   alignOrientCorners: {
     title: 'Line up the top layer',
     body: 'The corner at URF is already oriented. Turn U to bring the next unsolved corner to URF, then run the orientation algorithm on the next step.',
   },
+  alignOrientCornersSummary:
+    'Turn U to bring the next unsolved corner to URF.',
   orientFrontRightCorner: {
     title: 'Orient the corner at URF',
     body: (repLabel: string) =>
       `The unsolved corner is at URF. Run R' D' R D ${repLabel} until yellow faces up on that corner. Then turn U to bring the next unsolved corner to URF and repeat.`,
   },
+  orientFrontRightCornerSummary:
+    'Twist the URF corner until yellow faces up, then move on to the next one.',
   orientCornersTwice: 'twice',
   orientCornersFourTimes: 'four times',
 } as const;

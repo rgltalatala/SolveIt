@@ -313,6 +313,7 @@ export function LearningMiddleLayerView() {
       step={{
         title: displayStep.title,
         body: displayStep.body || undefined,
+        practiceGoalSummary: displayStep.practiceGoalSummary,
         dimmed: showPreparingOverlay,
         caseChildren: isLessonComplete ? (
           <p className="mt-4 text-sm text-slate-400">

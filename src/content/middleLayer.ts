@@ -57,10 +57,13 @@ If all of your unsolved middle-layer edges are trapped in the middle, simply rem
     title: 'Face the blue side',
     body: 'Middle-layer edges are done. Turn the cube so blue is toward you again. White on bottom, yellow on top.',
   },
+  faceBlueSummary: 'Turn the cube so blue faces you again. Keep white on the bottom.',
   faceBack: {
     title: 'Face the back side',
     body: "The front middle-layer edges look good, but the back still needs work. Turn the cube so the back face is toward you. White on bottom, yellow on top.",
   },
+  faceBackSummary:
+    'Turn the cube so the back face is toward you. Keep white on the bottom.',
   faceSideTitle: (color: string) => `Face the ${color} side`,
   alignPartnerTitle: (color: string) => `Line up ${color} with its center`,
   extractEdge: 'Lift the edge out',
@@ -68,14 +71,26 @@ If all of your unsolved middle-layer edges are trapped in the middle, simply rem
   insertEdge: 'Insert the edge',
   alignU: (edgeLabel: string, partner: string) =>
     `The ${edgeLabel} is on the top layer. Turn U until the ${partner} sticker lines up with the ${partner} center. Then you can turn the whole cube.`,
+  alignUSummary: (partner: string) =>
+    `Turn U until ${partner} lines up with its center.`,
   reorient: (faceLabel: string, edgeLabel: string) =>
     `Turn the whole cube so the ${faceLabel} face is toward you. You'll insert the ${edgeLabel} into the middle layer between its centers.`,
+  reorientSummary: (faceLabel: string) =>
+    `Turn the cube so ${faceLabel} faces you, ready to insert into the middle layer.`,
   reorientAligned: (faceLabel: string, edgeLabel: string) =>
     `The ${edgeLabel} is on top and already lined up with its centers. Turn the whole cube so ${faceLabel} is toward you, then insert it between its centers.`,
+  reorientAlignedSummary: (faceLabel: string) =>
+    `This edge is lined up. Turn so ${faceLabel} faces you, then insert.`,
   extract: (slot: string, algName: string) =>
     `The edge in ${slot} needs to come out. The ${algName} algorithm lifts it to the top layer without disturbing your bottom layer.`,
+  extractSummary: (slot: string) =>
+    `Wrong edge in ${slot}. Lift it to the top layer.`,
   insert: (edgeLabel: string, slot: string, algName: string) =>
     `Insert the ${edgeLabel} into ${slot} with the ${algName} algorithm. Your cross, corners, and any middle edges you've already placed stay intact.`,
+  insertSummary: (edgeLabel: string, slot: string) =>
+    `Insert the ${edgeLabel} into ${slot}.`,
   insertAligned: (edgeLabel: string, slot: string, algName: string) =>
     `The ${edgeLabel} is on top and lined up with its centers. Insert it into ${slot} with the ${algName} algorithm. Your cross, corners, and placed middle edges stay intact.`,
+  insertAlignedSummary: (edgeLabel: string, slot: string) =>
+    `${edgeLabel} is lined up. Insert it into ${slot}.`,
 } as const;

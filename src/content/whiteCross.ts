@@ -54,20 +54,36 @@ Repeat for the other three white edges, being careful not to undo the ones you'v
   },
   alignBfs: (partner: string, edgeLabel: string) =>
     `Match the ${partner} sticker on this ${edgeLabel} to the ${partner} center, then slot white on the bottom. The demo finds a path that won't knock out cross edges you've already solved.`,
+  alignBfsSummary: (partner: string) =>
+    `Line up ${partner} with its center, then slot white on the bottom.`,
   solveEdge: (partner: string, edgeLabel: string) =>
     `Work this ${edgeLabel}: line up its ${partner} sticker with the ${partner} center, then slot white on the bottom. The demo handles setup and keeps solved cross edges in place.`,
+  solveEdgeSummary: (partner: string) =>
+    `Get this edge home: match ${partner}, then put white on the bottom.`,
   stuck: (edgeLabel: string) =>
     `We couldn't build a safe demo for this ${edgeLabel} from here. Match the side sticker to its center and slot white on the bottom yourself, or reset the scramble and try again.`,
   middleLayer: (partner: string, edgeLabel: string) =>
     `This ${edgeLabel} is in the middle layer. Line up its ${partner} sticker with the ${partner} center, then slot white on the bottom. The demo walks you through it without disturbing solved cross edges.`,
+  middleLayerSummary: (partner: string) =>
+    `This edge is in the middle layer. Line up ${partner}, then slot white on the bottom.`,
   uLayerAlign: (partner: string, edgeLabel: string) =>
     `This ${edgeLabel} is on the top layer. Match its ${partner} sticker to the ${partner} center, then slot white on the bottom. The demo includes any positioning you need first.`,
+  uLayerAlignSummary: (partner: string) =>
+    `Top-layer edge: line up ${partner}, then slot white on the bottom.`,
   uLayerInsert: (partner: string, edgeLabel: string) =>
     `This ${edgeLabel} already lines up with the ${partner} center on top. Slot it into its cross position on the bottom. The demo shows the insert and any setup.`,
+  uLayerInsertSummary: (partner: string) =>
+    `${partner} already matches its center. Slot this edge onto the bottom.`,
   dLayerRotate: (partner: string, edgeLabel: string) =>
     `White is on the bottom for this ${edgeLabel}, but it's not under the ${partner} center yet. Turn the bottom layer until the side sticker matches its center.`,
+  dLayerRotateSummary: (partner: string) =>
+    `White's on the bottom. Turn D until ${partner} matches its center.`,
   dLayerInsert: (partner: string, edgeLabel: string) =>
     `This ${edgeLabel} lines up with the ${partner} center. Slot it on the bottom. The demo handles setup so your other cross edges stay put.`,
+  dLayerInsertSummary: (partner: string) =>
+    `${partner} lines up with its center. Slot this edge onto the bottom.`,
   directSolve: (partner: string, edgeLabel: string) =>
     `This ${edgeLabel} is ready to slot. Keep the ${partner} sticker matched to its center and put white on the bottom. The demo takes care of any setup.`,
+  directSolveSummary: (partner: string) =>
+    `Ready to slot: keep ${partner} matched and put white on the bottom.`,
 } as const;

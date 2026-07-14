@@ -85,8 +85,18 @@ export const demoStepChips = {
 
 export const lessonLayout = {
   cubeOrientationPanel: 'Cube orientation',
-  seeAllSteps: 'See all steps',
   lessonOptions: 'Lesson options',
-  goalHeading: 'Goal',
-  exampleHeading: 'Example',
+  lessonOptionsMenu: 'More lesson actions',
+  practiceHeading: 'Practice',
+  algorithmHeading: 'Algorithm',
+  moveOf: (current: number, total: number) => `Move ${current} of ${total}`,
+  play: 'Play',
+  pause: 'Pause',
+  speedLabel: (speed: string) => `${speed}×`,
+  workspaceTabs: {
+    practice: 'Practice',
+    why: 'Why',
+    hints: 'Hints',
+    more: 'More',
+  },
 } as const;

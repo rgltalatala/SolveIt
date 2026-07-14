@@ -79,6 +79,7 @@ function buildReturnToBlueStep(
     kind: 'reorient-hold',
     title: middleLayerSteps.faceBlue.title,
     body: middleLayerSteps.faceBlue.body,
+    practiceGoalSummary: middleLayerSteps.faceBlueSummary,
     demoMoves: returnToBlueY(currentHoldIndex),
     returnToInitialHold: true,
   };
@@ -103,10 +104,14 @@ function buildReorientToPartnerStep(
         faceLabel,
         edgeIdentity(edgeColors[0], edgeColors[1]),
       );
+  const practiceGoalSummary = onUAligned
+    ? middleLayerSteps.reorientAlignedSummary(faceLabel)
+    : middleLayerSteps.reorientSummary(faceLabel);
   return {
     kind: 'reorient-hold',
     title: middleLayerSteps.faceSideTitle(formatColorLabel(partnerColor)),
     body,
+    practiceGoalSummary,
     demoMoves,
     targetHoldIndex: targetHold,
   };
@@ -119,6 +124,7 @@ function buildReorientToBackStep(
     kind: 'reorient-hold',
     title: middleLayerSteps.faceBack.title,
     body: middleLayerSteps.faceBack.body,
+    practiceGoalSummary: middleLayerSteps.faceBackSummary,
     demoMoves: reorientMovesToFaceBack(currentHoldIndex),
     targetHoldIndex: holdFacingOpposite(currentHoldIndex),
   };
@@ -136,6 +142,9 @@ function buildAlignUStep(
       edgeIdentity(edgeColors[0], edgeColors[1]),
       formatColor(partnerColor),
     ),
+    practiceGoalSummary: middleLayerSteps.alignUSummary(
+      formatColor(partnerColor),
+    ),
     demoMoves,
     edgeColors,
   };
@@ -150,23 +159,53 @@ function buildSolveEdgeStep(
 ): MiddleLayerEdgesLessonStep {
   const algName = slot === 'FL' ? 'left' : 'right';
   const edgeLabel = edgeIdentity(edgeColors[0], edgeColors[1]);
-  const body =
-    action === 'extract'
-      ? middleLayerSteps.extract(slot, algName)
-      : onUAligned
-        ? middleLayerSteps.insertAligned(edgeLabel, slot, algName)
-        : middleLayerSteps.insert(edgeLabel, slot, algName);
+  const { title, body, practiceGoalSummary } = solveEdgeCopy(
+    action,
+    slot,
+    algName,
+    edgeLabel,
+    onUAligned,
+  );
   return {
     kind: 'solve-edge',
-    title:
-      action === 'extract'
-        ? middleLayerSteps.extractEdge
-        : edgeLabel,
+    title,
     body,
+    practiceGoalSummary,
     demoMoves,
     edgeColors,
     action,
     slot,
+  };
+}
+
+function solveEdgeCopy(
+  action: 'insert' | 'extract',
+  slot: 'FL' | 'FR',
+  algName: 'left' | 'right',
+  edgeLabel: string,
+  onUAligned: boolean,
+): { title: string; body: string; practiceGoalSummary: string } {
+  if (action === 'extract') {
+    return {
+      title: middleLayerSteps.extractEdge,
+      body: middleLayerSteps.extract(slot, algName),
+      practiceGoalSummary: middleLayerSteps.extractSummary(slot),
+    };
+  }
+  if (onUAligned) {
+    return {
+      title: edgeLabel,
+      body: middleLayerSteps.insertAligned(edgeLabel, slot, algName),
+      practiceGoalSummary: middleLayerSteps.insertAlignedSummary(
+        edgeLabel,
+        slot,
+      ),
+    };
+  }
+  return {
+    title: edgeLabel,
+    body: middleLayerSteps.insert(edgeLabel, slot, algName),
+    practiceGoalSummary: middleLayerSteps.insertSummary(edgeLabel, slot),
   };
 }
 

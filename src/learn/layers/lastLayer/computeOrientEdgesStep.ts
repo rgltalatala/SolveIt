@@ -27,6 +27,10 @@ function buildAlignUStep(
     subLesson: 'orient-edges',
     title: lastLayerSteps.alignPatternTitle(patternLabel),
     body: lastLayerSteps.alignPattern(patternLabel, targetLabel),
+    practiceGoalSummary: lastLayerSteps.alignPatternSummary(
+      patternLabel,
+      ollCase === 'l-shape' ? 'UB and UL' : 'UL and UR',
+    ),
     demoMoves: alignMoves,
     ollCase,
   };
@@ -41,6 +45,7 @@ function buildOrientEdgesStep(
       kind: 'orient-edges',
       title: lastLayerSteps.yellowCrossDot.title,
       body: lastLayerSteps.yellowCrossDot.body,
+      practiceGoalSummary: lastLayerSteps.yellowCrossDotSummary,
       demoMoves: algMoves,
       ollCase,
     };
@@ -51,6 +56,7 @@ function buildOrientEdgesStep(
       kind: 'orient-edges',
       title: lastLayerSteps.orientEdgesL.title,
       body: lastLayerSteps.orientEdgesL.body,
+      practiceGoalSummary: lastLayerSteps.orientEdgesLSummary,
       demoMoves: algMoves,
       ollCase,
     };
@@ -60,6 +66,7 @@ function buildOrientEdgesStep(
     kind: 'orient-edges',
     title: lastLayerSteps.orientEdgesBar.title,
     body: lastLayerSteps.orientEdgesBar.body,
+    practiceGoalSummary: lastLayerSteps.orientEdgesBarSummary,
     demoMoves: algMoves,
     ollCase,
   };
