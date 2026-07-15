@@ -1,0 +1,173 @@
+import { useLayoutEffect, useMemo, useRef } from 'react';
+import { useFrame } from '@react-three/fiber';
+import type { Group } from 'three';
+import type { CubeState, Move } from '@/domains/cube/cubeState';
+import type { DisplayCubeState } from '@/domains/cube/3d/cubeGeometry';
+import type { CubeAnatomyHighlight } from '@/domains/cube/3d/cubeAnatomy';
+import { Cubie } from '@/domains/cube/3d/Cubie';
+import { cubieDefinitions, getCubieFaceColors } from '@/domains/cube/3d/cubeGeometry';
+import {
+  axisIndex,
+  cubieOnFaceLayer,
+  easeInOutCubic,
+  getMoveAnimationSpec,
+  MOVE_ANIMATION_MS,
+  type MoveAnimationSpec,
+} from '@/domains/cube/3d/moveAnimation';
+import type { LessonCameraView } from '@/domains/cube/3d/lessonCamera';
+
+export type CubeMoveAnimation = {
+  move: Move;
+  /** Forward applies the move; reverse undoes it visually before parent state catches up. */
+  direction?: 'forward' | 'reverse';
+  onComplete: () => void;
+  /** After a whole-cube turn, snap orbit to lesson hold (not relative to user drag). */
+  cameraAfter?: LessonCameraView;
+  /** Override default {@link MOVE_ANIMATION_MS} (e.g. slower notation demos). */
+  durationMs?: number;
+};
+
+type AnimatedCubeMeshProps = {
+  cubeState: CubeState | DisplayCubeState;
+  animation: CubeMoveAnimation | null;
+  anatomyHighlight?: CubeAnatomyHighlight | null;
+};
+
+function partitionCubies(spec: MoveAnimationSpec | null) {
+  if (!spec) {
+    return {
+      staticCubies: cubieDefinitions,
+      layerCubies: [] as typeof cubieDefinitions,
+    };
+  }
+  if (spec.kind === 'whole') {
+    return {
+      staticCubies: [] as typeof cubieDefinitions,
+      layerCubies: cubieDefinitions,
+    };
+  }
+  const layerCubies = cubieDefinitions.filter((c) =>
+    cubieOnFaceLayer(c.position, spec.face),
+  );
+  const staticCubies = cubieDefinitions.filter(
+    (c) => !cubieOnFaceLayer(c.position, spec.face),
+  );
+  return { staticCubies, layerCubies };
+}
+
+function CubieAt({
+  cubeState,
+  position,
+  anatomyHighlight = null,
+}: {
+  cubeState: CubeState | DisplayCubeState;
+  position: (typeof cubieDefinitions)[0]['position'];
+  anatomyHighlight?: CubeAnatomyHighlight | null;
+}) {
+  const [x, y, z] = position;
+  return (
+    <group position={[x, y, z]}>
+      <Cubie
+        position={[0, 0, 0]}
+        cubiePosition={position}
+        faceColors={getCubieFaceColors(cubeState, position)}
+        anatomyHighlight={anatomyHighlight}
+      />
+    </group>
+  );
+}
+
+/**
+ * Face / whole-cube turns rotate one shared group (layer turns together).
+ * Static + turning groups are always mounted; only membership changes with the active move.
+ */
+export function AnimatedCubeMesh({
+  cubeState,
+  animation,
+  anatomyHighlight = null,
+}: AnimatedCubeMeshProps) {
+  const spec = animation ? getMoveAnimationSpec(animation.move) : null;
+  const { staticCubies, layerCubies } = useMemo(
+    () => partitionCubies(spec),
+    [spec, animation?.move],
+  );
+
+  const turnRef = useRef<Group>(null);
+  const progressRef = useRef(0);
+  const completedRef = useRef(false);
+  const activeSpecRef = useRef<MoveAnimationSpec | null>(null);
+
+  useLayoutEffect(() => {
+    progressRef.current = 0;
+    completedRef.current = false;
+    activeSpecRef.current = spec;
+    const direction = animation?.direction ?? 'forward';
+    if (!turnRef.current || !spec) return;
+    const ax = axisIndex(spec.axis);
+    const angle = direction === 'reverse' ? spec.angle : 0;
+    turnRef.current.rotation.set(
+      ax === 0 ? angle : 0,
+      ax === 1 ? angle : 0,
+      ax === 2 ? angle : 0,
+    );
+  }, [animation?.move, animation?.direction, spec, layerCubies.length]);
+
+  useLayoutEffect(() => {
+    if (animation || !turnRef.current) return;
+    turnRef.current.rotation.set(0, 0, 0);
+  }, [animation]);
+
+  useFrame((_, delta) => {
+    const activeSpec = activeSpecRef.current;
+    if (!animation || !activeSpec || !turnRef.current || completedRef.current)
+      return;
+
+    progressRef.current = Math.min(
+      1,
+      progressRef.current +
+        delta /
+          ((animation.durationMs ?? MOVE_ANIMATION_MS) / 1000),
+    );
+    const t = easeInOutCubic(progressRef.current);
+    const forward = (animation.direction ?? 'forward') === 'forward';
+    const angle = forward ? activeSpec.angle * t : activeSpec.angle * (1 - t);
+    const ax = axisIndex(activeSpec.axis);
+    turnRef.current.rotation.set(
+      ax === 0 ? angle : 0,
+      ax === 1 ? angle : 0,
+      ax === 2 ? angle : 0,
+    );
+
+    if (progressRef.current >= 1 && !completedRef.current) {
+      completedRef.current = true;
+      const isForward = (animation.direction ?? 'forward') === 'forward';
+      if (!isForward && turnRef.current) {
+        turnRef.current.rotation.set(0, 0, 0);
+      }
+      animation.onComplete();
+    }
+  });
+
+  return (
+    <>
+      {staticCubies.map((c) => (
+        <CubieAt
+          key={c.position.join(':')}
+          cubeState={cubeState}
+          position={c.position}
+          anatomyHighlight={anatomyHighlight}
+        />
+      ))}
+      <group ref={turnRef}>
+        {layerCubies.map((c) => (
+          <CubieAt
+            key={c.position.join(':')}
+            cubeState={cubeState}
+            position={c.position}
+            anatomyHighlight={anatomyHighlight}
+          />
+        ))}
+      </group>
+    </>
+  );
+}

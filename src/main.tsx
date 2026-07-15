@@ -4,8 +4,8 @@ import './index.css';
 import {
   hydrateLessonSession,
   startLessonSessionPersistence,
-} from './learn/lessonSessionPersistence';
-import { App } from './ui/App';
+} from '@/features/lesson/store/lessonSessionPersistence';
+import { App } from '@/app/App';
 
 hydrateLessonSession();
 startLessonSessionPersistence();

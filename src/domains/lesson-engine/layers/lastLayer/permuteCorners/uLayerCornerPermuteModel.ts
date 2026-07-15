@@ -1,0 +1,150 @@
+import type { Color, CubeState, Face } from '@/domains/cube/cubeState';
+import { faceStickerIndex } from '@/domains/cube/3d/cubeGeometry';
+import type { CubiePosition } from '@/domains/cube/3d/cubeGeometry';
+import {
+  U_LAYER_CORNER_POS,
+  type ULayerCornerId,
+} from '@/domains/lesson-engine/layers/bottomLayer/corners/cornerCases';
+import { findCornerWithColors } from '@/domains/lesson-engine/layers/bottomLayer/shared/pieceQueries';
+import { isYellowCrossComplete } from '@/domains/lesson-engine/layers/lastLayer/orientEdges/uLayerEdgeModel';
+
+export const U_LAYER_CORNER_SLOTS = ['URF', 'UBR', 'ULB', 'UFL'] as const;
+
+const SIDE_FACES: Record<ULayerCornerId, [Face, Face]> = {
+  URF: ['F', 'R'],
+  UBR: ['B', 'R'],
+  ULB: ['B', 'L'],
+  UFL: ['F', 'L'],
+};
+
+function readSticker(
+  state: CubeState,
+  position: CubiePosition,
+  face: Face,
+): Color {
+  return state[face][faceStickerIndex(face, position)];
+}
+
+function colorsMatchUnordered(stickers: Color[], target: Color[]): boolean {
+  if (stickers.length !== target.length) return false;
+  const sortedStickers = [...stickers].sort();
+  const sortedTarget = [...target].sort();
+  return sortedStickers.every((color, index) => color === sortedTarget[index]);
+}
+
+export function expectedULayerCornerColors(
+  state: CubeState,
+  slotId: ULayerCornerId,
+): [Color, Color, Color] {
+  const [faceA, faceB] = SIDE_FACES[slotId];
+  return ['yellow', state[faceA][4], state[faceB][4]];
+}
+
+export function cornerSideFacesForSlot(id: ULayerCornerId): [Face, Face] {
+  return SIDE_FACES[id];
+}
+
+export function cornerPermutedAtSlot(
+  state: CubeState,
+  slotId: ULayerCornerId,
+): boolean {
+  if (!isYellowCrossComplete(state)) return false;
+  const pos = U_LAYER_CORNER_POS[slotId];
+  const [faceA, faceB] = SIDE_FACES[slotId];
+  const stickers = [
+    readSticker(state, pos, 'U'),
+    readSticker(state, pos, faceA),
+    readSticker(state, pos, faceB),
+  ];
+  return colorsMatchUnordered(stickers, [
+    ...expectedULayerCornerColors(state, slotId),
+  ]);
+}
+
+/** True when the corner cubie for this home slot sits in that slot (orientation ignored). */
+export function cornerPermutedByIdentity(
+  state: CubeState,
+  homeSlotId: ULayerCornerId,
+): boolean {
+  if (!isYellowCrossComplete(state)) return false;
+  const [yellow, colorA, colorB] = expectedULayerCornerColors(
+    state,
+    homeSlotId,
+  );
+  const pos = findCornerWithColors(state, yellow, colorA, colorB);
+  const home = U_LAYER_CORNER_POS[homeSlotId];
+  return (
+    !!pos &&
+    pos[0] === home[0] &&
+    pos[1] === home[1] &&
+    pos[2] === home[2]
+  );
+}
+
+export function cornerOrientedAtSlot(
+  state: CubeState,
+  slotId: ULayerCornerId,
+): boolean {
+  const pos = U_LAYER_CORNER_POS[slotId];
+  return readSticker(state, pos, 'U') === 'yellow';
+}
+
+/** True when the corner cubie for this slot (by side colors) has yellow on U, anywhere on the top layer. */
+export function cornerOrientedByIdentity(
+  state: CubeState,
+  slotId: ULayerCornerId,
+): boolean {
+  const [yellow, colorA, colorB] = expectedULayerCornerColors(state, slotId);
+  const pos = findCornerWithColors(state, yellow, colorA, colorB);
+  if (!pos || pos[1] !== 1) return false;
+  return readSticker(state, pos, 'U') === 'yellow';
+}
+
+export function countOrientedCornersByIdentity(state: CubeState): number {
+  return U_LAYER_CORNER_SLOTS.filter((id) =>
+    cornerOrientedByIdentity(state, id),
+  ).length;
+}
+
+export function cornerSolvedAtSlot(
+  state: CubeState,
+  slotId: ULayerCornerId,
+): boolean {
+  return (
+    cornerPermutedAtSlot(state, slotId) &&
+    cornerOrientedAtSlot(state, slotId)
+  );
+}
+
+export function permutedCornerSlots(state: CubeState): ULayerCornerId[] {
+  return U_LAYER_CORNER_SLOTS.filter((id) => cornerPermutedAtSlot(state, id));
+}
+
+export function countPermutedCorners(state: CubeState): number {
+  return permutedCornerSlots(state).length;
+}
+
+export function isCornersFullyPermuted(state: CubeState): boolean {
+  return (
+    isYellowCrossComplete(state) && countPermutedCorners(state) === 4
+  );
+}
+
+export function unsolvedCornerSlots(state: CubeState): ULayerCornerId[] {
+  return U_LAYER_CORNER_SLOTS.filter((id) => !cornerSolvedAtSlot(state, id));
+}
+
+export function countSolvedCorners(state: CubeState): number {
+  return U_LAYER_CORNER_SLOTS.filter((id) => cornerSolvedAtSlot(state, id))
+    .length;
+}
+
+export function isCornersFullySolved(state: CubeState): boolean {
+  return (
+    isCornersFullyPermuted(state) && countSolvedCorners(state) === 4
+  );
+}
+
+export function isLastLayerComplete(state: CubeState): boolean {
+  return isCornersFullySolved(state);
+}

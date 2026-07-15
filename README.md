@@ -1,8 +1,32 @@
 # SolveIt
 
-SolveIt is a web app for learning to solve a 3×3 Rubik’s Cube. Scan your physical cube with the device camera to build a virtual model, then follow guided lessons for the white cross and white corners with animated 3D demos and step-by-step instructions matched to your hold (white on bottom, yellow on top).
+SolveIt is a web app that teaches beginners to solve a physical 3×3 Rubik’s Cube. Scan your cube with the device camera (or load a practice scramble), then follow personalized step-by-step lessons with animated 3D demos matched to how you hold the cube (yellow on top, white on bottom).
 
-You can also skip scanning and jump straight into a lesson with a random WCA scramble for practice.
+**Live app:** [https://solve-it-ub8d.vercel.app/](https://solve-it-ub8d.vercel.app/)
+
+## What it covers
+
+A full beginner layer-by-layer path:
+
+1. **White cross**
+2. **White corners**
+3. **Middle-layer edges**
+4. **Last layer** — orient edges, permute edges, permute corners, orient corners
+
+Each step is planned from *your* current cube state. Lessons include strategy intros, progress tracking, undo, re-scan/resync, and an optional avoid-back mode that turns Back-face moves into front-facing turns.
+
+Also included:
+
+- **Notation & anatomy** intro (pieces, faces, turns, rotations)
+- **Cases** reference — browse algorithms and preview them on the cube
+- **Scan validation & manual fix** — catch bad scans and correct stickers before learning
+
+## Using the app
+
+1. **Notation** — Optional intro to cube vocabulary (you can skip it next time).
+2. **Scan** — Capture all six faces. Confirm or fix colors if the detector misses something. Validation will flag impossible sticker counts before you continue.
+3. **Learn** — Watch the demo, do the moves on your physical cube, then **Apply on my cube & continue**. Use undo, re-scan, or jump between lessons, notation, and cases from the nav.
+4. **Practice** — From a lesson, you can load a random scramble to practice without re-scanning.
 
 ## Prerequisites
 
@@ -30,8 +54,6 @@ npm test         # run the test suite
 npm run lint     # run ESLint
 ```
 
-## Using the app
+## Stack
 
-1. **Scan** — Allow camera access and capture all six faces of your cube. Confirm or correct the detected colors if needed.
-2. **Ready** — Inspect the virtual cube, then start the white cross or white corners lesson.
-3. **Learn** — Follow each step on your physical cube while watching the animated demo. Use **Practice: random scramble → lesson** at any time to skip scanning.
+React, TypeScript, Vite, Tailwind CSS, React Three Fiber / Three.js, Zustand, React Router. Deployed on Vercel.
