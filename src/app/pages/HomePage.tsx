@@ -1,11 +1,13 @@
 import { Navigate } from 'react-router';
 import { currentLessonPath } from '@/features/lesson/lessonLoader';
 import { NotationIntroPanel } from '@/features/notation/components/NotationIntroPanel';
+import { CubePromptPanel } from '@/features/onboarding/components/CubePromptPanel';
+import { ScrambleSetupView } from '@/features/onboarding/components/ScrambleSetupView';
 import { ScanView } from '@/features/scanner/components/ScanView';
 import { LessonResyncView } from '@/features/lesson/components/LessonResyncView';
 import { useCubeStore } from '@/app/store/cubeStore';
 
-/** Pre-learning pipeline: notation intro → scan/correct → lessonResync. */
+/** Pre-learning pipeline: notation → cube prompt → scan/scramble → lessonResync. */
 export function HomePage() {
   const appPhase = useCubeStore((state) => state.appPhase);
 
@@ -17,6 +19,22 @@ export function HomePage() {
     return (
       <div className="min-h-0 flex-1 overflow-y-auto">
         <NotationIntroPanel />
+      </div>
+    );
+  }
+
+  if (appPhase === 'cubePrompt') {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        <CubePromptPanel />
+      </div>
+    );
+  }
+
+  if (appPhase === 'scrambleSetup') {
+    return (
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <ScrambleSetupView />
       </div>
     );
   }

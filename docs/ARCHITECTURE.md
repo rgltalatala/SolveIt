@@ -62,11 +62,13 @@ Defined in `src/app/router/router.tsx`, wrapped by `AppLayout`:
 | Phase | UI |
 | --- | --- |
 | `notation` | `NotationIntroPanel` |
+| `cubePrompt` | `CubePromptPanel` (scrambled vs solved) |
+| `scrambleSetup` | `ScrambleSetupView` (alg + animated follow-along + confirm) |
 | `scanning` / `correcting` | `ScanView` |
 | `lessonResync` | `LessonResyncView` |
 | `learning` | Navigate to `currentLessonPath()` |
 
-Initial phase comes from `initialAppPhase()` in `src/domains/notation/notationPreferences.ts` (skip notation intro if previously completed).
+Initial phase comes from `initialAppPhase()` in `src/domains/notation/notationPreferences.ts` (`cubePrompt` if notation intro was previously completed, otherwise `notation`). Mid-lesson re-scan still jumps straight to `scanning`.
 
 ## State management
 

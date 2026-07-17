@@ -1,11 +1,10 @@
-import { isWholeCubeRotation } from '@/domains/cube/cubeState';
 import { getDemoStepChipLabel } from '@/domains/lesson-engine/studentHold/index';
 import { lessonLayout, moveSequenceDemo } from '@/content/beginner/tips';
 import {
+  MoveSequenceDemoMoveChips,
   useMoveSequenceDemoContext,
   type PlaybackSpeed,
 } from '@/shared/components/MoveSequenceDemo';
-import { demoMoveChipClassName } from '@/features/lesson/utils/demoMoveChipClassName';
 
 const SPEED_CYCLE: PlaybackSpeed[] = [0.5, 1, 2];
 
@@ -23,16 +22,6 @@ function practiceFocusIndex(
   if (activeMoveIndex >= 0) return activeMoveIndex;
   if (applied >= moveCount) return moveCount - 1;
   return applied;
-}
-
-function demoMoveChipText(
-  label: string,
-  done: boolean,
-  highlighted: boolean,
-): string {
-  if (highlighted) return `► ${label}`;
-  if (done) return `✓ ${label}`;
-  return label;
 }
 
 /**
@@ -54,13 +43,11 @@ export function LessonPracticePanel({
     instructions,
     instructionIndex,
     activeMoveIndex,
-    reverseAnimating,
     playbackSpeed,
     handleReset,
     handlePrev,
     handleNext,
     handlePlayAll,
-    handleJumpTo,
     setPlaybackSpeed,
   } = useMoveSequenceDemoContext();
 
@@ -164,44 +151,7 @@ export function LessonPracticePanel({
         <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-slate-500">
           {lessonLayout.algorithmHeading}
         </p>
-        <div
-          className="flex flex-wrap gap-1.5 p-0.5"
-          aria-label={lessonLayout.algorithmHeading}
-        >
-          {moves.map((m, i) => {
-            const done = reverseAnimating ? i < applied - 1 : i < applied;
-            const nextUp = i === activeMoveIndex && animating;
-            const isCurrentIdle = !animating && i === applied && applied < moves.length;
-            const highlighted = nextUp || isCurrentIdle;
-            const isRotation = isWholeCubeRotation(m);
-            const step = demoSteps?.[i];
-            const label = step ? getDemoStepChipLabel(step) : m;
-            const chipClass = demoMoveChipClassName({
-              isRotation,
-              done: done && !highlighted,
-              nextUp: highlighted,
-            });
-
-            return (
-              <button
-                key={`${m}-${i}`}
-                type="button"
-                disabled={animating}
-                title={
-                  isRotation
-                    ? moveSequenceDemo.wholeCubeRotationTitle
-                    : `Jump to ${label}`
-                }
-                aria-current={highlighted ? 'step' : undefined}
-                aria-label={`${label}${done ? ', done' : ''}${highlighted ? ', current' : ''}`}
-                className={`rounded-md px-2.5 py-1.5 font-mono text-sm font-semibold transition-colors disabled:cursor-wait ${chipClass}`}
-                onClick={() => handleJumpTo(i)}
-              >
-                {demoMoveChipText(label, done, highlighted)}
-              </button>
-            );
-          })}
-        </div>
+        <MoveSequenceDemoMoveChips />
       </div>
 
       <div className="rounded-lg border border-amber-900/30 bg-amber-950/15 px-3 py-2.5">

@@ -24,11 +24,12 @@ It is not a speedcubing trainer. It is a patient, layer-by-layer coach for first
 ## User flow
 
 1. **Notation (optional)** — Intro to pieces, faces, turns, and rotations. Can be skipped on later visits.
-2. **Scan** — Capture all six faces with the camera. Confirm or fix colors if detection misses something.
-3. **Validate & correct** — Impossible sticker counts and other issues are flagged before learning continues.
-4. **Resync into the curriculum** — The app places you on the right lesson (and first step) for how far the cube has progressed.
-5. **Learn** — Watch the demo, do the moves on your physical cube, then **Apply on my cube & continue**. Use undo, re-scan, or jump between lessons, notation, and cases from the nav.
-6. **Practice** — From a lesson, load a random scramble to practice without re-scanning.
+2. **Cube state prompt** — Choose whether you have a scrambled cube (scan) or a solved cube (follow a provided scramble).
+3. **Scan *or* scramble setup** — Either capture all six faces with the camera, or follow an animated scramble on a solved cube and confirm it matches.
+4. **Validate & correct** (scan path) — Impossible sticker counts and other issues are flagged before learning continues.
+5. **Resync into the curriculum** (scan path) — The app places you on the right lesson (and first step) for how far the cube has progressed.
+6. **Learn** — Watch the demo, do the moves on your physical cube, then **Apply on my cube & continue**. Use undo, re-scan, or jump between lessons, notation, and cases from the nav.
+7. **Practice** — From a lesson, load a random scramble to practice without re-scanning.
 
 Mid-lesson **re-scan / resync** is first-class: if the physical cube has moved ahead (or drifted), scanning again can jump you to the correct stage.
 
@@ -56,6 +57,7 @@ Beginner layer-by-layer:
 | **Avoid-back mode** | Prefer front-facing turns when demos would use `B`. Preference can default on for new B-containing examples. |
 | **Notation & anatomy** | Standalone intro and in-lesson reference for vocabulary and turns. |
 | **Cases reference** | Browse algorithms and preview them on the cube. |
+| **Scramble setup** | From a solved cube, follow an animated scramble, confirm the match, then open the white-cross lesson. |
 | **Practice scramble** | Skip scanning; load a scramble and open the white-cross lesson. |
 | **Session persistence** | Active learning sessions resume across reloads (localStorage). |
 

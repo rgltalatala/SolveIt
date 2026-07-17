@@ -14,7 +14,7 @@ export function NotationIntroPanel() {
     if (dontShowAgain) {
       setNotationIntroCompleted(true);
     }
-    setAppPhase('scanning');
+    setAppPhase('cubePrompt');
   };
 
   return (
@@ -49,7 +49,7 @@ export function NotationIntroPanel() {
           className="rounded-lg bg-emerald-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-emerald-600"
           onClick={handleContinue}
         >
-          {notationIntro.continueToScan}
+          {notationIntro.continue}
         </button>
       </footer>
     </section>

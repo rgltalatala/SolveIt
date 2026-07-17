@@ -6,10 +6,28 @@ const mirroredPreviewNote =
 export const notationIntro = {
   title: 'Cube notation & anatomy',
   subtitle:
-    "Before you scan your cube, let's cover how moves are written. It'll make every lesson step clearer.",
+    "Before you get started, let's cover how moves are written. It'll make every lesson step clearer.",
   openNotation: 'Explore notation',
   dontShowAgain: "Don't show this again when starting a new lesson",
-  continueToScan: 'Continue to scan',
+  continue: 'Continue',
+} as const;
+
+export const cubePrompt = {
+  title: 'How does your cube look?',
+  body: 'Do you have a scrambled cube ready to scan, or a solved cube you can scramble with us?',
+  scrambled: 'Scrambled',
+  solved: 'Solved',
+} as const;
+
+export const scrambleSetup = {
+  scrambleHeading: 'Scramble',
+  followAlong:
+    'Follow the scramble on your physical cube. Use the controls to play, step, or reset the animation.',
+  keyboardHint:
+    'Tip: use the left and right arrow keys to step through moves without clicking.',
+  confirmMatch:
+    "When you're done, check that your physical cube matches the virtual cube below.",
+  confirmContinue: 'My cube matches. Continue',
 } as const;
 
 export const faceInstructions: Record<Face, string> = {

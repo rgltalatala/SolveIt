@@ -21,6 +21,6 @@ export function setNotationIntroCompleted(completed: boolean): void {
 }
 
 /** Initial app phase: notation intro unless the user marked it complete. */
-export function initialAppPhase(): 'notation' | 'scanning' {
-  return getNotationIntroCompleted() ? 'scanning' : 'notation';
+export function initialAppPhase(): 'notation' | 'cubePrompt' {
+  return getNotationIntroCompleted() ? 'cubePrompt' : 'notation';
 }

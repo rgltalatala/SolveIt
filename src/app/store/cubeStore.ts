@@ -50,6 +50,8 @@ export interface CubeStore {
 
   appPhase:
     | 'notation'
+    | 'cubePrompt'
+    | 'scrambleSetup'
     | 'scanning'
     | 'correcting'
     | 'learning'

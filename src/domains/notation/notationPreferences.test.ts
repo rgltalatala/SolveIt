@@ -35,6 +35,6 @@ describe('notationPreferences', () => {
     stubStorage();
     expect(initialAppPhase()).toBe('notation');
     setNotationIntroCompleted(true);
-    expect(initialAppPhase()).toBe('scanning');
+    expect(initialAppPhase()).toBe('cubePrompt');
   });
 });

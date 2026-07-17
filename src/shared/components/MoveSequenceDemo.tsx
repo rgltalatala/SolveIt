@@ -414,6 +414,84 @@ export function MoveSequenceDemoControls({
   );
 }
 
+type MoveSequenceDemoMoveChipsProps = {
+  /** When true, chips jump playback to that move. Default true. */
+  interactive?: boolean;
+  'aria-label'?: string;
+};
+
+/** Highlighted move chips synced to demo playback (current / done / upcoming). */
+export function MoveSequenceDemoMoveChips({
+  interactive = true,
+  'aria-label': ariaLabel = lessonLayout.algorithmHeading,
+}: MoveSequenceDemoMoveChipsProps) {
+  const {
+    hasMoves,
+    moves,
+    demoSteps,
+    activeMoveIndex,
+    reverseAnimating,
+    applied,
+    animating,
+    handleJumpTo,
+  } = useMoveSequenceDemoContext();
+
+  if (!hasMoves) return null;
+
+  return (
+    <div className="flex flex-wrap gap-1.5 p-0.5" aria-label={ariaLabel}>
+      {moves.map((m, i) => {
+        const done = reverseAnimating ? i < applied - 1 : i < applied;
+        const nextUp = i === activeMoveIndex && animating;
+        const isCurrentIdle =
+          !animating && i === applied && applied < moves.length;
+        const highlighted = nextUp || isCurrentIdle;
+        const isRotation = isWholeCubeRotation(m);
+        const step = demoSteps?.[i];
+        const label = step ? getDemoStepChipLabel(step) : m;
+        const chipClass = demoMoveChipClassName({
+          isRotation,
+          done: done && !highlighted,
+          nextUp: highlighted,
+        });
+        const title = isRotation
+          ? moveSequenceDemo.wholeCubeRotationTitle
+          : interactive
+            ? `Jump to ${label}`
+            : undefined;
+
+        if (!interactive) {
+          return (
+            <span
+              key={`${m}-${i}`}
+              title={title}
+              aria-current={highlighted ? 'step' : undefined}
+              className={`rounded-md px-2.5 py-1.5 font-mono text-sm font-semibold ${chipClass}`}
+            >
+              {label}
+            </span>
+          );
+        }
+
+        return (
+          <button
+            key={`${m}-${i}`}
+            type="button"
+            disabled={animating}
+            title={title}
+            aria-current={highlighted ? 'step' : undefined}
+            aria-label={`${label}${done && !highlighted ? ', done' : ''}${highlighted ? ', current' : ''}`}
+            className={`rounded-md px-2.5 py-1.5 font-mono text-sm font-semibold transition-colors disabled:cursor-wait ${chipClass}`}
+            onClick={() => handleJumpTo(i)}
+          >
+            {label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export function MoveSequenceDemoStepInstructions() {
   const {
     hasMoves,
