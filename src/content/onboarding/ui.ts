@@ -15,6 +15,12 @@ export const ui = {
   rescanCube: 'Re-scan cube',
 } as const;
 
+export const madeBy = {
+  prefix: 'Made by ',
+  name: 'Raph',
+  href: 'https://github.com/rgltalatala',
+} as const;
+
 export const lessonLabels: Record<
   'white-cross' | 'white-corners' | 'middle-layer-edges' | 'last-layer',
   string
