@@ -28,7 +28,7 @@ export function PieceTypeCard({
   return (
     <button
       type="button"
-      className={`flex flex-col items-start gap-1 rounded-lg border bg-slate-950/40 px-3 py-2 text-left transition-colors hover:border-slate-500 ${borderClass}`}
+      className={`flex min-w-0 w-full flex-col items-start gap-1 rounded-lg border bg-slate-950/40 px-3 py-2 text-left transition-colors hover:border-slate-500 ${borderClass}`}
       aria-pressed={isActive}
       onMouseEnter={prefersHover ? () => onActivate(pieceType) : undefined}
       onMouseLeave={prefersHover ? onDeactivate : undefined}
@@ -39,7 +39,9 @@ export function PieceTypeCard({
       data-testid={`piece-type-card-${pieceType}`}
     >
       <span className="text-sm font-semibold">{label}</span>
-      <span className="text-xs leading-snug text-slate-400">{description}</span>
+      <span className="text-xs leading-snug wrap-break-word text-slate-400">
+        {description}
+      </span>
     </button>
   );
 }

@@ -1,4 +1,6 @@
-import { Line, Text } from '@react-three/drei';
+import { useEffect, useMemo } from 'react';
+import { Line } from '@react-three/drei';
+import { CanvasTexture, DoubleSide, LinearFilter } from 'three';
 import type { Face } from '@/domains/cube/cubeState';
 
 const LABEL_COLOR = '#ef4444';
@@ -61,6 +63,70 @@ type FaceAnatomyLabelsProps = {
   highlightedFace: Face | null;
 };
 
+function createFaceLetterTexture(face: Face, color: string): CanvasTexture {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) {
+    return new CanvasTexture(canvas);
+  }
+
+  ctx.clearRect(0, 0, size, size);
+  ctx.font = 'bold 84px system-ui, -apple-system, Segoe UI, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineJoin = 'round';
+  ctx.strokeStyle = '#111827';
+  ctx.lineWidth = 12;
+  ctx.strokeText(face, size / 2, size / 2 + 2);
+  ctx.fillStyle = color;
+  ctx.fillText(face, size / 2, size / 2 + 2);
+
+  const texture = new CanvasTexture(canvas);
+  texture.minFilter = LinearFilter;
+  texture.magFilter = LinearFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function FaceLetterLabel({
+  face,
+  position,
+  rotation,
+  color,
+  fontSize,
+  opacity,
+}: {
+  face: Face;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  color: string;
+  fontSize: number;
+  opacity: number;
+}) {
+  const texture = useMemo(
+    () => createFaceLetterTexture(face, color),
+    [face, color],
+  );
+
+  useEffect(() => () => texture.dispose(), [texture]);
+
+  return (
+    <mesh position={position} rotation={rotation} renderOrder={11}>
+      <planeGeometry args={[fontSize, fontSize]} />
+      <meshBasicMaterial
+        map={texture}
+        transparent
+        opacity={opacity}
+        depthTest={false}
+        side={DoubleSide}
+      />
+    </mesh>
+  );
+}
+
 export function FaceAnatomyLabels({ highlightedFace }: FaceAnatomyLabelsProps) {
   return (
     <group>
@@ -71,6 +137,7 @@ export function FaceAnatomyLabels({ highlightedFace }: FaceAnatomyLabelsProps) {
           const color = isHighlighted ? LABEL_COLOR : LABEL_COLOR_DIM;
           const fontSize = highlightedFace === face ? 1.05 : 0.85;
           const lineWidth = highlightedFace === face ? 3 : 1.5;
+          const opacity = isHighlighted ? 1 : 0.55;
 
           return (
             <group key={face}>
@@ -80,23 +147,17 @@ export function FaceAnatomyLabels({ highlightedFace }: FaceAnatomyLabelsProps) {
                   color={color}
                   lineWidth={lineWidth}
                   transparent
-                  opacity={isHighlighted ? 1 : 0.55}
+                  opacity={opacity}
                 />
               ) : null}
-              <Text
+              <FaceLetterLabel
+                face={face}
                 position={labelPosition}
                 rotation={rotation ?? [0, 0, 0]}
-                fontSize={fontSize}
                 color={color}
-                anchorX="center"
-                anchorY="middle"
-                outlineWidth={0.02}
-                outlineColor="#111827"
-                fillOpacity={isHighlighted ? 1 : 0.55}
-                renderOrder={11}
-              >
-                {face}
-              </Text>
+                fontSize={fontSize}
+                opacity={opacity}
+              />
             </group>
           );
         },

@@ -314,7 +314,7 @@ export function NotationGuide({
             <p className="mt-2 text-sm text-slate-300">
               {notationFaceNames.intro}
             </p>
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
               {FACE_NAME_LABELS.map(({ letter, label }) => (
                 <FaceNameCard
                   key={letter}
@@ -394,7 +394,7 @@ export function NotationGuide({
             <p className="mt-2 text-sm text-slate-300">
               {notationFaceTurns.intro}
             </p>
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
               {FACE_TURN_MOVES.map((move) => (
                 <NotationMoveCard
                   key={move}
@@ -427,7 +427,7 @@ export function NotationGuide({
             <p className="mt-2 text-sm text-slate-300">
               {notationCubeRotations.intro}
             </p>
-            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
               {CUBE_ROTATION_MOVES.map((move) => (
                 <NotationMoveCard
                   key={move}

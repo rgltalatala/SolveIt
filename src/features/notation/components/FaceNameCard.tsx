@@ -26,7 +26,7 @@ export function FaceNameCard({
   return (
     <button
       type="button"
-      className={`flex flex-col items-start gap-1 rounded-lg border bg-slate-950/40 px-3 py-2 text-left transition-colors hover:border-slate-500 ${borderClass}`}
+      className={`flex min-w-0 w-full flex-col items-start gap-1 rounded-lg border bg-slate-950/40 px-3 py-2 text-left transition-colors hover:border-slate-500 ${borderClass}`}
       aria-pressed={isActive}
       onMouseEnter={prefersHover ? () => onActivate(letter) : undefined}
       onMouseLeave={prefersHover ? onDeactivate : undefined}
@@ -37,7 +37,9 @@ export function FaceNameCard({
       data-testid={`face-name-card-${letter}`}
     >
       <span className="font-mono text-sm font-semibold">{letter}</span>
-      <span className="text-xs leading-snug text-slate-400">{label}</span>
+      <span className="text-xs leading-snug wrap-break-word text-slate-400">
+        {label}
+      </span>
     </button>
   );
 }

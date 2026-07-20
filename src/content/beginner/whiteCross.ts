@@ -42,7 +42,9 @@ export function whitePartnerEdgeHeading(partner: Color): string {
 export const whiteCrossSteps = {
   intro: {
     title: 'How this lesson works',
-    body: `The white cross is the foundation of every beginner solve, so it's worth taking your time here.
+    body: `Before you start, flip the cube so white is on the bottom and blue faces you. Yellow ends up on top. Keep white on the bottom for this whole beginner solve. We're building the cube layer by layer from the white face up, so that hold matters more than which side color is in front.
+
+The white cross is the foundation of every beginner solve, so it's worth taking your time here.
 
 Start by finding an edge by its colors, like the White–Blue Edge. Match its side sticker with the center of the same color, then turn that face to connect the edge with the white center on the bottom. Once both colors line up, that edge is solved in its home slot (DF, DR, DB, or DL).
 
