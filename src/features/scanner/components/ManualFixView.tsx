@@ -80,7 +80,7 @@ export function ManualFixView({ assembledFromScanned }: ManualFixViewProps) {
 
         {/*
           Narrow / mobile: left = Faces|Colors toggle + one 2×3 set, right = centered FaceGrid.
-          lg+: stacked faces → hint → colors → grid.
+          lg+: stacked hint → faces → colors → grid.
         */}
         <div className="grid min-h-0 flex-1 grid-cols-2 gap-3 overflow-hidden lg:flex lg:flex-col lg:gap-2.5">
           <div className="flex min-h-0 flex-col gap-2 lg:contents">
@@ -98,8 +98,12 @@ export function ManualFixView({ assembledFromScanned }: ManualFixViewProps) {
                 : manualFixCopy.showFaces}
             </button>
 
+            <p className="order-1 hidden shrink-0 text-sm text-slate-300 lg:block">
+              {manualFixCopy.paintHint}
+            </p>
+
             <div
-              className={`shrink-0 grid-cols-2 gap-1.5 lg:order-1 lg:flex lg:flex-wrap lg:gap-2 ${mobileTool === 'faces' ? 'grid' : 'hidden lg:flex'}`}
+              className={`shrink-0 grid-cols-2 gap-1.5 lg:order-2 lg:flex lg:flex-wrap lg:gap-2 ${mobileTool === 'faces' ? 'grid' : 'hidden lg:flex'}`}
             >
               {FACE_ORDER.map((face) => (
                 <button
@@ -115,10 +119,6 @@ export function ManualFixView({ assembledFromScanned }: ManualFixViewProps) {
                 </button>
               ))}
             </div>
-
-            <p className="order-2 hidden shrink-0 text-sm text-slate-300 lg:block">
-              {manualFixCopy.paintHint}
-            </p>
 
             <div
               className={`shrink-0 lg:order-3 ${mobileTool === 'colors' ? 'block' : 'hidden lg:block'}`}
