@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 
-export type LessonWorkspaceTabId = 'practice' | 'why' | 'hints' | 'more';
+export type LessonWorkspaceTabId = 'practice' | 'why' | 'more';
 
 export type LessonWorkspaceMode = 'intro' | 'active' | 'complete';
 
@@ -8,7 +8,6 @@ type UseLessonWorkspaceTabOptions = {
   mode: LessonWorkspaceMode;
   hasPractice: boolean;
   hasBody: boolean;
-  hasHints: boolean;
   hasMore: boolean;
 };
 
@@ -18,7 +17,6 @@ function buildVisibleTabs(
   const tabs: LessonWorkspaceTabId[] = [];
   if (options.hasPractice) tabs.push('practice');
   if (options.hasBody) tabs.push('why');
-  if (options.hasHints) tabs.push('hints');
   if (options.hasMore) tabs.push('more');
   return tabs;
 }
@@ -37,11 +35,11 @@ function defaultTab(
  * Lesson workspace tabs. Only one panel is shown at a time to avoid nested scrolling.
  */
 export function useLessonWorkspaceTab(options: UseLessonWorkspaceTabOptions) {
-  const { mode, hasPractice, hasBody, hasHints, hasMore } = options;
+  const { mode, hasPractice, hasBody, hasMore } = options;
 
   const tabs = useMemo(
-    () => buildVisibleTabs({ mode, hasPractice, hasBody, hasHints, hasMore }),
-    [mode, hasPractice, hasBody, hasHints, hasMore],
+    () => buildVisibleTabs({ mode, hasPractice, hasBody, hasMore }),
+    [mode, hasPractice, hasBody, hasMore],
   );
 
   const [tab, setTab] = useState<LessonWorkspaceTabId | null>(() =>
@@ -52,21 +50,21 @@ export function useLessonWorkspaceTab(options: UseLessonWorkspaceTabOptions) {
   useEffect(() => {
     if (prevModeRef.current !== mode) {
       prevModeRef.current = mode;
-      setTab(defaultTab({ mode, hasPractice, hasBody, hasHints, hasMore }, tabs));
+      setTab(defaultTab({ mode, hasPractice, hasBody, hasMore }, tabs));
       return;
     }
     if (tab !== null && !tabs.includes(tab)) {
-      setTab(defaultTab({ mode, hasPractice, hasBody, hasHints, hasMore }, tabs));
+      setTab(defaultTab({ mode, hasPractice, hasBody, hasMore }, tabs));
     } else if (tab === null && tabs.length > 0) {
-      setTab(defaultTab({ mode, hasPractice, hasBody, hasHints, hasMore }, tabs));
+      setTab(defaultTab({ mode, hasPractice, hasBody, hasMore }, tabs));
     }
-  }, [tabs, tab, mode, hasPractice, hasBody, hasHints, hasMore]);
+  }, [tabs, tab, mode, hasPractice, hasBody, hasMore]);
 
   return {
     tab:
       tab !== null && tabs.includes(tab)
         ? tab
-        : defaultTab({ mode, hasPractice, hasBody, hasHints, hasMore }, tabs),
+        : defaultTab({ mode, hasPractice, hasBody, hasMore }, tabs),
     setTab: (next: LessonWorkspaceTabId) => setTab(next),
     tabs,
   };

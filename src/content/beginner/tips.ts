@@ -88,7 +88,6 @@ export const demoStepChips = {
 export const lessonLayout = {
   cubeOrientationPanel: 'Cube orientation',
   lessonOptions: 'Lesson options',
-  lessonOptionsMenu: 'More lesson actions',
   practiceHeading: 'Practice',
   algorithmHeading: 'Algorithm',
   moveOf: (current: number, total: number) => `Move ${current} of ${total}`,
@@ -98,7 +97,6 @@ export const lessonLayout = {
   workspaceTabs: {
     practice: 'Practice',
     why: 'Why',
-    hints: 'Hints',
     more: 'More',
   },
 } as const;

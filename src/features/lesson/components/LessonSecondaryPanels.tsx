@@ -48,11 +48,9 @@ export function LessonSecondaryPanels({
   return (
     <div className="flex flex-col gap-2">
       {showOrientationPanel ? (
-        <details className="rounded-lg border border-slate-800 bg-slate-950/40 text-sm text-slate-400">
-          <summary className="cursor-pointer px-3 py-2 text-slate-400 hover:text-slate-200">
-            {lessonLayout.cubeOrientationPanel}
-          </summary>
-          <div className="space-y-2 border-t border-slate-800 px-3 py-2 text-xs leading-relaxed">
+        <div className="rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-xs leading-relaxed text-slate-400">
+          <p className="text-sm text-slate-300">{lessonLayout.cubeOrientationPanel}</p>
+          <div className="mt-2 space-y-2">
             <p>
               Hold your cube with{' '}
               <span className="text-slate-300">white on the bottom</span> and{' '}
@@ -70,7 +68,7 @@ export function LessonSecondaryPanels({
             ) : null}
             {orientationExtra}
           </div>
-        </details>
+        </div>
       ) : null}
 
       {avoidBack ? (

@@ -10,6 +10,7 @@ export const whiteCrossLesson = {
   completeBody:
     "Nice work. You've got all four cross edges. When you're ready, move on to white corners.",
   continueWhiteCorners: 'Continue: White corners',
+  // Reserved for a pre-lesson UI tour of lesson options and apply.
   sessionNotesSummary: 'Lesson session & reset',
   sessionNotes: [
     {
@@ -22,7 +23,7 @@ export const whiteCrossLesson = {
     },
     {
       label: 'Apply on my cube',
-      text: 'updates your virtual cube and advances the lesson. Any y2 bookends are stored on the cube; the internal hold flag resets each apply.',
+      text: 'applies the demo moves to your virtual cube and shows the next set of moves.',
     },
     {
       label: 'Reset lesson tips',

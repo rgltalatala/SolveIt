@@ -293,8 +293,6 @@ export function LearningMiddleLayerView() {
               middleLayerLesson.progress,
             )
           : undefined,
-        sessionNotesSummary: middleLayerLesson.sessionNotesSummary,
-        sessionNotes: middleLayerLesson.sessionNotes,
         canUndo,
         isStepPending,
         onUndo: handleUndoLessonStep,

@@ -225,8 +225,6 @@ export function LearningCrossView() {
         progress: showProgress
           ? crossLessonProgress(studentFrame, whiteCrossLesson.progress)
           : undefined,
-        sessionNotesSummary: whiteCrossLesson.sessionNotesSummary,
-        sessionNotes: whiteCrossLesson.sessionNotes,
         canUndo: canUndoLesson,
         isStepPending,
         onUndo: handleUndoLessonStep,

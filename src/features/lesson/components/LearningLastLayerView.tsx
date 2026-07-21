@@ -417,8 +417,6 @@ export function LearningLastLayerView() {
               phaseLabel: `${lastLayerLesson.subLessonPrefix} ${subLessonLabel}`,
             }
           : undefined,
-        sessionNotesSummary: 'Lesson session & reset',
-        sessionNotes: [],
         canUndo,
         isStepPending,
         onUndo: handleUndoLessonStep,

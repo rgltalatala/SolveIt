@@ -348,8 +348,6 @@ export function LearningCornersView() {
               whiteCornersLesson.progress,
             )
           : undefined,
-        sessionNotesSummary: whiteCornersLesson.sessionNotesSummary,
-        sessionNotes: whiteCornersLesson.sessionNotes,
         canUndo,
         isStepPending,
         onUndo: handleUndoLessonStep,

@@ -5,10 +5,9 @@ import { MoveSequenceDemoProvider } from '@/shared/components/MoveSequenceDemo';
 import type { DemoSnapshot } from '@/features/lesson/utils/lessonDemo';
 import { LessonCasePanel } from '@/features/lesson/components/LessonCasePanel';
 import { LessonApplyFooter } from '@/features/lesson/components/LessonApplyPanel';
-import { LessonHeader, type SessionNote } from '@/features/lesson/components/LessonHeader';
+import { LessonHeader } from '@/features/lesson/components/LessonHeader';
 import { LessonCubeStage } from '@/features/lesson/components/LessonCubeStage';
 import { LessonSecondaryPanels } from '@/features/lesson/components/LessonSecondaryPanels';
-import { LessonAvoidBackPanel } from '@/features/lesson/components/LessonAvoidBackPanel';
 import { LearningSplitLayout } from '@/shared/components/LearningSplitLayout';
 import { CubeView } from '@/domains/cube/3d/CubeView';
 import { LEARNING_CUBE_FRAME_CLASS } from '@/shared/components/LearningSplitLayout';
@@ -31,8 +30,6 @@ export type LessonViewShellProps = {
     subtitle?: string;
     titleClassName?: string;
     progress?: LessonProgressConfig;
-    sessionNotesSummary: string;
-    sessionNotes: readonly SessionNote[];
     canUndo: boolean;
     isStepPending: boolean;
     onUndo: () => void;
@@ -82,72 +79,32 @@ export type LessonViewShellProps = {
   };
 };
 
-function hasHintsContent(
+function hasMoreContent(
   secondary: LessonViewShellProps['secondary'],
   applyHint?: string,
-  sessionNotesCount = 0,
 ): boolean {
   return (
-    Boolean(secondary.avoidBack) ||
-    Boolean(applyHint) ||
-    sessionNotesCount > 0
-  );
-}
-
-function hasMoreContent(secondary: LessonViewShellProps['secondary']): boolean {
-  return (
     secondary.showOrientationPanel !== false ||
-    Boolean(secondary.orientationExtra)
+    Boolean(secondary.orientationExtra) ||
+    Boolean(secondary.avoidBack) ||
+    Boolean(applyHint)
   );
 }
 
-function HintsPanel({
+function MorePanel({
   secondary,
   applyHint,
-  sessionNotesSummary,
-  sessionNotes,
 }: {
   secondary: LessonViewShellProps['secondary'];
   applyHint?: string;
-  sessionNotesSummary: string;
-  sessionNotes: readonly SessionNote[];
 }) {
   return (
     <div className="flex flex-col gap-2 text-sm text-slate-300">
       {applyHint ? <p className="text-xs leading-relaxed">{applyHint}</p> : null}
-      {secondary.avoidBack ? (
-        <LessonAvoidBackPanel
-          frontColor={secondary.avoidBack.frontColor}
-          avoidBackMoves={secondary.avoidBack.avoidBackMoves}
-          onToggleAvoidBack={secondary.avoidBack.onToggleAvoidBack}
-          rememberAvoidBackDefault={
-            secondary.avoidBack.rememberAvoidBackDefault
-          }
-          onRememberDefaultChange={secondary.avoidBack.onRememberDefaultChange}
-          showRotationCallout={secondary.avoidBack.showRotationCallout}
-          onMarkCalloutSeen={secondary.avoidBack.onMarkCalloutSeen}
-          holdNote={secondary.avoidBack.holdNote}
-        />
-      ) : null}
-      {sessionNotes.length > 0 ? (
-        <div className="rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-xs text-slate-400">
-          <p className="font-medium text-slate-300">{sessionNotesSummary}</p>
-          <ul className="mt-1.5 list-disc space-y-1 pl-4 leading-relaxed">
-            {sessionNotes.map((note) => (
-              <li key={note.text}>
-                {note.label ? (
-                  <>
-                    <span className="text-slate-300">{note.label}</span>{' '}
-                    {note.text}
-                  </>
-                ) : (
-                  note.text
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
+      <LessonSecondaryPanels
+        {...secondary}
+        showOrientationPanel={secondary.showOrientationPanel !== false}
+      />
     </div>
   );
 }
@@ -180,39 +137,19 @@ function WorkspaceTabPanel({
   progress,
   secondary,
   applyHint,
-  sessionNotesSummary,
-  sessionNotes,
 }: {
   tab: LessonWorkspaceTabId | null;
   step: LessonViewShellProps['step'];
   progress?: LessonProgressConfig;
   secondary: LessonViewShellProps['secondary'];
   applyHint?: string;
-  sessionNotesSummary: string;
-  sessionNotes: readonly SessionNote[];
 }) {
   if (!tab) return null;
   if (tab === 'practice') {
     return <LessonPracticePanel practiceGoalSummary={step.practiceGoalSummary} />;
   }
   if (tab === 'why') return <GoalPanel step={step} progress={progress} />;
-  if (tab === 'hints') {
-    return (
-      <HintsPanel
-        secondary={secondary}
-        applyHint={applyHint}
-        sessionNotesSummary={sessionNotesSummary}
-        sessionNotes={sessionNotes}
-      />
-    );
-  }
-  return (
-    <LessonSecondaryPanels
-      {...secondary}
-      avoidBack={undefined}
-      showOrientationPanel={secondary.showOrientationPanel !== false}
-    />
-  );
+  return <MorePanel secondary={secondary} applyHint={applyHint} />;
 }
 
 /**
@@ -232,8 +169,6 @@ function LessonWorkflowColumn({
   demo,
   secondary,
   progress,
-  sessionNotesSummary,
-  sessionNotes,
   isStepPending,
   hasPractice,
 }: {
@@ -241,25 +176,17 @@ function LessonWorkflowColumn({
   demo?: LessonViewShellProps['demo'];
   secondary: LessonViewShellProps['secondary'];
   progress?: LessonProgressConfig;
-  sessionNotesSummary: string;
-  sessionNotes: readonly SessionNote[];
   isStepPending: boolean;
   hasPractice: boolean;
 }) {
   const mode = workspaceModeForDemo(demo);
   const hasBody = Boolean(step.body);
-  const hasHints = hasHintsContent(
-    secondary,
-    demo?.applyHint,
-    sessionNotes.length,
-  );
-  const hasMore = hasMoreContent(secondary);
+  const hasMore = hasMoreContent(secondary, demo?.applyHint);
 
   const { tab, setTab, tabs } = useLessonWorkspaceTab({
     mode,
     hasPractice,
     hasBody,
-    hasHints,
     hasMore,
   });
 
@@ -280,8 +207,6 @@ function LessonWorkflowColumn({
           progress={progress}
           secondary={secondary}
           applyHint={demo?.applyHint}
-          sessionNotesSummary={sessionNotesSummary}
-          sessionNotes={sessionNotes}
         />
       </div>
 
@@ -304,27 +229,26 @@ function CompleteWorkflowColumn({
   demo,
   secondary,
   progress,
-  sessionNotesSummary,
-  sessionNotes,
   isStepPending,
 }: {
   step: LessonViewShellProps['step'];
   demo?: LessonViewShellProps['demo'];
   secondary: LessonViewShellProps['secondary'];
   progress?: LessonProgressConfig;
-  sessionNotesSummary: string;
-  sessionNotes: readonly SessionNote[];
   isStepPending: boolean;
 }) {
   const hasBody = Boolean(step.body);
+  const completeSecondary = {
+    ...secondary,
+    showOrientationPanel: false as const,
+  };
+  const hasMore = hasMoreContent(completeSecondary);
   const tabs = useMemo<LessonWorkspaceTabId[]>(() => {
     const next: LessonWorkspaceTabId[] = [];
     if (hasBody) next.push('why');
-    if (secondary.showOrientationPanel !== false || secondary.orientationExtra) {
-      next.push('more');
-    }
+    if (hasMore) next.push('more');
     return next;
-  }, [hasBody, secondary.showOrientationPanel, secondary.orientationExtra]);
+  }, [hasBody, hasMore]);
   const [tab, setTab] = useState<LessonWorkspaceTabId | null>(tabs[0] ?? null);
 
   useEffect(() => {
@@ -348,9 +272,7 @@ function CompleteWorkflowColumn({
           tab={tab}
           step={step}
           progress={progress}
-          secondary={{ ...secondary, showOrientationPanel: false }}
-          sessionNotesSummary={sessionNotesSummary}
-          sessionNotes={sessionNotes}
+          secondary={completeSecondary}
         />
       </div>
 
@@ -378,9 +300,6 @@ export function LessonViewShell({
     Boolean(demo?.alternateActions) && !demo?.canApply && !cube.isComplete;
   const hasPractice = Boolean(demo) && !isIntroOnly && !cube.isComplete;
 
-  const showSecondaryInOverflow =
-    !cube.isComplete && Boolean(secondary.avoidBack);
-
   let sidebar: ReactNode = null;
   if (cube.isComplete) {
     sidebar = (
@@ -389,8 +308,6 @@ export function LessonViewShell({
         demo={demo}
         secondary={secondary}
         progress={header.progress}
-        sessionNotesSummary={header.sessionNotesSummary}
-        sessionNotes={header.sessionNotes}
         isStepPending={header.isStepPending}
       />
     );
@@ -401,8 +318,6 @@ export function LessonViewShell({
         demo={demo}
         secondary={secondary}
         progress={header.progress}
-        sessionNotesSummary={header.sessionNotesSummary}
-        sessionNotes={header.sessionNotes}
         isStepPending={header.isStepPending}
         hasPractice={hasPractice}
       />
@@ -411,17 +326,7 @@ export function LessonViewShell({
 
   return (
     <section className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-2 px-3 py-2 sm:px-4">
-      <LessonHeader
-        {...header}
-        overflowExtra={
-          showSecondaryInOverflow ? (
-            <LessonSecondaryPanels
-              {...secondary}
-              showOrientationPanel={false}
-            />
-          ) : undefined
-        }
-      />
+      <LessonHeader {...header} />
       {cube.isComplete ? (
         <LearningSplitLayout
           cube={

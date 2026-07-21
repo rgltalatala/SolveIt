@@ -14,8 +14,6 @@ type LessonHeaderProps = {
   subtitle?: string;
   titleClassName?: string;
   progress?: LessonProgressConfig;
-  sessionNotesSummary: string;
-  sessionNotes: readonly SessionNote[];
   canUndo: boolean;
   isStepPending: boolean;
   onUndo: () => void;
@@ -31,8 +29,6 @@ export function LessonHeader({
   subtitle,
   titleClassName,
   progress,
-  sessionNotesSummary,
-  sessionNotes,
   canUndo,
   isStepPending,
   onUndo,
@@ -81,17 +77,12 @@ export function LessonHeader({
       <details ref={optionsMenuRef} className="relative shrink-0 text-sm">
         <summary
           className="cursor-pointer list-none rounded-lg border border-slate-700 bg-slate-900/60 px-2.5 py-1.5 text-slate-300 hover:text-slate-100 [&::-webkit-details-marker]:hidden"
-          aria-label={lessonLayout.lessonOptionsMenu}
+          aria-label={lessonLayout.lessonOptions}
           title={lessonLayout.lessonOptions}
         >
-          <span aria-hidden="true" className="text-base leading-none">
-            ⋮
-          </span>
+          {lessonLayout.lessonOptions}
         </summary>
         <div className="absolute right-0 z-30 mt-1 w-64 max-h-[min(70dvh,420px)] overflow-y-auto rounded-lg border border-slate-700 bg-slate-900 p-3 shadow-xl">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            {lessonLayout.lessonOptions}
-          </p>
           <LessonHeaderActions
             canUndo={canUndo}
             isStepPending={isStepPending}
@@ -100,27 +91,6 @@ export function LessonHeader({
             onResetTips={onResetTips}
             extraActions={extraSessionActions}
           />
-          {sessionNotes.length > 0 ? (
-            <details className="mt-3 text-xs text-slate-400">
-              <summary className="cursor-pointer text-slate-300 hover:text-slate-100">
-                {sessionNotesSummary}
-              </summary>
-              <ul className="mt-2 list-disc space-y-1 pl-5 leading-relaxed">
-                {sessionNotes.map((note) => (
-                  <li key={note.text}>
-                    {note.label ? (
-                      <>
-                        <span className="text-slate-300">{note.label}</span>{' '}
-                        {note.text}
-                      </>
-                    ) : (
-                      note.text
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          ) : null}
           {overflowExtra ? (
             <div className="mt-3 flex flex-col gap-2 border-t border-slate-800 pt-3">
               {overflowExtra}

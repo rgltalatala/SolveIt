@@ -4,7 +4,6 @@ import type { LessonWorkspaceTabId } from '@/features/lesson/hooks/useLessonWork
 const TAB_LABELS: Record<LessonWorkspaceTabId, string> = {
   practice: lessonLayout.workspaceTabs.practice,
   why: lessonLayout.workspaceTabs.why,
-  hints: lessonLayout.workspaceTabs.hints,
   more: lessonLayout.workspaceTabs.more,
 };
 

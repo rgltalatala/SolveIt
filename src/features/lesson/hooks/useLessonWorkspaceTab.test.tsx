@@ -13,7 +13,6 @@ describe('useLessonWorkspaceTab', () => {
         mode: 'intro',
         hasPractice: false,
         hasBody: true,
-        hasHints: false,
         hasMore: true,
       }),
     );
@@ -27,11 +26,10 @@ describe('useLessonWorkspaceTab', () => {
         mode: 'active',
         hasPractice: true,
         hasBody: true,
-        hasHints: true,
-        hasMore: false,
+        hasMore: true,
       }),
     );
-    expect(result.current.tabs).toEqual(['practice', 'why', 'hints']);
+    expect(result.current.tabs).toEqual(['practice', 'why', 'more']);
     expect(result.current.tab).toBe('practice');
   });
 
@@ -41,7 +39,6 @@ describe('useLessonWorkspaceTab', () => {
         mode: 'active',
         hasPractice: false,
         hasBody: false,
-        hasHints: false,
         hasMore: false,
       }),
     );
@@ -56,7 +53,7 @@ describe('LessonWorkspaceTabs', () => {
     const user = userEvent.setup();
     render(
       <LessonWorkspaceTabs
-        tabs={['practice', 'why', 'hints', 'more']}
+        tabs={['practice', 'why', 'more']}
         activeTab="practice"
         onChange={onChange}
       />,
