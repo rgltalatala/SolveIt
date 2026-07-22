@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { cubePrompt } from '@/content/onboarding/onboarding';
 import { useCubeStore } from '@/app/store/cubeStore';
 import { renderWithRouter } from '@/shared/test/renderWithRouter';
-import { CubePromptPanel } from '@/features/onboarding/components/CubePromptPanel';
+import { CubeStatePrompt } from '@/features/onboarding/components/CubeStatePrompt';
 
-describe('CubePromptPanel', () => {
+describe('CubeStatePrompt', () => {
   afterEach(() => cleanup());
 
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe('CubePromptPanel', () => {
 
   it('sends scrambled choice to scanning', async () => {
     const user = userEvent.setup();
-    renderWithRouter(<CubePromptPanel />);
+    renderWithRouter(<CubeStatePrompt />);
 
     await user.click(
       screen.getByRole('button', { name: cubePrompt.scrambled }),
@@ -26,7 +26,7 @@ describe('CubePromptPanel', () => {
 
   it('sends solved choice to scrambleSetup', async () => {
     const user = userEvent.setup();
-    renderWithRouter(<CubePromptPanel />);
+    renderWithRouter(<CubeStatePrompt />);
 
     await user.click(screen.getByRole('button', { name: cubePrompt.solved }));
 

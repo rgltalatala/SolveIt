@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { CubeState, Color } from '@/domains/cube/cubeState';
 import type { LessonWorkspaceMode, LessonWorkspaceTabId } from '@/features/lesson/hooks/useLessonWorkspaceTab';
+import { useLessonUiTour } from '@/features/lesson/hooks/useLessonUiTour';
+import { TourPrompt } from '@/features/onboarding/components/TourPrompt';
 import { MoveSequenceDemoProvider } from '@/shared/components/MoveSequenceDemo';
 import type { DemoSnapshot } from '@/features/lesson/utils/lessonDemo';
 import { LessonCasePanel } from '@/features/lesson/components/LessonCasePanel';
@@ -299,6 +301,7 @@ export function LessonViewShell({
   const isIntroOnly =
     Boolean(demo?.alternateActions) && !demo?.canApply && !cube.isComplete;
   const hasPractice = Boolean(demo) && !isIntroOnly && !cube.isComplete;
+  const { promptOpen, startTour, declineTour } = useLessonUiTour(hasPractice);
 
   let sidebar: ReactNode = null;
   if (cube.isComplete) {
@@ -326,6 +329,11 @@ export function LessonViewShell({
 
   return (
     <section className="mx-auto flex h-full min-h-0 w-full max-w-6xl flex-col gap-2 px-3 py-2 sm:px-4">
+      <TourPrompt
+        open={promptOpen}
+        onStart={startTour}
+        onDecline={declineTour}
+      />
       <LessonHeader {...header} />
       {cube.isComplete ? (
         <LearningSplitLayout

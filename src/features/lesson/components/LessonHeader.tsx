@@ -69,7 +69,7 @@ export function LessonHeader({
           </p>
         ) : null}
         {progress ? (
-          <div className="mt-1.5">
+          <div className="mt-1.5" data-tour="progress">
             <LessonProgress progress={progress} compact />
           </div>
         ) : null}
@@ -79,6 +79,7 @@ export function LessonHeader({
           className="cursor-pointer list-none rounded-lg border border-slate-700 bg-slate-900/60 px-2.5 py-1.5 text-slate-300 hover:text-slate-100 [&::-webkit-details-marker]:hidden"
           aria-label={lessonLayout.lessonOptions}
           title={lessonLayout.lessonOptions}
+          data-tour="options"
         >
           {lessonLayout.lessonOptions}
         </summary>

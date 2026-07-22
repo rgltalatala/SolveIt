@@ -11,7 +11,7 @@ export const middleLayerLesson = {
     "All four middle-layer edges are in. When you're ready, tackle the last layer.",
   continueLastLayer: 'Continue: Last layer',
   preparingSubtitle: 'Finding a demo for this middle-layer edge…',
-  // Reserved for a pre-lesson UI tour of lesson options and apply.
+  // Tour copy for lesson options/apply lives in lessonUiTour.ts.
   sessionNotesSummary: 'Lesson session & reset',
   sessionNotes: [
     {

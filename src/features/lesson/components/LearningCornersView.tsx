@@ -16,6 +16,7 @@ import type { YRotationStep } from '@/domains/lesson-engine/studentHold/types';
 import { whiteCornersLesson } from '@/content/beginner/whiteCorners';
 import { preparing } from '@/content/beginner/tips';
 import { ui } from '@/content/onboarding/ui';
+import { resetUiTourForTips } from '@/features/lesson/hooks/useLessonUiTour';
 import { useLessonNavigation } from '@/features/lesson/hooks/useLessonNavigation';
 import { useCubeStore } from '@/app/store/cubeStore';
 import { useWhiteCornerLessonStep } from '@/features/lesson/hooks/bottomLayer/useWhiteCornerLessonStep';
@@ -273,6 +274,7 @@ export function LearningCornersView() {
   const handleRestartLessonTips = () => {
     resetLessonSession();
     setAvoidBackMoves(false);
+    resetUiTourForTips();
     recomputeStep();
   };
 

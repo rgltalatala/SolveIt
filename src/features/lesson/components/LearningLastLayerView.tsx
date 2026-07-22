@@ -24,6 +24,7 @@ import type { YRotationStep } from '@/domains/lesson-engine/studentHold/types';
 import { lastLayerLesson } from '@/content/beginner/lastLayer';
 import { applyHints, preparing } from '@/content/beginner/tips';
 import { ui } from '@/content/onboarding/ui';
+import { resetUiTourForTips } from '@/features/lesson/hooks/useLessonUiTour';
 import { deriveLastLayerSubLessonId, lessonPath } from '@/features/lesson/lessonLoader';
 import { useLessonNavigation } from '@/features/lesson/hooks/useLessonNavigation';
 import { useCubeStore } from '@/app/store/cubeStore';
@@ -313,6 +314,7 @@ export function LearningLastLayerView() {
   const handleRestartLessonTips = () => {
     resetLessonSession();
     resetLastSession();
+    resetUiTourForTips();
     recomputeStep();
   };
 

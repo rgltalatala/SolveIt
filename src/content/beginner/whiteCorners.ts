@@ -14,7 +14,7 @@ export const whiteCornersLesson = {
     "All four white corners are in. When you're ready, move on to middle-layer edges.",
   continueMiddleLayer: 'Continue: Middle layer edges',
   preparingSubtitle: 'Finding a short demo for this corner…',
-  // Reserved for a pre-lesson UI tour of lesson options and apply.
+  // Tour copy for lesson options/apply lives in lessonUiTour.ts.
   sessionNotesSummary: 'Lesson session & reset',
   sessionNotes: [
     {

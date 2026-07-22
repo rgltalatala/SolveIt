@@ -10,7 +10,7 @@ export const whiteCrossLesson = {
   completeBody:
     "Nice work. You've got all four cross edges. When you're ready, move on to white corners.",
   continueWhiteCorners: 'Continue: White corners',
-  // Reserved for a pre-lesson UI tour of lesson options and apply.
+  // Tour copy for lesson options/apply lives in lessonUiTour.ts.
   sessionNotesSummary: 'Lesson session & reset',
   sessionNotes: [
     {

@@ -8,6 +8,7 @@ import {
 import { whiteCrossLesson } from '@/content/beginner/whiteCross';
 import { applyHints, lessonAvoidBack, preparing } from '@/content/beginner/tips';
 import { ui } from '@/content/onboarding/ui';
+import { resetUiTourForTips } from '@/features/lesson/hooks/useLessonUiTour';
 import { useLessonNavigation } from '@/features/lesson/hooks/useLessonNavigation';
 import { useCubeStore } from '@/app/store/cubeStore';
 import { useWhiteCrossLessonStep } from '@/features/lesson/hooks/bottomLayer/useWhiteCrossLessonStep';
@@ -174,6 +175,7 @@ export function LearningCrossView() {
     resetLessonSession();
     resetStrategyIntro();
     setAvoidBackMoves(false);
+    resetUiTourForTips();
     recomputeStep();
   };
 

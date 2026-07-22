@@ -51,7 +51,7 @@ export function LessonApplyFooter({
   }
   if (!canApply) return null;
   return (
-    <div className="shrink-0 border-t border-slate-800 pt-2">
+    <div className="shrink-0 border-t border-slate-800 pt-2" data-tour="apply">
       <div className="flex flex-col gap-1.5">
         <LessonApplyButton
           buttonLabel={applyLabel}

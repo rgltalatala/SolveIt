@@ -25,6 +25,7 @@ export function LessonWorkspaceTabs({
       className="flex shrink-0 gap-1 overflow-x-auto pb-0.5"
       role="tablist"
       aria-label="Lesson workspace"
+      data-tour="tabs"
     >
       {tabs.map((id) => {
         const isActive = id === activeTab;

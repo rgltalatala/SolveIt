@@ -102,6 +102,7 @@ export function LessonPracticePanel({
           className="flex flex-nowrap items-center gap-1 sm:gap-1.5"
           role="group"
           aria-label={lessonLayout.practiceHeading}
+          data-tour="controls"
         >
           <button
             type="button"

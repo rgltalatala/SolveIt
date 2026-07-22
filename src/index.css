@@ -22,3 +22,41 @@ body {
   background: #0f172a;
   color: #e2e8f0;
 }
+
+/* Lesson chrome tour (driver.js) — black text on default white popover */
+.lesson-ui-tour-popover {
+  color: #000;
+}
+
+.lesson-ui-tour-popover .driver-popover-title {
+  color: #000;
+  font-size: 1rem;
+}
+
+.lesson-ui-tour-popover .driver-popover-description {
+  color: #000;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.lesson-ui-tour-popover .driver-popover-next-btn,
+.lesson-ui-tour-popover .driver-popover-prev-btn {
+  background: #047857;
+  color: #fff;
+  border: 0;
+  text-shadow: none;
+}
+
+.lesson-ui-tour-popover .driver-popover-prev-btn {
+  background: #f1f5f9;
+  color: #000;
+  border: 1px solid #cbd5e1;
+}
+
+.lesson-ui-tour-popover .driver-popover-close-btn {
+  color: #64748b;
+}
+
+.lesson-ui-tour-popover .driver-popover-progress-text {
+  color: #000;
+}

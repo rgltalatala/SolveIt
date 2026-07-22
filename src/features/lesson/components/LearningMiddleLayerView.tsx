@@ -16,6 +16,7 @@ import type { YRotationStep } from '@/domains/lesson-engine/studentHold/types';
 import { middleLayerLesson } from '@/content/beginner/middleLayer';
 import { preparing } from '@/content/beginner/tips';
 import { ui } from '@/content/onboarding/ui';
+import { resetUiTourForTips } from '@/features/lesson/hooks/useLessonUiTour';
 import { useLessonNavigation } from '@/features/lesson/hooks/useLessonNavigation';
 import { useCubeStore } from '@/app/store/cubeStore';
 import { LAST_LAYER_LESSON_ID } from '@/domains/lesson-engine/layers/lastLayer/index';
@@ -226,6 +227,7 @@ export function LearningMiddleLayerView() {
 
   const handleRestartLessonTips = () => {
     resetLessonSession();
+    resetUiTourForTips();
     recomputeStep();
   };
 

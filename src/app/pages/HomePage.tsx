@@ -1,7 +1,7 @@
 import { Navigate } from 'react-router';
 import { currentLessonPath } from '@/features/lesson/lessonLoader';
 import { NotationIntroPanel } from '@/features/notation/components/NotationIntroPanel';
-import { CubePromptPanel } from '@/features/onboarding/components/CubePromptPanel';
+import { CubeStatePrompt } from '@/features/onboarding/components/CubeStatePrompt';
 import { ScrambleSetupView } from '@/features/onboarding/components/ScrambleSetupView';
 import { ScanView } from '@/features/scanner/components/ScanView';
 import { LessonResyncView } from '@/features/lesson/components/LessonResyncView';
@@ -26,7 +26,7 @@ export function HomePage() {
   if (appPhase === 'cubePrompt') {
     return (
       <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-        <CubePromptPanel />
+        <CubeStatePrompt />
       </div>
     );
   }
