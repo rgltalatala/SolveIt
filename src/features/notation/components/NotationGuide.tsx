@@ -8,8 +8,9 @@ import {
   notationCubeRotations,
   notationFaceNames,
   notationFaceTurns,
-  notationGuide as notationGuideCopy,
+  notationPointerIntro,
   notationPositionLabels,
+  notationReplayAnimationsLabel,
 } from '@/content/notation/notation';
 import type { NotationSectionId } from '@/features/lesson/store/lessonSessionStore';
 import { FaceNameCard } from '@/features/notation/components/FaceNameCard';
@@ -264,7 +265,7 @@ export function NotationGuide({
                   checked={replayAnimations}
                   onChange={(e) => setReplayAnimations(e.target.checked)}
                 />
-                {notationGuideCopy.replayAnimations}
+                {notationReplayAnimationsLabel(prefersHover)}
               </label>
             ) : null}
           </div>
@@ -281,7 +282,7 @@ export function NotationGuide({
               {notationCubePieces.heading}
             </h2>
             <p className="mt-2 text-sm text-slate-300">
-              {notationCubePieces.intro}
+              {notationPointerIntro(prefersHover, notationCubePieces)}
             </p>
             <div className="mt-3 grid gap-3">
               {PIECE_TYPE_CARDS.map(({ pieceType, label, description }) => (
@@ -312,7 +313,7 @@ export function NotationGuide({
               {notationFaceNames.heading}
             </h2>
             <p className="mt-2 text-sm text-slate-300">
-              {notationFaceNames.intro}
+              {notationPointerIntro(prefersHover, notationFaceNames)}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
               {FACE_NAME_LABELS.map(({ letter, label }) => (
@@ -342,7 +343,7 @@ export function NotationGuide({
               {notationPositionLabels.heading}
             </h2>
             <p className="mt-2 text-sm text-slate-300">
-              {notationPositionLabels.intro}
+              {notationPointerIntro(prefersHover, notationPositionLabels)}
             </p>
             <h3 className="mt-4 text-sm font-semibold text-slate-200">
               {notationPositionLabels.edgesHeading}
@@ -392,7 +393,7 @@ export function NotationGuide({
               {notationFaceTurns.heading}
             </h2>
             <p className="mt-2 text-sm text-slate-300">
-              {notationFaceTurns.intro}
+              {notationPointerIntro(prefersHover, notationFaceTurns)}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
               {FACE_TURN_MOVES.map((move) => (
@@ -425,7 +426,7 @@ export function NotationGuide({
               {notationCubeRotations.heading}
             </h2>
             <p className="mt-2 text-sm text-slate-300">
-              {notationCubeRotations.intro}
+              {notationPointerIntro(prefersHover, notationCubeRotations)}
             </p>
             <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-2">
               {CUBE_ROTATION_MOVES.map((move) => (
